@@ -23,6 +23,7 @@ const FALLBACK: SiteChromeData = {
   contactEmailHref: "mailto:baselandquynhon@gmail.com",
   contactAddress: { vi: "41 Hoa Lư, Phường Quy Nhơn, Tỉnh Gia Lai", en: "41 Hoa Lư, Quy Nhơn Ward, Gia Lai Province" },
   footerCopyright: FOOTER_COPYRIGHT,
+  logoUrl: null,
 };
 
 function menuTypeToHref(item: { type: string; href: string | null; targetSlug: string | null }): string {
@@ -57,6 +58,7 @@ export const getSiteChromeData = cache(async function getSiteChromeData(): Promi
     contactEmailHref: settings.contactEmailHref,
     contactAddress: { vi: settings.addressVi, en: settings.addressEn },
     footerCopyright: FOOTER_COPYRIGHT,
+    logoUrl: settings.logoUrl,
   };
 });
 

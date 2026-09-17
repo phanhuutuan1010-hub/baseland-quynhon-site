@@ -13,7 +13,7 @@ export function Footer({ data }: { data: SiteChromeData }) {
       <div className="mx-auto flex max-w-[1440px] flex-wrap justify-between gap-10 border-b border-[var(--color-border-on-dark)] pb-8">
         <div className="max-w-80">
           <div className="mb-5 flex items-center gap-3">
-            <Image src="/images/brand/icon-baseland.png" alt="Base Land" width={54} height={24} className="h-6 w-auto" />
+            <Image src={data.logoUrl || "/images/brand/icon-baseland.png"} alt="Base Land" width={54} height={24} className="h-6 w-auto" />
             <span className="font-ui text-[13px] font-semibold tracking-[0.1em] text-[var(--color-warm-white)] uppercase">
               Quy Nhơn
             </span>

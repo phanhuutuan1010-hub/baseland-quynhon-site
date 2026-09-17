@@ -10,8 +10,9 @@ import type { HomeFeaturedProjectContent } from "@/lib/content/home";
 
 // The id="featured" anchor is targeted by HeroSection's primary CTA — kept
 // structural (not admin-editable) for the same reason as that href.
-// Image/link target are still hardcoded to Q'Terra pending Phase 2 (once a
-// real Project table exists to point this at instead of a raw path).
+// Link target is still hardcoded to Q'Terra pending a real Project picker
+// for this section; the image itself is admin-settable (imageSrc), falling
+// back to the built-in Q'Terra facade shot when unset.
 export function FeaturedProjectSection({ content }: { content: HomeFeaturedProjectContent }) {
   const { pick } = useLang();
   const t = pick(content);
@@ -22,7 +23,7 @@ export function FeaturedProjectSection({ content }: { content: HomeFeaturedProje
         <div className="mb-14 flex flex-wrap items-start gap-10 md:gap-20">
           <div className="aspect-4/3 min-w-[280px] flex-1 basis-115 border border-[var(--color-sand)] box-border">
             <Image
-              src="/images/qterra/qterra-facade.jpg"
+              src={t.imageSrc || "/images/qterra/qterra-facade.jpg"}
               alt="Phối cảnh Q'Terra Quy Nhơn"
               width={800}
               height={600}

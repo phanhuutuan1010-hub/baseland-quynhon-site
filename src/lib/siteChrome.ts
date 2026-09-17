@@ -15,4 +15,7 @@ export type SiteChromeData = {
   contactEmailHref: string;
   contactAddress: Localized<string>;
   footerCopyright: Localized<string>;
+  /** Admin-set logo (Settings > Chung) — falls back to the built-in Base
+   * Land mark (Nav.tsx/Footer.tsx) when unset. */
+  logoUrl: string | null;
 };

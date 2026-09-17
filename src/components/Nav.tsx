@@ -46,7 +46,7 @@ export function Nav({ data }: { data: SiteChromeData }) {
         style={{ transitionTimingFunction: "var(--ease-editorial)" }}
       >
         <Link href="/" className="flex items-center gap-3 no-underline">
-          <Image src="/images/brand/icon-baseland.png" alt="Base Land Quy Nhơn — về trang chủ" width={54} height={24} className="h-6 w-auto" priority />
+          <Image src={data.logoUrl || "/images/brand/icon-baseland.png"} alt="Base Land Quy Nhơn — về trang chủ" width={54} height={24} className="h-6 w-auto" priority />
           <span className={`font-ui text-[13px] font-semibold tracking-[0.1em] uppercase whitespace-nowrap ${textColor}`}>
             Quy Nhơn
           </span>

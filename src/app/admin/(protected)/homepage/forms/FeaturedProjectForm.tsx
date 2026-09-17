@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AdminTextField, AdminTextAreaField } from "@/components/admin/AdminField";
+import { MediaPickerField } from "@/components/admin/MediaPickerField";
 import { LangToggle } from "@/components/admin/LangToggle";
 import { SaveBar } from "@/components/admin/SaveBar";
 import { RepeatableStringList } from "@/components/admin/RepeatableList";
@@ -17,6 +18,7 @@ type FeaturedValue = {
   scaleValue: string;
   cta: string;
   amenities: string[];
+  imageSrc?: string;
 };
 
 export function FeaturedProjectForm({ initial }: { initial: { vi: FeaturedValue; en: FeaturedValue } }) {
@@ -26,12 +28,20 @@ export function FeaturedProjectForm({ initial }: { initial: { vi: FeaturedValue;
   const current = lang === "vi" ? vi : en;
   const setCurrent = lang === "vi" ? setVi : setEn;
 
+  // Not language-specific, but content is stored once per language — write
+  // to both so switching the VI/EN tab never shows a different value.
+  function setImageSrc(url: string) {
+    setVi((prev) => ({ ...prev, imageSrc: url }));
+    setEn((prev) => ({ ...prev, imageSrc: url }));
+  }
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-col gap-5 p-6">
+        <MediaPickerField label="Ảnh (để trống = dùng ảnh Q'Terra mặc định)" value={current.imageSrc ?? ""} onChange={setImageSrc} kindFilter="IMAGE" />
         <LangToggle value={lang} onChange={setLang} />
         <p className="m-0 -mb-2 font-body text-xs text-[var(--color-text-muted)]">
-          Ảnh và link dự án hiện đang cố định (Q&apos;Terra) — sẽ chọn được dự án thật khi có module Project (Phase 2).
+          Link dự án hiện đang cố định (Q&apos;Terra) — sẽ chọn được dự án thật khi có bộ chọn Project trong section này.
         </p>
         <AdminTextField label="Kicker" value={current.kicker} onChange={(v) => setCurrent({ ...current, kicker: v })} />
         <AdminTextField label="Tiêu đề" value={current.title} onChange={(v) => setCurrent({ ...current, title: v })} />

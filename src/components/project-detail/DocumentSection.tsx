@@ -25,12 +25,23 @@ export function DocumentSection({ id, data }: { id: string; data: ProjectDocumen
                 </div>
                 <div className="font-body text-sm text-[var(--color-text-muted)]">{pick(d.note)}</div>
               </div>
-              <Link
-                href={data.ctaHref}
-                className="whitespace-nowrap font-ui text-xs font-bold tracking-[0.08em] text-[var(--project-primary-text)] uppercase no-underline hover:text-[var(--project-primary-dark)]"
-              >
-                {pick(data.ctaLabel)}
-              </Link>
+              {d.fileUrl ? (
+                <a
+                  href={d.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="whitespace-nowrap font-ui text-xs font-bold tracking-[0.08em] text-[var(--project-primary-text)] uppercase no-underline hover:text-[var(--project-primary-dark)]"
+                >
+                  {pick(data.ctaLabel)}
+                </a>
+              ) : (
+                <Link
+                  href={data.ctaHref}
+                  className="whitespace-nowrap font-ui text-xs font-bold tracking-[0.08em] text-[var(--project-primary-text)] uppercase no-underline hover:text-[var(--project-primary-dark)]"
+                >
+                  {pick(data.ctaLabel)}
+                </Link>
+              )}
             </div>
           ))}
         </div>

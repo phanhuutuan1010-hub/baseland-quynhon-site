@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
+import { MediaPickerModal } from "@/components/admin/MediaPickerModal";
 
 // Feature set intentionally matches the CMS spec exactly: heading/
 // paragraph/bold/italic/link/image/quote/list — nothing more. The server
@@ -11,6 +13,7 @@ import ImageExtension from "@tiptap/extension-image";
 // src/lib/server/sanitizeHtml.ts), so this editor's output is a UX
 // convenience, not the security boundary.
 export function RichTextEditor({ value, onChange }: { value: string; onChange: (html: string) => void }) {
+  const [pickerOpen, setPickerOpen] = useState(false);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3] } }),
@@ -59,12 +62,15 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
           if (url) editor.chain().focus().setLink({ href: url }).run();
           else editor.chain().focus().unsetLink().run();
         })}
-        {toolbarBtn("Image", false, () => {
-          const url = window.prompt("URL ảnh:");
-          if (url) editor.chain().focus().setImage({ src: url }).run();
-        })}
+        {toolbarBtn("Image", false, () => setPickerOpen(true))}
       </div>
       <EditorContent editor={editor} />
+      <MediaPickerModal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        kindFilter="IMAGE"
+        onSelect={(url) => editor.chain().focus().setImage({ src: url }).run()}
+      />
     </div>
   );
 }

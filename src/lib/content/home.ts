@@ -29,6 +29,11 @@ export type HomeContent = {
     scaleValue: string;
     cta: string;
     amenities: string[];
+    /** Optional admin-set photo — falls back to the built-in Q'Terra facade
+     * shot when unset. Duplicated in vi/en like heroImageSrc (not language-
+     * specific, just stored once per language because that's this
+     * section's shape). */
+    imageSrc?: string;
   };
   local: {
     kicker: string;

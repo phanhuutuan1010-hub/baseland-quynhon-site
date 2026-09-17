@@ -38,6 +38,7 @@ const featuredProjectContent = z.object({
   scaleValue: z.string().trim(),
   cta: z.string().trim(),
   amenities: z.array(z.string().trim()),
+  imageSrc: z.string().trim().optional().or(z.literal("")),
 });
 
 const projectsTeaserContent = z.object({

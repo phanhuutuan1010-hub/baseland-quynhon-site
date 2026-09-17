@@ -343,7 +343,14 @@ export type ProjectFAQ = {
   navLabel?: Localized<string>;
 };
 
-export type ProjectDocumentItem = { name: Localized<string>; note: Localized<string> };
+export type ProjectDocumentItem = {
+  name: Localized<string>;
+  note: Localized<string>;
+  /** Optional — a document row may exist before the real PDF is ready.
+   * Absent means the row renders as a listed-but-not-yet-downloadable item
+   * (no broken link) rather than an empty href. */
+  fileUrl?: string;
+};
 
 export type ProjectDocuments = {
   eyebrow: Localized<string>;

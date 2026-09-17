@@ -62,13 +62,16 @@ function FieldEditor({
   }
 
   if (typeof value === "string") {
-    // Every image/video URL field across the 21 section types uses one of
-    // these two exact key names (see lib/project-detail/types.ts) — that
+    // Every image/video/document URL field across the 21 section types uses
+    // one of these exact key names (see lib/project-detail/types.ts) — that
     // naming convention is what lets one generic field detect "this is
     // media", same spirit as isLocalizedLeaf() detecting bilingual leaves
     // by shape rather than a per-section field map.
-    if (path === "src") return <MediaPickerField label="Ảnh" value={value} onChange={onChange} kindFilter="IMAGE" />;
+    if (path === "src" || path === "posterUrl" || path === "avatar") {
+      return <MediaPickerField label={prettifyKey(path)} value={value} onChange={onChange} kindFilter="IMAGE" />;
+    }
     if (path === "videoUrl") return <MediaPickerField label="Video" value={value} onChange={onChange} kindFilter="VIDEO" />;
+    if (path === "fileUrl") return <MediaPickerField label="Tài liệu" value={value} onChange={onChange} kindFilter="DOCUMENT" />;
     return <AdminTextField label={`${prettifyKey(path)} (chung, không tách ngôn ngữ)`} value={value} onChange={(v) => onChange(v)} />;
   }
 
