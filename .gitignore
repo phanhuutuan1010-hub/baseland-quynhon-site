@@ -38,6 +38,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# resize-photos.js scratch folders — local photos being prepped for upload,
+# never meant to be committed.
+/photos-in
+/photos-out
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
