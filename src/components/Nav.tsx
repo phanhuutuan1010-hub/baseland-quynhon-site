@@ -7,14 +7,27 @@ import { useEffect, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import type { SiteChromeData } from "@/lib/siteChrome";
 
+// Routes whose very first section is a full-bleed dark image/gradient the
+// transparent nav can sit on top of with white text before the user
+// scrolls. Every other route starts with a plain light section (e.g.
+// /news, /about, /privacy) — white-on-cream there was unreadable until the
+// first scroll tick flipped it solid, so those always render solid nav.
+function hasDarkHeroAtTop(pathname: string): boolean {
+  if (pathname === "/" || pathname === "/contact" || pathname === "/projects") return true;
+  if (pathname.startsWith("/projects/")) return true;
+  if (pathname.startsWith("/news/")) return true; // article pages always have an image/dark placeholder hero
+  return false;
+}
+
 export function Nav({ data }: { data: SiteChromeData }) {
-  const [solid, setSolid] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { lang, setLang, pick } = useLang();
   const pathname = usePathname();
+  const solid = scrolled || !hasDarkHeroAtTop(pathname);
 
   useEffect(() => {
-    const onScroll = () => setSolid(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
