@@ -45,7 +45,7 @@ export function ProjectMasterplan({ id, data }: { id: string; data: ProjectMaste
             transition: "opacity 700ms var(--ease-editorial), transform 900ms var(--ease-editorial)",
           }}
         >
-          {data.image ? (
+          {data.image?.src ? (
             <Image
               src={data.image.src}
               alt={pick(data.image.alt)}

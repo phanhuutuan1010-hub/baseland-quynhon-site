@@ -63,7 +63,7 @@ export function ProjectPhotoStatement({
           transition: "transform 1100ms var(--ease-editorial)",
         }}
       >
-        {data.image ? (
+        {data.image?.src ? (
           <Image src={data.image.src} alt={pick(data.image.alt)} fill className="object-cover" />
         ) : (
           <ImagePlaceholder

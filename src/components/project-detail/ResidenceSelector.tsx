@@ -52,7 +52,7 @@ export function ResidenceSelector({ id, data }: { id: string; data: ProjectResid
               key={activeUnit.key}
               className="relative aspect-4/3 animate-[fade-slide-in_400ms_var(--ease-editorial)] border border-[var(--color-border)] bg-[var(--color-sand)]"
             >
-              {activeUnit.floorPlanImage ? (
+              {activeUnit.floorPlanImage?.src ? (
                 <Image
                   src={activeUnit.floorPlanImage.src}
                   alt={pick(activeUnit.floorPlanImage.alt)}

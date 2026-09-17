@@ -8,18 +8,19 @@ import type { EditableProjectSectionKey } from "./project";
 // (that's the Homepage sections' shape, not Project sections'). Item
 // arrays start empty; the admin adds rows via the form's own "+ Thêm" control.
 const L = { vi: "", en: "" };
+const emptyImage = { src: "", alt: L };
 
 export const PROJECT_SECTION_DEFAULTS: Record<EditableProjectSectionKey, object> = {
   intro: { eyebrow: L, headline: L, body: L },
   stats: { items: [] },
   towers: { eyebrow: L, headline: L, towers: [] },
-  location: { eyebrow: L, headline: L, body: L, benefits: [] },
-  masterplan: { eyebrow: L, headline: L, body: L, zones: [], ctaLabel: L, ctaHref: "#lead" },
-  architecture: { headline: L, body: L },
+  location: { eyebrow: L, headline: L, body: L, mapImage: emptyImage, benefits: [] },
+  masterplan: { eyebrow: L, headline: L, body: L, image: emptyImage, zones: [], ctaLabel: L, ctaHref: "#lead" },
+  architecture: { headline: L, body: L, image: emptyImage },
   materialStory: { kicker: L, headline: L, body: L, swatches: [], galleryImages: [] },
   lifestyle: { eyebrow: L, headline: L, chapters: [] },
-  education: { headline: L, body: L },
-  views: { headline: L, body: L },
+  education: { headline: L, body: L, image: emptyImage },
+  views: { headline: L, body: L, image: emptyImage },
   investment: { eyebrow: L, headline: L, points: [], pricingTitle: L, pricingBody: L, pricingCtaLabel: L, pricingCtaHref: "#lead" },
   legal: { body: L, points: [] },
   faq: { eyebrow: L, headline: L, groupLabels: {}, items: [] },

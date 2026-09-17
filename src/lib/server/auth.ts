@@ -1,6 +1,7 @@
 import "server-only";
 
 import { randomBytes, createHash } from "node:crypto";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
@@ -95,7 +96,17 @@ export async function destroySession(): Promise<void> {
 // user" — every admin page/layout and every server action must call this (or
 // requireRole) themselves. The middleware only does a cheap pre-check; it
 // never grants access on its own.
-export async function getSessionUser(): Promise<User | null> {
+//
+// cache()-wrapped: a single page render often calls this 2-3 times (root
+// admin layout + a nested per-section layout + the page itself all guard
+// independently, by design — see each one's own comment). Without caching,
+// that's 2-3 redundant round trips to the session table for the exact same
+// cookie within one request; measured at ~600-1100ms each against this
+// project's Neon (ap-southeast-1) instance, so the redundancy alone could
+// add 1-2 extra seconds to a single page load. cache() (from "react") scopes
+// the memoized result to one request — it does not leak across users or
+// requests the way a module-level variable would.
+export const getSessionUser = cache(async (): Promise<User | null> => {
   const cookieStore = await cookies();
   const rawToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   if (!rawToken) return null;
@@ -109,7 +120,7 @@ export async function getSessionUser(): Promise<User | null> {
     return null;
   }
   return session.user;
-}
+});
 
 export async function requireUser(): Promise<User> {
   const user = await getSessionUser();

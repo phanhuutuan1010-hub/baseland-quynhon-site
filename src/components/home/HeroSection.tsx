@@ -6,10 +6,11 @@ import { HeroCarousel } from "@/components/HeroCarousel";
 import { useSequenceReveal, stepStyle, stepScaleStyle, lineRevealStyle } from "@/lib/useSequenceReveal";
 import type { HomeHeroContent } from "@/lib/content/home";
 
-// Carousel images and the two CTA hrefs (#featured / /contact) are
-// structural, not admin content — #featured must keep matching
-// FeaturedProjectSection's anchor id, so it isn't exposed as an editable
-// field (see Phase 1 scope note in the plan).
+// The two CTA hrefs (#featured / /contact) are structural — #featured must
+// keep matching FeaturedProjectSection's anchor id, so they aren't exposed
+// as editable fields (see Phase 1 scope note in the plan). The background
+// defaults to a 4-slide carousel but swaps to a single admin-set image
+// (heroImageSrc, via Media Library) when one is configured.
 export function HeroSection({ content }: { content: HomeHeroContent }) {
   const { pick } = useLang();
   const t = pick(content);
@@ -19,12 +20,16 @@ export function HeroSection({ content }: { content: HomeHeroContent }) {
     <section className="relative h-screen min-h-[640px] w-full overflow-hidden">
       <div style={{ opacity: entered ? 1 : 0, transition: "opacity 600ms var(--ease-editorial)" }}>
         <HeroCarousel
-          slides={[
-            { src: "/images/qterra/qterra-facade.jpg", alt: "Phối cảnh Q'Terra Quy Nhơn" },
-            { placeholder: "Ảnh biển Quy Nhơn" },
-            { src: "/images/qterra/qterra-amenities.jpg", alt: "Tiện ích & kiến trúc Q'Terra" },
-            { placeholder: "Ảnh skyline Quy Nhơn" },
-          ]}
+          slides={
+            t.heroImageSrc
+              ? [{ src: t.heroImageSrc, alt: t.eyebrow || "Base Land Quy Nhơn" }]
+              : [
+                  { src: "/images/qterra/qterra-facade.jpg", alt: "Phối cảnh Q'Terra Quy Nhơn" },
+                  { placeholder: "Ảnh biển Quy Nhơn" },
+                  { src: "/images/qterra/qterra-amenities.jpg", alt: "Tiện ích & kiến trúc Q'Terra" },
+                  { placeholder: "Ảnh skyline Quy Nhơn" },
+                ]
+          }
         />
       </div>
       <div

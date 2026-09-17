@@ -26,7 +26,7 @@ export function AmenitySection({ id, data }: { id: string; data: ProjectAmenitie
               }`}
             >
               <div className="aspect-16/10 min-w-65 w-full flex-1 basis-95 overflow-hidden">
-                {ch.image ? (
+                {ch.image?.src ? (
                   <Image src={ch.image.src} alt={pick(ch.image.alt)} width={960} height={600} className="h-full w-full object-cover" />
                 ) : (
                   <ImagePlaceholder label={pick(ch.title)} />

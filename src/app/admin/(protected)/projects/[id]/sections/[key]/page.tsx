@@ -65,7 +65,15 @@ export default async function ProjectSectionEditPage({ params }: { params: Promi
     ? await getNamedTableContent(key, id)
     : (await prisma.projectSection.findUnique({ where: { projectId_type: { projectId: id, type: KEY_TO_SECTION_TYPE[key] } } }))?.content;
 
-  const initial = (existingContent ?? PROJECT_SECTION_DEFAULTS[key]) as Record<string, unknown>;
+  // Shallow-merged with defaults rather than used as-is: real content saved
+  // before an optional top-level field (e.g. location.mapImage) existed in
+  // PROJECT_SECTION_DEFAULTS is missing that key entirely — and this form
+  // only edits keys already present in the object, never invents new ones
+  // — so without the merge, that field would silently never be editable.
+  const initial = {
+    ...(PROJECT_SECTION_DEFAULTS[key] as Record<string, unknown>),
+    ...((existingContent ?? {}) as Record<string, unknown>),
+  };
 
   return (
     <div className="flex flex-col gap-4">

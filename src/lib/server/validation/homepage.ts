@@ -13,6 +13,7 @@ const heroContent = z.object({
   tagline: z.string().trim(),
   ctaPrimary: z.string().trim(),
   ctaSecondary: z.string().trim(),
+  heroImageSrc: z.string().trim().optional().or(z.literal("")),
 });
 
 const introContent = z.object({

@@ -42,7 +42,7 @@ export function ProjectLocation({ id, data }: { id: string; data: ProjectLocatio
           </div>
           <div className="min-w-70 flex-1 basis-105">
             <div className="aspect-4/3 border border-[var(--project-border)] bg-[var(--color-sand)]">
-              {data.mapImage ? (
+              {data.mapImage?.src ? (
                 <Image
                   src={data.mapImage.src}
                   alt={pick(data.mapImage.alt)}
@@ -101,7 +101,7 @@ export function ProjectLocation({ id, data }: { id: string; data: ProjectLocatio
             {data.benefits.map((b, i) => (
               <Reveal key={pick(b.name)} delayMs={i * 120}>
                 <div className="mb-4.5 aspect-3/4 border border-[var(--color-border)]">
-                  {b.image ? (
+                  {b.image?.src ? (
                     <Image
                       src={b.image.src}
                       alt={pick(b.image.alt)}

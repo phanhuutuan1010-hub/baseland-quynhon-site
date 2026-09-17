@@ -6,6 +6,8 @@ export const createMediaSchema = z.object({
   url: z.string().trim().url(),
   mimeType: z.enum(ALLOWED_MIME_TYPES),
   size: z.number().int().positive(),
+  width: z.number().int().positive().optional(),
+  height: z.number().int().positive().optional(),
   titleVi: z.string().trim(),
   titleEn: z.string().trim(),
   altVi: z.string().trim().optional().or(z.literal("")),

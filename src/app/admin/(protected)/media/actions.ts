@@ -30,6 +30,8 @@ export async function createMedia(input: unknown): Promise<ActionResult & { id?:
       url: d.url,
       mimeType: d.mimeType,
       size: d.size,
+      width: d.width,
+      height: d.height,
       kind,
       titleVi: d.titleVi,
       titleEn: d.titleEn,

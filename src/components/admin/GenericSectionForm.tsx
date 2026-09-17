@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AdminTextField, AdminTextAreaField } from "@/components/admin/AdminField";
+import { MediaPickerField } from "@/components/admin/MediaPickerField";
 import { LangToggle } from "@/components/admin/LangToggle";
 import { SaveBar } from "@/components/admin/SaveBar";
 import { RepeatableStringList } from "@/components/admin/RepeatableList";
@@ -61,6 +62,13 @@ function FieldEditor({
   }
 
   if (typeof value === "string") {
+    // Every image/video URL field across the 21 section types uses one of
+    // these two exact key names (see lib/project-detail/types.ts) — that
+    // naming convention is what lets one generic field detect "this is
+    // media", same spirit as isLocalizedLeaf() detecting bilingual leaves
+    // by shape rather than a per-section field map.
+    if (path === "src") return <MediaPickerField label="Ảnh" value={value} onChange={onChange} kindFilter="IMAGE" />;
+    if (path === "videoUrl") return <MediaPickerField label="Video" value={value} onChange={onChange} kindFilter="VIDEO" />;
     return <AdminTextField label={`${prettifyKey(path)} (chung, không tách ngôn ngữ)`} value={value} onChange={(v) => onChange(v)} />;
   }
 

@@ -20,6 +20,18 @@ export const MAX_SIZE_BY_KIND: Record<MediaKind, number> = {
   DOCUMENT: 20 * 1024 * 1024,
 };
 
+// Raw (pre-compression) size cap for image uploads specifically — these go
+// through the server for resize/WebP conversion (see
+// src/app/api/media/upload-image/route.ts), unlike video/PDF which upload
+// browser-direct-to-Blob. Vercel Serverless Functions cap request body at
+// 4.5MB platform-wide; 4MB leaves headroom for multipart framing.
+export const MAX_RAW_IMAGE_UPLOAD_BYTES = 4 * 1024 * 1024;
+
+// Long edge cap after resize — large enough for any hero/banner use on this
+// site, small enough that a full-res camera photo doesn't ship untouched.
+export const IMAGE_MAX_DIMENSION = 2560;
+export const IMAGE_WEBP_QUALITY = 80;
+
 export function kindForMimeType(mimeType: string): MediaKind | null {
   if (mimeType.startsWith("image/")) return "IMAGE";
   if (mimeType.startsWith("video/")) return "VIDEO";

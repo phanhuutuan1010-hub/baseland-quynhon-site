@@ -2,11 +2,19 @@
 
 import { useState } from "react";
 import { AdminTextField } from "@/components/admin/AdminField";
+import { MediaPickerField } from "@/components/admin/MediaPickerField";
 import { LangToggle } from "@/components/admin/LangToggle";
 import { SaveBar } from "@/components/admin/SaveBar";
 import { updateHomepageSectionContent } from "../actions";
 
-type HeroValue = { eyebrow: string; headlineLines: [string, string]; tagline: string; ctaPrimary: string; ctaSecondary: string };
+type HeroValue = {
+  eyebrow: string;
+  headlineLines: [string, string];
+  tagline: string;
+  ctaPrimary: string;
+  ctaSecondary: string;
+  heroImageSrc?: string;
+};
 
 export function HeroForm({ initial }: { initial: { vi: HeroValue; en: HeroValue } }) {
   const [vi, setVi] = useState(initial.vi);
@@ -15,9 +23,18 @@ export function HeroForm({ initial }: { initial: { vi: HeroValue; en: HeroValue 
   const current = lang === "vi" ? vi : en;
   const setCurrent = lang === "vi" ? setVi : setEn;
 
+  // The background image isn't language-specific, but content is stored
+  // once per language (see validation/homepage.ts) — write it to both so
+  // switching the VI/EN tab never shows a different value.
+  function setHeroImageSrc(url: string) {
+    setVi((prev) => ({ ...prev, heroImageSrc: url }));
+    setEn((prev) => ({ ...prev, heroImageSrc: url }));
+  }
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-col gap-5 p-6">
+        <MediaPickerField label="Ảnh nền (để trống = dùng carousel mặc định)" value={current.heroImageSrc ?? ""} onChange={setHeroImageSrc} kindFilter="IMAGE" />
         <LangToggle value={lang} onChange={setLang} />
         <AdminTextField label="Eyebrow" value={current.eyebrow} onChange={(v) => setCurrent({ ...current, eyebrow: v })} />
         <AdminTextField

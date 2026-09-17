@@ -7,6 +7,11 @@ export type HomeContent = {
     tagline: string;
     ctaPrimary: string;
     ctaSecondary: string;
+    /** Optional admin-set background — falls back to the built-in 4-slide
+     * carousel (HeroCarousel) when unset. Duplicated in both vi/en (same
+     * value) purely because Homepage sections store one object per
+     * language — the image itself isn't language-specific. */
+    heroImageSrc?: string;
   };
   intro: { kicker: string; title: string; body: string };
   whyqn: {

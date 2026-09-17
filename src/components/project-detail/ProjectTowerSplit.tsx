@@ -53,7 +53,7 @@ function TowerPanel({ tower, curtainDelayMs }: { tower: ProjectTower; curtainDel
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {tower.image ? (
+      {tower.image?.src ? (
         <Image src={tower.image.src} alt={pick(tower.image.alt)} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
       ) : (
         <ImagePlaceholder label={pick(tower.placeholderLabel ?? tower.name)} tone="dark" className="rounded-none border-none" />

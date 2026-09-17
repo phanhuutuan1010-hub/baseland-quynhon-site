@@ -10,8 +10,13 @@ function createClient() {
   return new PrismaClient({ adapter });
 }
 
+// Cached on globalThis in every environment, not just dev. The common
+// "only cache outside production" version of this snippet is written to
+// survive dev's HMR module reloads, but on Vercel a warm serverless
+// function reuses the same Node process (and thus the same globalThis)
+// across multiple invocations — skipping the cache there means a fresh
+// PrismaClient/pooler connection gets created on every single request
+// instead of only on a true cold start, which is where the connection-setup
+// cost this session measured (~500-600ms) was actually coming from.
 export const prisma = globalForPrisma.prisma ?? createClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+globalForPrisma.prisma = prisma;
