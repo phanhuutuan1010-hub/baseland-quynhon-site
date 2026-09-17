@@ -1,0 +1,391 @@
+@import "tailwindcss";
+
+/*
+ * BASE LAND QUY NHƠN — design tokens.
+ * Source of truth: the Claude Design handoff bundle (design-tokens.css +
+ * CLAUDE.md locked standard). --color-clay follows CLAUDE.md's "exact brand
+ * hex" (#996c4e) rather than the stale value in the standalone tokens file.
+ */
+:root {
+  --color-warm-white: #faf5ee;
+  --color-sand: #e9dcc7;
+  --color-limestone: #dcd2c1;
+  --color-terracotta: #c1633c;
+  --color-terracotta-dark: #a34f2e;
+  --color-terracotta-light: #d9835c;
+  --color-clay: #996c4e;
+  --color-deep-earth: #3e2c22;
+  --color-charcoal: #262220;
+  --color-brand-green: #006a56;
+  --color-brand-green-dark: #00503f;
+  --color-brand-green-light: #1f8a71;
+  --color-ocean-blue: #2e5568;
+  --color-ocean-blue-light: #4a7b8f;
+  --color-error: #b3261e;
+
+  --color-bg: var(--color-warm-white);
+  --color-text: var(--color-charcoal);
+  --color-text-muted: #6b5f55;
+  --color-link: var(--color-ocean-blue);
+  --color-link-hover: var(--color-ocean-blue-light);
+  --color-border: rgba(38, 34, 32, 0.12);
+  --color-border-on-dark: rgba(250, 245, 238, 0.2);
+
+  /* WCAG-AA-guaranteed variants of Terracotta/Text-Muted — darker within the
+   * same hue family, for the specific contexts where the base token drops
+   * below 4.5:1 (eyebrow labels / secondary body text sitting on Sand or
+   * Limestone specifically; both already pass 4.5:1 on Warm White and stay
+   * untouched there). Verified against the darkest background in the
+   * palette (Limestone, #dcd2c1 — the worst case, so any lighter background
+   * passes too): terracotta-accessible 4.68:1, text-muted-accessible
+   * 5.15:1. Opt-in only — the base tokens are unchanged everywhere else. */
+  --color-terracotta-accessible: #8f4327;
+  --color-text-muted-accessible: #5c5148;
+
+  /* Semantic role aliases (additive — the concrete tokens above remain the
+   * source of truth for site chrome: Nav/Footer/StickyCta/Homepage/Contact/
+   * About/News keep referencing --color-brand-green/--color-terracotta
+   * directly and are unaffected by anything below).
+   * Brand Green = accent-primary (action role: solid CTAs, active nav,
+   * primary links). Terracotta = accent-secondary (material/local-color
+   * role: eyebrow labels, numbered markers, outline-CTA borders, dividers).
+   * Never swap these roles on the same component. */
+  --color-accent-primary: var(--color-brand-green);
+  --color-accent-secondary: var(--color-terracotta);
+
+  /* ---- Project Detail Template theme tokens ---------------------------
+   * Every shared project-detail component (ProjectHero, ProjectStats,
+   * ResidenceSelector, FloorPlanViewer, AmenitySection, InvestmentSection,
+   * TrustSection, DocumentSection, ProjectCTA, LeadFormFull, ...) reads
+   * ONLY these --project-* custom properties for its accent/CTA colors —
+   * never a concrete --color-* value directly. That's what lets one
+   * project (e.g. Simona Heights) re-skin every shared component through
+   * a single scoped override block (see [data-project-theme="simona"]
+   * below) without forking a single component file. The defaults here
+   * (unscoped, i.e. no data-project-theme attribute — currently only
+   * Q'Terra; The Sailing/Simona/Phú Gia each set their own `theme` and
+   * fully override this block) equal the site's own Brand Green /
+   * Terracotta roles, so nothing changes for a project that doesn't opt
+   * into a custom theme.
+   *
+   * --project-accent/-dark use the Accessible Terracotta variant (see
+   * --color-terracotta-accessible below), not the base --color-terracotta/
+   * -dark: the shared template reads --project-accent as TEXT color in
+   * many places (eyebrows, distance/time labels, NFA/NSA labels — see
+   * ProjectIntro, ProjectLocation, ProjectLifestyle, ResidenceSelector),
+   * where base Terracotta only reaches 3.78:1 against Warm White — below
+   * WCAG AA's 4.5:1. Swapping the reference here (not --color-terracotta
+   * itself, which stays untouched for every other sitewide use) fixes
+   * every one of those labels at once, for this project's default theme
+   * only — Simona/Phú Gia/The Sailing each define their own --project-
+   * accent independently and are unaffected. */
+  --project-primary: var(--color-brand-green);
+  --project-primary-dark: var(--color-brand-green-dark);
+  --project-primary-light: var(--color-brand-green-light);
+  --project-primary-foreground: var(--color-warm-white);
+  --project-accent: var(--color-terracotta-accessible);
+  --project-accent-dark: var(--color-terracotta-accessible);
+  --project-accent-light: var(--color-terracotta-light);
+  /* RGB triplet (no alpha) so components can build their own rgba() tint
+   * at whatever opacity a given divider/hover needs:
+   * rgba(var(--project-accent-rgb), 0.35). */
+  --project-accent-rgb: 143, 67, 39;
+  --project-primary-rgb: 0, 106, 86;
+  /* Text-link color for the shared "ctaLabel" link pattern (FloorPlanViewer,
+   * DocumentSection — a plain text link, not a button fill). Defaults to
+   * --project-primary itself: every theme except Simona uses Brand Green
+   * for primary, which already passes 4.5:1 as text. Simona overrides this
+   * alone (see its block) because its primary is a bright Gold meant for
+   * BUTTON fills with dark foreground text on top — darkening --project-
+   * primary itself to pass as text would drop that button's own internal
+   * contrast below 3:1. Keeping the two roles as separate tokens avoids
+   * that conflict without touching any other theme. */
+  --project-primary-text: var(--project-primary);
+  --project-background: var(--color-warm-white);
+  --project-surface: var(--color-sand);
+  --project-dark: var(--color-deep-earth);
+  --project-dark-alt: var(--color-charcoal);
+  --project-border: var(--color-border);
+  --project-muted: var(--color-text-muted);
+
+  --fs-hero: clamp(1.6rem, 7vw, 6rem);
+  --fs-h1: clamp(2.25rem, 4.5vw, 3.5rem);
+  --fs-h2: clamp(1.75rem, 3vw, 2.5rem);
+  --fs-h3: clamp(1.25rem, 2vw, 1.5rem);
+  --fs-body-lg: 1.125rem;
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+  --fs-label: 0.8125rem;
+
+  --lh-tight: 1.1;
+  --lh-heading: 1.25;
+  --lh-body: 1.65;
+  --ls-label: 0.14em;
+
+  --container-max: 1440px;
+  --shadow-sm: 0 1px 3px rgba(38, 34, 32, 0.08);
+  --shadow-md: 0 8px 24px rgba(38, 34, 32, 0.1);
+  --shadow-lg: 0 24px 64px rgba(38, 34, 32, 0.16);
+
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 240ms;
+  --duration-base: 480ms;
+  --duration-slow: 800ms;
+
+  --z-nav: 100;
+  --z-menu: 200;
+}
+
+@theme inline {
+  --color-warm-white: var(--color-warm-white);
+  --color-sand: var(--color-sand);
+  --color-limestone: var(--color-limestone);
+  --color-terracotta: var(--color-terracotta);
+  --color-terracotta-dark: var(--color-terracotta-dark);
+  --color-terracotta-light: var(--color-terracotta-light);
+  --color-clay: var(--color-clay);
+  --color-deep-earth: var(--color-deep-earth);
+  --color-charcoal: var(--color-charcoal);
+  --color-brand-green: var(--color-brand-green);
+  --color-brand-green-dark: var(--color-brand-green-dark);
+  --color-brand-green-light: var(--color-brand-green-light);
+  --color-ocean-blue: var(--color-ocean-blue);
+  --color-ocean-blue-light: var(--color-ocean-blue-light);
+  --color-error: var(--color-error);
+  --color-accent-primary: var(--color-accent-primary);
+  --color-accent-secondary: var(--color-accent-secondary);
+
+  --font-display: var(--font-prata), Georgia, serif;
+  --font-ui: var(--font-montserrat), -apple-system, sans-serif;
+  --font-body: var(--font-jakarta), -apple-system, sans-serif;
+
+  --text-hero: var(--fs-hero);
+  --text-h1: var(--fs-h1);
+  --text-h2: var(--fs-h2);
+  --text-h3: var(--fs-h3);
+  --text-body-lg: var(--fs-body-lg);
+  --text-label: var(--fs-label);
+  --text-label--letter-spacing: var(--ls-label);
+
+  --tracking-label: var(--ls-label);
+  --ease-editorial: var(--ease-editorial);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+}
+
+/* Tailwind's default radius scale already lines up with the token scale:
+   rounded-xs = 2px (radius-sm), rounded-sm = 4px (radius-md), rounded-lg = 8px
+   (radius-lg), rounded-full = pill. Use those defaults directly site-wide. */
+
+/*
+ * SIMONA HEIGHTS — "Simona Gold" project theme.
+ * Scopes every --project-* token (see the block above) to Gold × Art Deco
+ * for exactly the Simona Heights project-detail page. Applied via a
+ * `data-project-theme="simona"` attribute set independently on ProjectNav's
+ * own root and on ProjectPage's own root (see those components) — both
+ * read `project.theme` from the same ProjectDetailData object, so they
+ * stay in sync without sharing a DOM ancestor. Every other project
+ * (Q'Terra, The Sailing, and any future project with no `theme` field)
+ * falls through to the Brand Green / Terracotta defaults above untouched.
+ * Primary = Rich Gold with dark-charcoal foreground text (gold background,
+ * dark text — never white-on-gold, per the locked CTA spec). Accent =
+ * Champagne Gold, used the way Terracotta is used elsewhere: eyebrow
+ * labels, thin dividers, outline-CTA borders.
+ */
+[data-project-theme="simona"] {
+  --project-primary: #b08d4f; /* Rich Gold — button fills only */
+  --project-primary-dark: #8c6e3e; /* Antique Gold — hover */
+  --project-primary-light: #d4b98c; /* Champagne Gold */
+  --project-primary-foreground: #201b15; /* Deep charcoal text on gold */
+  /* Dark Antique Gold — passes 4.5:1 as TEXT everywhere in the palette
+   * (down to 4.84:1 on Limestone, the darkest light background); Rich Gold
+   * itself only reaches 2.86:1 as text, which is why this is a separate
+   * token from --project-primary rather than a darkened version of it
+   * (see the base :root block's comment on --project-primary-text). */
+  --project-primary-text: #6b532e;
+  /* Champagne Gold (#c9a876) only reached 2.07:1 as eyebrow/label text;
+   * Antique Gold (#8c6e3e) reached 3.17–4.38:1 depending on background —
+   * still short of 4.5:1 on Sand/Limestone. Both accent roles use this
+   * darker Antique Gold variant instead, verified against every light
+   * background in the palette (Warm White 6.67, Ivory 6.44, Sand 5.35,
+   * Limestone 4.84 — all ≥4.5:1). */
+  --project-accent: #6b532e;
+  --project-accent-dark: #6b532e;
+  --project-accent-light: #e3d3aa; /* Soft Gold — used as light text on Simona's dark sections only */
+  --project-accent-rgb: 107, 83, 46;
+  --project-primary-rgb: 176, 141, 79;
+  --project-background: #f7f1e6; /* Warm Ivory */
+  --project-surface: #ede7da; /* Pearl */
+  --project-dark: #17130f; /* Obsidian */
+  --project-dark-alt: #241c15; /* Deep Brown / Midnight Charcoal */
+  --project-border: rgba(176, 141, 79, 0.35);
+  --project-muted: #6b6459; /* Warm Gray */
+  /* Reserved for Sea/Harbour split + investment-value accents — not part
+     of the primary/accent CTA system, so components opt in explicitly
+     rather than inheriting them via --project-accent. */
+  --project-burgundy: #6e2a34;
+  --project-forest: #1f3d2e;
+  --project-ocean: #16323d;
+}
+
+/*
+ * PHÚ GIA ROYAL PARK — "Townhouse × Community × Commerce × Green" project
+ * theme. --project-primary* is deliberately left UNSET here (falls through
+ * to the Brand Green default above) — this project's CTA stays Brand Green
+ * sitewide, unlike Simona's gold override (see brief mục 0: "CTA color =
+ * Brand Green sitewide"). Only the editorial accent/surface tokens change,
+ * built around Olive/Garden Green as the distinguishing accent (Terracotta
+ * — the site's other material color — stays available as --project-secondary
+ * for occasional editorial use, never as a CTA color).
+ */
+[data-project-theme="phu-gia"] {
+  /* Olive #6f7d52 only reached 4.09:1 as eyebrow/label text on Warm White
+   * (worse on Sand/Limestone) — below WCAG AA's 4.5:1. Deep Olive passes
+   * everywhere in the palette (Limestone 4.91, the darkest light
+   * background) while staying in the same olive-green family. */
+  --project-accent: #4f5a3a; /* Deep Olive — editorial accent, not CTA */
+  --project-accent-dark: #4f5a3a;
+  --project-accent-light: #99a67a; /* Soft Sage — used as light text on dark sections only */
+  --project-accent-rgb: 79, 90, 58;
+  --project-background: var(--color-warm-white); /* Warm Ivory */
+  --project-surface: var(--color-limestone);
+  --project-dark: var(--color-deep-earth);
+  --project-dark-alt: var(--color-charcoal);
+  --project-border: rgba(111, 125, 82, 0.28);
+  --project-muted: #6b6355;
+  /* Secondary editorial color (Natural Terracotta) — material/local-color
+   * moments beside the olive green accent (mục 3). Not read automatically
+   * by any shared component; opt in explicitly, the way Simona's
+   * --project-burgundy/-forest/-ocean work. */
+  --project-secondary: var(--color-terracotta);
+}
+
+/*
+ * THE SAILING QUY NHƠN — "Sailing × Sea × City × Iconic Architecture"
+ * project theme. --project-primary* is deliberately left UNSET here (falls
+ * through to the Brand Green default above) — CTA stays Brand Green
+ * sitewide for this project too (mục 0), same as Q'Terra/Phú Gia and unlike
+ * Simona's gold override. The distinguishing accent is a very light Muted
+ * Gold — used only for thin dividers/eyebrow labels/outline-CTA borders,
+ * never a solid CTA fill — over a cool Sea Blue / Ocean Deep / Pearl
+ * palette (mục 3: "SEA BLUE × WHITE × ARCHITECTURAL DARK").
+ */
+[data-project-theme="the-sailing"] {
+  /* Muted Gold #b9a06a only reached 2.33:1 as eyebrow/label text, and Deep
+   * Muted Gold #8f7a4f 2.77–3.82:1 — both below WCAG AA's 4.5:1. This
+   * darker shade passes everywhere in the palette (Limestone 4.66, the
+   * darkest light background) while staying in the same muted-gold family. */
+  --project-accent: #685738; /* Dark Muted Gold — editorial accent, not CTA */
+  --project-accent-dark: #685738;
+  --project-accent-light: #d9c896; /* Pale Champagne — used as light text on dark sections only */
+  --project-accent-rgb: 104, 87, 56;
+  --project-background: #f2f5f4; /* Pearl */
+  --project-surface: #e3e8e6; /* Stone */
+  --project-dark: #0d2b3e; /* Ocean Deep */
+  --project-dark-alt: #0a1f2e; /* Deep Navy */
+  --project-border: rgba(31, 82, 115, 0.25); /* Sea Blue, low opacity */
+  --project-muted: #5b6265; /* Graphite */
+  /* Secondary editorial color (Terracotta) — a very light Base Land
+   * connective touch only (mục 3: "Terracotta chỉ secondary accent rất
+   * nhẹ"), never a CTA color. Not read automatically by any shared
+   * component; opt in explicitly, the way Simona's --project-burgundy/
+   * -forest/-ocean and Phú Gia's --project-secondary work. */
+  --project-secondary: var(--color-terracotta);
+  /* Reserved for the Sea Blue / Coastal Blue range used in Sea View /
+   * Architecture full-bleed moments — opt in explicitly (mục 4). */
+  --project-sea-blue: #1f5273;
+  --project-coastal-blue: #4a86a8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* @layer base (not a bare rule): bare/unlayered CSS beats every Tailwind
+ * utility regardless of specificity, since Tailwind's own utilities live
+ * inside @layer utilities. An unlayered `a { color }` here was silently
+ * overriding every text-[var(--color-*)] utility applied to a <Link>/<a>
+ * CTA site-wide, painting all button text --color-link (ocean-blue) instead
+ * of the intended white/charcoal. Layering it lets any component's color
+ * utility win as expected, while plain inline text links (no color utility
+ * of their own) still fall back to this default. */
+@layer base {
+  a {
+    color: var(--color-link);
+  }
+}
+
+::selection {
+  background: var(--color-terracotta);
+  color: var(--color-warm-white);
+}
+
+input,
+select,
+button,
+textarea {
+  font-family: var(--font-body);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-green-light);
+  outline-offset: 3px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Crossfade + slight slide used when switching content in place (unit-type
+ * tab in ResidenceSelector, floor-plan chip in FloorPlanViewer) — per the
+ * Q'Terra brief's mục 14 ("Animation: crossfade + slide nhẹ"). Applied by
+ * giving the swapped content a `key` tied to the active selection plus
+ * `animate-[fade-slide-in_400ms_var(--ease-editorial)]`, so React remounts
+ * and replays it on every switch. The reduced-motion rule above already
+ * collapses its duration to ~0, so no separate JS guard is needed here. */
+@keyframes fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

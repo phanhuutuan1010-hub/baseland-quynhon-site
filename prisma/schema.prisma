@@ -1,0 +1,455 @@
+// Admin CMS — Phase 0 (auth) + Phase 1 (Settings/Menu/Homepage) done. Later
+// phases add Project + its child tables, News, Media, Lead — see
+// C:\Users\ThinkPad\.claude\plans\lively-weaving-russell.md for the full
+// target schema and phase breakdown.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Connection URL lives in prisma.config.ts (Prisma ORM v7 removed
+// datasource.url from schema files) — see that file and src/lib/server/db.ts.
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  SALES
+}
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  passwordHash      String
+  name              String
+  role              Role
+  failedLoginCount  Int       @default(0)
+  lockedUntil       DateTime?
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
+  activityLogs        ActivityLog[]
+  assignedLeads       Lead[]
+
+  @@map("users")
+}
+
+// Opaque, DB-backed session — the cookie carries only the random raw token;
+// we store its SHA-256 hash so a leaked DB dump can't be replayed directly.
+// This (rather than a JWT) is what lets logout revoke access immediately.
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+// General "who changed what, when" trail. For the sensitive field groups
+// (Price/Legal/Ownership/Handover/Progress/Operator/Developer) callers are
+// required to also populate oldValue/newValue — enforced in code (see
+// src/lib/server/activityLog.ts), not at the schema level.
+model ActivityLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  entityType String
+  entityId   String
+  field      String?
+  oldValue   Json?
+  newValue   Json?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@map("activity_logs")
+}
+
+// Singleton row (always id = 1) — Contact/Analytics/Global site settings.
+// logo/favicon/defaultOgImage are plain URL strings for now (pointing at
+// existing /public/images assets); Phase 3 (Media Library) can convert them
+// to a Media relation without touching how Nav/Footer/layout consume them.
+model Settings {
+  id                Int      @id @default(1)
+  branchName        String
+  navCtaLabelVi     String
+  navCtaLabelEn     String
+  hotline           String
+  hotlineHref       String
+  contactEmail      String
+  contactEmailHref  String
+  addressVi         String
+  addressEn         String
+  mapsUrl           String?
+  socialLinks       Json?
+  gaId              String?
+  gtmId             String?
+  metaPixelId       String?
+  siteName          String
+  defaultLanguage   String   @default("vi")
+  logoUrl           String?
+  faviconUrl        String?
+  defaultOgImageUrl String?
+  updatedAt         DateTime @updatedAt
+
+  @@map("settings")
+}
+
+enum MenuType {
+  INTERNAL
+  EXTERNAL
+  PROJECT
+  NEWS
+  ANCHOR
+}
+
+// Flat list (no nesting) — matches the site's current single-level Nav.
+model MenuItem {
+  id         String   @id @default(cuid())
+  labelVi    String
+  labelEn    String
+  type       MenuType
+  href       String?
+  targetSlug String?
+  order      Int
+  enabled    Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("menu_items")
+}
+
+// The 9 real, independently orderable/hideable homepage sections. Footer is
+// deliberately not here — it's site-wide chrome driven by Settings + Menu,
+// not a homepage-only section (see plan file's scope decisions).
+enum HomepageSectionType {
+  HERO
+  INTRODUCTION
+  WHY_QUY_NHON
+  FEATURED_PROJECT
+  PROJECTS_TEASER
+  SERVICES
+  WHY_BASE_LAND
+  NEWS_TEASER
+  LEAD_CTA
+}
+
+// content is `{ vi: {...}, en: {...} }`, shaped exactly like the matching
+// slice of the old HomeContent type (src/lib/content/home.ts) — see
+// src/lib/server/mappers/homepage.ts for the exact per-type shape contract.
+model HomepageSection {
+  id        String              @id @default(cuid())
+  type      HomepageSectionType @unique
+  enabled   Boolean             @default(true)
+  order     Int
+  content   Json
+  updatedAt DateTime            @updatedAt
+
+  @@map("homepage_sections")
+}
+
+enum ProjectPublishStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// The 16 optional single-object sections from ProjectDetailData (everything
+// except hero/cta — always-present, stored as columns on Project — and the
+// 5 sections named explicitly in the CMS spec, which get their own tables
+// below). Render ORDER for these is fixed by ProjectPage.tsx, not by the
+// CMS — only content and show/hide (Project.sections) are admin-controlled.
+enum ProjectSectionType {
+  INTRO
+  STATS
+  TOWERS
+  LOCATION
+  MASTERPLAN
+  ARCHITECTURE
+  MATERIAL_STORY
+  LIFESTYLE
+  EDUCATION
+  VIEWS
+  INVESTMENT
+  LEGAL
+  FAQ
+  VERIFICATION
+  VIDEO_DUO
+  NEWS_TEASER
+}
+
+// One project detail page. hero/cta/sections/category/statusLabel are kept
+// as columns (always required, exactly matching ProjectDetailData's
+// non-optional fields); every other section lives in the related tables
+// below, content shaped exactly like its ProjectDetailData TS type — see
+// src/lib/server/mappers/project.ts for the assembly contract.
+model Project {
+  id                  String               @id @default(cuid())
+  slug                String               @unique
+  name                String
+  category            Json
+  statusLabel         Json
+  theme               String?
+  // Partial<Record<ProjectSectionKey, boolean>> — explicit show/hide
+  // override, same semantics as the original isSectionVisible().
+  sections             Json                @default("{}")
+  hero                 Json
+  cta                  Json
+  publishStatus        ProjectPublishStatus @default(DRAFT)
+  // When true, the public Verification section hides items not yet marked
+  // verified instead of showing them hedge-labeled (see mục 5/9 spec).
+  verificationRequired Boolean              @default(false)
+  // Optional SEO overrides — when unset, generateMetadata() falls back to
+  // the derived title/description/OG image it already computes from hero.
+  seoTitle             String?
+  seoDescription       String?
+  seoOgImageUrl        String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  publishedAt          DateTime?
+
+  projectSections ProjectSection[]
+  residences      ProjectResidences?
+  floorPlans      ProjectFloorPlans?
+  amenities       ProjectAmenities?
+  gallery         ProjectGallery?
+  documents       ProjectDocuments?
+  relatedNews     NewsProject[]
+  leads           Lead[]
+
+  @@map("projects")
+}
+
+model ProjectSection {
+  id        String             @id @default(cuid())
+  projectId String
+  type      ProjectSectionType
+  content   Json
+  updatedAt DateTime           @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, type])
+  @@map("project_sections")
+}
+
+// content is the full ProjectResidences object (frame fields + items[])
+// verbatim — one row per project (1-1), matching the explicit "residences"
+// table named in the CMS spec.
+model ProjectResidences {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  content   Json
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_residences")
+}
+
+model ProjectFloorPlans {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  content   Json
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_floor_plans")
+}
+
+model ProjectAmenities {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  content   Json
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_amenities")
+}
+
+model ProjectGallery {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  content   Json
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_gallery")
+}
+
+model ProjectDocuments {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  content   Json
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_documents")
+}
+
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+}
+
+// Fixed-ish taxonomy (mirrors the old NEWS_CATEGORIES), now editable —
+// order drives display order in the category filter chips.
+model Category {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  labelVi   String
+  labelEn   String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  news News[]
+
+  @@map("categories")
+}
+
+// contentVi/En store sanitized HTML from the Tiptap editor (see
+// src/lib/server/sanitizeHtml.ts) — never raw/unsanitized admin input.
+// featuredImageUrl is a plain URL string for now (same pattern as Settings'
+// logo/favicon) until the Media Library lands and can offer a real picker.
+model News {
+  id               String     @id @default(cuid())
+  slug             String     @unique
+  titleVi          String
+  titleEn          String
+  excerptVi        String
+  excerptEn        String
+  contentVi        String
+  contentEn        String
+  featuredImageUrl String?
+  tags             String[]   @default([])
+  categoryId       String
+  // Optional SEO overrides — when unset, generateMetadata() falls back to
+  // the derived title/description it already computes from title/excerpt.
+  seoTitle         String?
+  seoDescription   String?
+  status           NewsStatus @default(DRAFT)
+  publishedAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  category        Category      @relation(fields: [categoryId], references: [id])
+  relatedProjects NewsProject[]
+
+  @@map("news")
+}
+
+model NewsProject {
+  newsId    String
+  projectId String
+
+  news    News    @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@id([newsId, projectId])
+  @@map("news_projects")
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  ARCHIVED
+}
+
+// `source` is the free-text string every lead form on the site already
+// sends (e.g. "home", "contact", a project slug, or
+// "project-video/<slug>/<topic>") — projectId is resolved server-side from
+// that same string (see src/lib/server/leadProject.ts) rather than adding a
+// new prop to every lead form call site across the public site.
+// `notes` is a JSON array of `{ text, authorName, createdAt }` — free-form,
+// no separate note-history table (see plan's "không cần activity timeline
+// chi tiết, chỉ cần Notes tự do").
+model Lead {
+  id           String     @id @default(cuid())
+  name         String
+  phone        String
+  email        String?
+  message      String?
+  source       String
+  projectId    String?
+  status       LeadStatus @default(NEW)
+  assignedToId String?
+  notes        Json       @default("[]")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  project    Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  assignedTo User?    @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  @@map("leads")
+}
+
+enum MediaKind {
+  IMAGE
+  VIDEO
+  DOCUMENT
+}
+
+// Every upload goes through Vercel Blob (src/app/admin/(protected)/media/actions.ts)
+// — `url` is the public Blob URL, `filename` is the original upload name
+// (kept for display/download, not used to derive the URL). Old /public/images
+// assets are NOT migrated here — see plan's scope decision — this table only
+// tracks uploads made through the Media Library from here on.
+model Media {
+  id                     String    @id @default(cuid())
+  filename               String
+  url                    String    @unique
+  titleVi                String
+  titleEn                String
+  altVi                  String
+  altEn                  String
+  captionVi              String?
+  captionEn              String?
+  mimeType               String
+  size                   Int
+  width                  Int?
+  height                 Int?
+  kind                   MediaKind
+  // Normalized 0..1 crop anchor for future crop-aware image components —
+  // not yet consumed by any public component (see ADMIN_GUIDE.md mục 9).
+  focalX                 Float     @default(0.5)
+  focalY                 Float     @default(0.5)
+  // DOCUMENT-only: intent flag for gating a download behind the lead form —
+  // not yet enforced by the public Documents section (ADMIN_GUIDE.md mục 9).
+  requireLeadForDownload Boolean   @default(false)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@map("media")
+}
