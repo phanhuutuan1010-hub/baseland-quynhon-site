@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
@@ -27,7 +28,17 @@ export function ProjectsTeaserSection({ content }: { content: HomeProjectsTeaser
           {t.items.map((item, i) => (
             <div key={item.slotId || i}>
               <div className="relative mb-5 aspect-4/3">
-                <ImagePlaceholder label={item.name ? `${item.name}.jpg` : "Ảnh dự án"} />
+                {item.imageSrc ? (
+                  <Image
+                    src={item.imageSrc}
+                    alt={item.name || "Ảnh dự án"}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <ImagePlaceholder label={item.name ? `${item.name}.jpg` : "Ảnh dự án"} />
+                )}
                 {item.status && (
                   <div className="absolute top-3.5 left-3.5 rounded-full bg-[var(--color-warm-white)] px-3.5 py-1.5 font-ui text-[11px] font-bold tracking-[0.05em] text-[var(--color-deep-earth)] uppercase">
                     {item.status}

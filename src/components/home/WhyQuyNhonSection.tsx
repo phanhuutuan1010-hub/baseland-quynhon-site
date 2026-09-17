@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
@@ -25,8 +26,18 @@ export function WhyQuyNhonSection({ content }: { content: HomeWhyQuyNhonContent 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {t.points.map((point, i) => (
             <div key={point.label || i}>
-              <div className="mb-5 aspect-4/3">
-                <ImagePlaceholder label={point.label ? `Ảnh Quy Nhơn: ${point.label}` : "Ảnh Quy Nhơn"} />
+              <div className="relative mb-5 aspect-4/3">
+                {point.imageSrc ? (
+                  <Image
+                    src={point.imageSrc}
+                    alt={point.label || "Ảnh Quy Nhơn"}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <ImagePlaceholder label={point.label ? `Ảnh Quy Nhơn: ${point.label}` : "Ảnh Quy Nhơn"} />
+                )}
               </div>
               {point.label && (
                 <div className="mb-2.5 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--color-deep-earth)] uppercase">

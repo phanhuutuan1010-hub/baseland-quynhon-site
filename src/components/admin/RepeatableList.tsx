@@ -1,8 +1,11 @@
 import { AdminTextField } from "./AdminField";
+import { MediaPickerField } from "./MediaPickerField";
 
 // Generic array-editing UI shared by the homepage section forms — each form
 // still declares its own exact field list (no schema interpreter/page
 // builder), this only avoids re-implementing add/remove/row-layout each time.
+// `type: "image"` renders a MediaPickerField instead of a plain text input —
+// still just one declared field, not a schema interpreter.
 export function RepeatableObjectList<T extends Record<string, string>>({
   items,
   onChange,
@@ -11,7 +14,7 @@ export function RepeatableObjectList<T extends Record<string, string>>({
 }: {
   items: T[];
   onChange: (items: T[]) => void;
-  fields: { key: keyof T & string; label: string }[];
+  fields: { key: keyof T & string; label: string; type?: "text" | "image" }[];
   itemLabel: string;
 }) {
   function updateItem(index: number, key: keyof T & string, value: string) {
@@ -46,9 +49,13 @@ export function RepeatableObjectList<T extends Record<string, string>>({
             </button>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {fields.map((f) => (
-              <AdminTextField key={f.key} label={f.label} value={item[f.key] ?? ""} onChange={(v) => updateItem(index, f.key, v)} />
-            ))}
+            {fields.map((f) =>
+              f.type === "image" ? (
+                <MediaPickerField key={f.key} label={f.label} value={item[f.key] ?? ""} onChange={(v) => updateItem(index, f.key, v)} kindFilter="IMAGE" />
+              ) : (
+                <AdminTextField key={f.key} label={f.label} value={item[f.key] ?? ""} onChange={(v) => updateItem(index, f.key, v)} />
+              ),
+            )}
           </div>
         </div>
       ))}

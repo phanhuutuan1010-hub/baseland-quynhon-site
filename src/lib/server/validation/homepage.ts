@@ -25,7 +25,9 @@ const introContent = z.object({
 const whyQuyNhonContent = z.object({
   kicker: z.string().trim(),
   statement: z.string().trim(),
-  points: z.array(z.object({ label: z.string().trim(), desc: z.string().trim() })),
+  points: z.array(
+    z.object({ label: z.string().trim(), desc: z.string().trim(), imageSrc: z.string().trim().optional().or(z.literal("")) }),
+  ),
 });
 
 const featuredProjectContent = z.object({
@@ -37,7 +39,7 @@ const featuredProjectContent = z.object({
   scaleLabel: z.string().trim(),
   scaleValue: z.string().trim(),
   cta: z.string().trim(),
-  amenities: z.array(z.string().trim()),
+  amenities: z.array(z.object({ label: z.string().trim(), imageSrc: z.string().trim().optional().or(z.literal("")) })),
   imageSrc: z.string().trim().optional().or(z.literal("")),
 });
 
@@ -51,6 +53,7 @@ const projectsTeaserContent = z.object({
       location: z.string().trim(),
       status: z.string().trim(),
       cta: z.string().trim(),
+      imageSrc: z.string().trim().optional().or(z.literal("")),
     }),
   ),
 });

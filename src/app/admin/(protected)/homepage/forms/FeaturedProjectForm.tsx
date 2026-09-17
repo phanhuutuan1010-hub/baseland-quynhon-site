@@ -5,9 +5,10 @@ import { AdminTextField, AdminTextAreaField } from "@/components/admin/AdminFiel
 import { MediaPickerField } from "@/components/admin/MediaPickerField";
 import { LangToggle } from "@/components/admin/LangToggle";
 import { SaveBar } from "@/components/admin/SaveBar";
-import { RepeatableStringList } from "@/components/admin/RepeatableList";
+import { RepeatableObjectList } from "@/components/admin/RepeatableList";
 import { updateHomepageSectionContent } from "../actions";
 
+type FeaturedAmenity = { label: string; imageSrc?: string };
 type FeaturedValue = {
   kicker: string;
   title: string;
@@ -17,7 +18,7 @@ type FeaturedValue = {
   scaleLabel: string;
   scaleValue: string;
   cta: string;
-  amenities: string[];
+  amenities: FeaturedAmenity[];
   imageSrc?: string;
 };
 
@@ -57,7 +58,15 @@ export function FeaturedProjectForm({ initial }: { initial: { vi: FeaturedValue;
         <AdminTextField label="Nhãn CTA" value={current.cta} onChange={(v) => setCurrent({ ...current, cta: v })} />
         <div>
           <p className="mb-2 font-ui text-xs font-semibold tracking-[0.04em] text-[var(--color-text-muted)] uppercase">Tiện ích</p>
-          <RepeatableStringList items={current.amenities} onChange={(amenities) => setCurrent({ ...current, amenities })} itemLabel="Tiện ích" />
+          <RepeatableObjectList
+            items={current.amenities}
+            onChange={(amenities) => setCurrent({ ...current, amenities })}
+            fields={[
+              { key: "label", label: "Tên tiện ích" },
+              { key: "imageSrc", label: "Ảnh (để trống = dùng placeholder)", type: "image" },
+            ]}
+            itemLabel="Tiện ích"
+          />
         </div>
       </div>
       <SaveBar onSave={() => updateHomepageSectionContent("FEATURED_PROJECT", { vi, en })} />

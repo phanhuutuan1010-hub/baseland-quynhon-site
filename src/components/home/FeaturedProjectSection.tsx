@@ -82,13 +82,23 @@ export function FeaturedProjectSection({ content }: { content: HomeFeaturedProje
         </div>
         <HScroller>
           {t.amenities.map((amenity, i) => (
-            <div key={amenity || i} className="w-65 flex-none">
-              <div className="mb-3.5 aspect-4/3 border border-[var(--color-sand)] box-border">
-                <ImagePlaceholder label={amenity ? `Tiện ích Q'Terra: ${amenity}` : "Tiện ích Q'Terra"} />
+            <div key={amenity.label || i} className="w-65 flex-none">
+              <div className="relative mb-3.5 aspect-4/3 border border-[var(--color-sand)] box-border">
+                {amenity.imageSrc ? (
+                  <Image
+                    src={amenity.imageSrc}
+                    alt={amenity.label || "Tiện ích Q'Terra"}
+                    fill
+                    sizes="260px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <ImagePlaceholder label={amenity.label ? `Tiện ích Q'Terra: ${amenity.label}` : "Tiện ích Q'Terra"} />
+                )}
               </div>
-              {amenity && (
+              {amenity.label && (
                 <div className="font-ui text-[13px] font-semibold tracking-[0.04em] text-[var(--color-warm-white)]">
-                  {amenity}
+                  {amenity.label}
                 </div>
               )}
             </div>

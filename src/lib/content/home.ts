@@ -17,7 +17,9 @@ export type HomeContent = {
   whyqn: {
     kicker: string;
     statement: string;
-    points: { label: string; desc: string }[];
+    /** imageSrc optional — falls back to the decorative ImagePlaceholder
+     * (see WhyQuyNhonSection) when unset, same pattern as heroImageSrc. */
+    points: { label: string; desc: string; imageSrc?: string }[];
   };
   featured: {
     kicker: string;
@@ -28,7 +30,9 @@ export type HomeContent = {
     scaleLabel: string;
     scaleValue: string;
     cta: string;
-    amenities: string[];
+    /** Each amenity optionally carries its own photo — falls back to the
+     * decorative ImagePlaceholder (see FeaturedProjectSection) when unset. */
+    amenities: { label: string; imageSrc?: string }[];
     /** Optional admin-set photo — falls back to the built-in Q'Terra facade
      * shot when unset. Duplicated in vi/en like heroImageSrc (not language-
      * specific, just stored once per language because that's this
@@ -38,7 +42,9 @@ export type HomeContent = {
   local: {
     kicker: string;
     title: string;
-    items: { slotId: string; name: string; location: string; status: string; cta: string }[];
+    /** imageSrc optional — falls back to the decorative ImagePlaceholder
+     * (see ProjectsTeaserSection) when unset. */
+    items: { slotId: string; name: string; location: string; status: string; cta: string; imageSrc?: string }[];
   };
   services: { kicker: string; title: string; items: { num: string; title: string; desc: string }[] };
   whybl: { kicker: string; title: string; values: { name: string; desc: string }[] };
@@ -106,7 +112,13 @@ export const HOME_CONTENT: Localized<HomeContent> = {
       scaleLabel: "Quy mô",
       scaleValue: "864 căn hộ",
       cta: "Khám phá Q'Terra",
-      amenities: ["Hồ bơi vô cực", "Nhà hàng", "Phòng gym", "Spa", "Sky bar"],
+      amenities: [
+        { label: "Hồ bơi vô cực" },
+        { label: "Nhà hàng" },
+        { label: "Phòng gym" },
+        { label: "Spa" },
+        { label: "Sky bar" },
+      ],
     },
     local: {
       kicker: "DỰ ÁN TẠI QUY NHƠN",
@@ -221,7 +233,13 @@ export const HOME_CONTENT: Localized<HomeContent> = {
       scaleLabel: "Scale",
       scaleValue: "864 units",
       cta: "Discover Q'Terra",
-      amenities: ["Infinity Pool", "Restaurant", "Fitness Center", "Spa", "Sky Bar"],
+      amenities: [
+        { label: "Infinity Pool" },
+        { label: "Restaurant" },
+        { label: "Fitness Center" },
+        { label: "Spa" },
+        { label: "Sky Bar" },
+      ],
     },
     local: {
       kicker: "PROJECTS IN QUY NHƠN",

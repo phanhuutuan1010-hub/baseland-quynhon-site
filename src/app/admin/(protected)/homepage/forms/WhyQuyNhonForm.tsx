@@ -7,7 +7,7 @@ import { SaveBar } from "@/components/admin/SaveBar";
 import { RepeatableObjectList } from "@/components/admin/RepeatableList";
 import { updateHomepageSectionContent } from "../actions";
 
-type Point = { label: string; desc: string };
+type Point = { label: string; desc: string; imageSrc?: string };
 type WhyQuyNhonValue = { kicker: string; statement: string; points: Point[] };
 
 export function WhyQuyNhonForm({ initial }: { initial: { vi: WhyQuyNhonValue; en: WhyQuyNhonValue } }) {
@@ -31,6 +31,7 @@ export function WhyQuyNhonForm({ initial }: { initial: { vi: WhyQuyNhonValue; en
             fields={[
               { key: "label", label: "Nhãn" },
               { key: "desc", label: "Mô tả" },
+              { key: "imageSrc", label: "Ảnh (để trống = dùng placeholder)", type: "image" },
             ]}
             itemLabel="Điểm"
           />
