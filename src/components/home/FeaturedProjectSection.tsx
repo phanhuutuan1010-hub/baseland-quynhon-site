@@ -30,46 +30,66 @@ export function FeaturedProjectSection({ content }: { content: HomeFeaturedProje
             />
           </div>
           <div className="min-w-[280px] flex-1 basis-95">
-            <div className="mb-5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--color-terracotta-light)] uppercase">
-              {t.kicker}
-            </div>
-            <h2 className="m-0 mb-6 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-warm-white)]">
-              {t.title}
-            </h2>
-            <p className="m-0 mb-9 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]">
-              {t.desc}
-            </p>
-            <div className="mb-9 flex flex-wrap gap-10">
-              <div>
-                <div className="mb-1.5 font-ui text-xs tracking-[0.08em] text-[var(--color-terracotta-light)] uppercase">
-                  {t.locationLabel}
-                </div>
-                <div className="font-body text-[17px] text-[var(--color-warm-white)]">{t.locationValue}</div>
+            {t.kicker && (
+              <div className="mb-5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--color-terracotta-light)] uppercase">
+                {t.kicker}
               </div>
-              <div>
-                <div className="mb-1.5 font-ui text-xs tracking-[0.08em] text-[var(--color-terracotta-light)] uppercase">
-                  {t.scaleLabel}
-                </div>
-                <div className="font-body text-[17px] text-[var(--color-warm-white)]">{t.scaleValue}</div>
+            )}
+            {t.title && (
+              <h2 className="m-0 mb-6 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-warm-white)]">
+                {t.title}
+              </h2>
+            )}
+            {t.desc && (
+              <p className="m-0 mb-9 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]">
+                {t.desc}
+              </p>
+            )}
+            {(t.locationLabel || t.locationValue || t.scaleLabel || t.scaleValue) && (
+              <div className="mb-9 flex flex-wrap gap-10">
+                {(t.locationLabel || t.locationValue) && (
+                  <div>
+                    {t.locationLabel && (
+                      <div className="mb-1.5 font-ui text-xs tracking-[0.08em] text-[var(--color-terracotta-light)] uppercase">
+                        {t.locationLabel}
+                      </div>
+                    )}
+                    {t.locationValue && <div className="font-body text-[17px] text-[var(--color-warm-white)]">{t.locationValue}</div>}
+                  </div>
+                )}
+                {(t.scaleLabel || t.scaleValue) && (
+                  <div>
+                    {t.scaleLabel && (
+                      <div className="mb-1.5 font-ui text-xs tracking-[0.08em] text-[var(--color-terracotta-light)] uppercase">
+                        {t.scaleLabel}
+                      </div>
+                    )}
+                    {t.scaleValue && <div className="font-body text-[17px] text-[var(--color-warm-white)]">{t.scaleValue}</div>}
+                  </div>
+                )}
               </div>
-            </div>
-            <Link
-              href="/projects/qterra"
-              className="inline-flex items-center rounded-xs border border-[var(--color-brand-green)] bg-[var(--color-brand-green)] px-8 py-4 font-ui text-[13px] font-semibold tracking-[0.08em] text-[var(--color-warm-white)] uppercase no-underline hover:bg-[var(--color-brand-green-dark)]"
-            >
-              {t.cta}
-            </Link>
+            )}
+            {t.cta && (
+              <Link
+                href="/projects/qterra"
+                className="inline-flex items-center rounded-xs border border-[var(--color-brand-green)] bg-[var(--color-brand-green)] px-8 py-4 font-ui text-[13px] font-semibold tracking-[0.08em] text-[var(--color-warm-white)] uppercase no-underline hover:bg-[var(--color-brand-green-dark)]"
+              >
+                {t.cta}
+              </Link>
+            )}
           </div>
         </div>
         <HScroller>
-          {t.amenities.map((amenity) => (
-            <div key={amenity} className="w-65 flex-none">
+          {t.amenities.map((amenity, i) => (
+            <div key={amenity || i} className="w-65 flex-none">
               <div className="mb-3.5 aspect-4/3 border border-[var(--color-sand)] box-border">
-                <ImagePlaceholder label={`Tiện ích Q'Terra: ${amenity}`} />
+                <ImagePlaceholder label={amenity ? `Tiện ích Q'Terra: ${amenity}` : "Tiện ích Q'Terra"} />
               </div>
-              <div className="font-ui text-[13px] font-semibold tracking-[0.04em] text-[var(--color-warm-white)]">
-                {amenity}
-              </div>
+              {amenity && (
+                <div className="font-ui text-[13px] font-semibold tracking-[0.04em] text-[var(--color-warm-white)]">
+                  {amenity}
+                </div>
+              )}
             </div>
           ))}
         </HScroller>

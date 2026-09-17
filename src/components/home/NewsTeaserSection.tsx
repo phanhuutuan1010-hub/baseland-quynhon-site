@@ -24,19 +24,25 @@ export function NewsTeaserSection({
       <Reveal className="mx-auto max-w-[1440px]">
         <div className="mb-14 flex flex-wrap items-end justify-between gap-5">
           <div>
-            <div className="mb-5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--color-terracotta-accessible)] uppercase">
-              {t.kicker}
-            </div>
-            <h2 className="m-0 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-              {t.title}
-            </h2>
+            {t.kicker && (
+              <div className="mb-5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--color-terracotta-accessible)] uppercase">
+                {t.kicker}
+              </div>
+            )}
+            {t.title && (
+              <h2 className="m-0 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
+                {t.title}
+              </h2>
+            )}
           </div>
-          <Link
-            href="/news"
-            className="font-ui text-xs font-bold tracking-[0.06em] whitespace-nowrap text-[var(--color-brand-green)] uppercase no-underline hover:text-[var(--color-brand-green-dark)]"
-          >
-            {t.viewAll} →
-          </Link>
+          {t.viewAll && (
+            <Link
+              href="/news"
+              className="font-ui text-xs font-bold tracking-[0.06em] whitespace-nowrap text-[var(--color-brand-green)] uppercase no-underline hover:text-[var(--color-brand-green-dark)]"
+            >
+              {t.viewAll} →
+            </Link>
+          )}
         </div>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {latestArticles.map((article) => (

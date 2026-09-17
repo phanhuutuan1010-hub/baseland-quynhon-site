@@ -2,78 +2,79 @@ import { z } from "zod";
 
 // Mirrors each slice of HomeContent (src/lib/content/home.ts) exactly, so
 // existing/new content round-trips through the DB with no shape drift.
+// Every text/list field here is display copy an admin may legitimately want
+// to leave blank while staging a section (e.g. no tagline yet) — validation
+// only enforces the field's *type*, not that it be non-empty. The matching
+// public components hide the element instead of rendering an empty
+// heading/paragraph/list-item when a value is blank (see e.g. HeroSection).
 const heroContent = z.object({
-  eyebrow: z.string().trim().min(1),
-  headlineLines: z.tuple([z.string().trim().min(1), z.string().trim().min(1)]),
-  tagline: z.string().trim().min(1),
-  ctaPrimary: z.string().trim().min(1),
-  ctaSecondary: z.string().trim().min(1),
+  eyebrow: z.string().trim(),
+  headlineLines: z.tuple([z.string().trim(), z.string().trim()]),
+  tagline: z.string().trim(),
+  ctaPrimary: z.string().trim(),
+  ctaSecondary: z.string().trim(),
 });
 
 const introContent = z.object({
-  kicker: z.string().trim().min(1),
-  title: z.string().trim().min(1),
-  body: z.string().trim().min(1),
+  kicker: z.string().trim(),
+  title: z.string().trim(),
+  body: z.string().trim(),
 });
 
 const whyQuyNhonContent = z.object({
-  kicker: z.string().trim().min(1),
-  statement: z.string().trim().min(1),
-  points: z.array(z.object({ label: z.string().trim().min(1), desc: z.string().trim().min(1) })).min(1),
+  kicker: z.string().trim(),
+  statement: z.string().trim(),
+  points: z.array(z.object({ label: z.string().trim(), desc: z.string().trim() })),
 });
 
 const featuredProjectContent = z.object({
-  kicker: z.string().trim().min(1),
-  title: z.string().trim().min(1),
-  desc: z.string().trim().min(1),
-  locationLabel: z.string().trim().min(1),
-  locationValue: z.string().trim().min(1),
-  scaleLabel: z.string().trim().min(1),
-  scaleValue: z.string().trim().min(1),
-  cta: z.string().trim().min(1),
-  amenities: z.array(z.string().trim().min(1)).min(1),
+  kicker: z.string().trim(),
+  title: z.string().trim(),
+  desc: z.string().trim(),
+  locationLabel: z.string().trim(),
+  locationValue: z.string().trim(),
+  scaleLabel: z.string().trim(),
+  scaleValue: z.string().trim(),
+  cta: z.string().trim(),
+  amenities: z.array(z.string().trim()),
 });
 
 const projectsTeaserContent = z.object({
-  kicker: z.string().trim().min(1),
-  title: z.string().trim().min(1),
-  items: z
-    .array(
-      z.object({
-        slotId: z.string().trim().min(1),
-        name: z.string().trim().min(1),
-        location: z.string().trim().min(1),
-        status: z.string().trim().min(1),
-        cta: z.string().trim().min(1),
-      }),
-    )
-    .min(1),
+  kicker: z.string().trim(),
+  title: z.string().trim(),
+  items: z.array(
+    z.object({
+      slotId: z.string().trim(),
+      name: z.string().trim(),
+      location: z.string().trim(),
+      status: z.string().trim(),
+      cta: z.string().trim(),
+    }),
+  ),
 });
 
 const servicesContent = z.object({
-  kicker: z.string().trim().min(1),
-  title: z.string().trim().min(1),
-  items: z
-    .array(z.object({ num: z.string().trim().min(1), title: z.string().trim().min(1), desc: z.string().trim().min(1) }))
-    .min(1),
+  kicker: z.string().trim(),
+  title: z.string().trim(),
+  items: z.array(z.object({ num: z.string().trim(), title: z.string().trim(), desc: z.string().trim() })),
 });
 
 const whyBaseLandContent = z.object({
-  kicker: z.string().trim().min(1),
-  title: z.string().trim().min(1),
-  values: z.array(z.object({ name: z.string().trim().min(1), desc: z.string().trim().min(1) })).min(1),
+  kicker: z.string().trim(),
+  title: z.string().trim(),
+  values: z.array(z.object({ name: z.string().trim(), desc: z.string().trim() })),
 });
 
 const newsTeaserContent = z.object({
-  kicker: z.string().trim().min(1),
-  title: z.string().trim().min(1),
-  viewAll: z.string().trim().min(1),
-  items: z.array(z.object({ date: z.string().trim().min(1), title: z.string().trim().min(1) })).min(1),
+  kicker: z.string().trim(),
+  title: z.string().trim(),
+  viewAll: z.string().trim(),
+  items: z.array(z.object({ date: z.string().trim(), title: z.string().trim() })),
 });
 
 const leadCtaContent = z.object({
-  title: z.string().trim().min(1),
-  sub: z.string().trim().min(1),
+  title: z.string().trim(),
+  sub: z.string().trim(),
 });
 
 export const HOMEPAGE_SECTION_SCHEMAS = {

@@ -35,15 +35,18 @@ const DEFAULT_DESCRIPTION = "Base Land Quy Nhơn — an cư & đầu tư bên b�
 
 export async function generateMetadata(): Promise<Metadata> {
   const meta = await getSiteMetaSettings();
+  // Settings.siteName is allowed to be blank while an admin is mid-edit —
+  // fall back rather than shipping an empty <title>/OG siteName.
+  const siteName = meta.siteName || "Base Land Quy Nhơn";
   return {
     metadataBase: new URL(SITE_URL),
-    title: meta.siteName,
+    title: siteName,
     description: DEFAULT_DESCRIPTION,
     icons: meta.faviconUrl ? { icon: meta.faviconUrl } : undefined,
     openGraph: {
-      title: meta.siteName,
+      title: siteName,
       description: DEFAULT_DESCRIPTION,
-      siteName: meta.siteName,
+      siteName,
       locale: "vi_VN",
       type: "website",
       images: meta.defaultOgImageUrl ? [{ url: meta.defaultOgImageUrl }] : undefined,
@@ -73,8 +76,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     name: "Base Land Quy Nhơn",
     url: SITE_URL,
     logo: `${SITE_URL}/images/brand/icon-baseland.png`,
-    telephone: chrome.contactPhoneHref.replace(/^tel:/, ""),
-    email: chrome.contactEmail,
+    ...(chrome.contactPhoneHref ? { telephone: chrome.contactPhoneHref.replace(/^tel:/, "") } : {}),
+    ...(chrome.contactEmail ? { email: chrome.contactEmail } : {}),
     address: {
       "@type": "PostalAddress",
       streetAddress: "41 Hoa Lư",

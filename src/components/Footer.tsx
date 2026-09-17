@@ -18,29 +18,43 @@ export function Footer({ data }: { data: SiteChromeData }) {
               Quy Nhơn
             </span>
           </div>
-          <p className="m-0 font-body text-sm leading-[1.7] text-[var(--color-sand)] opacity-80">
-            {pick(data.contactAddress)}
-          </p>
+          {pick(data.contactAddress) && (
+            <p className="m-0 font-body text-sm leading-[1.7] text-[var(--color-sand)] opacity-80">
+              {pick(data.contactAddress)}
+            </p>
+          )}
         </div>
-        <div className="flex flex-col gap-2.5 font-body text-sm text-[var(--color-sand)]">
-          <a href={data.contactPhoneHref} className="text-[var(--color-sand)] no-underline">
-            {data.contactPhone}
-          </a>
-          <a href={data.contactEmailHref} className="text-[var(--color-sand)] no-underline">
-            {data.contactEmail}
-          </a>
-        </div>
+        {(data.contactPhone || data.contactEmail) && (
+          <div className="flex flex-col gap-2.5 font-body text-sm text-[var(--color-sand)]">
+            {data.contactPhone && (
+              <a href={data.contactPhoneHref} className="text-[var(--color-sand)] no-underline">
+                {data.contactPhone}
+              </a>
+            )}
+            {data.contactEmail && (
+              <a href={data.contactEmailHref} className="text-[var(--color-sand)] no-underline">
+                {data.contactEmail}
+              </a>
+            )}
+          </div>
+        )}
         <div className="flex flex-col gap-2.5 font-ui text-[13px] tracking-[0.04em] uppercase">
-          {data.navLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="text-[var(--color-sand)] no-underline opacity-75">
-              {pick(link.label)}
-            </Link>
-          ))}
+          {data.navLinks.map((link) => {
+            const label = pick(link.label);
+            if (!label) return null;
+            return (
+              <Link key={link.href} href={link.href} className="text-[var(--color-sand)] no-underline opacity-75">
+                {label}
+              </Link>
+            );
+          })}
         </div>
       </div>
-      <p className="mx-auto mt-5 max-w-[1440px] font-body text-[13px] text-[var(--color-sand)] opacity-55">
-        {pick(data.footerCopyright)}
-      </p>
+      {pick(data.footerCopyright) && (
+        <p className="mx-auto mt-5 max-w-[1440px] font-body text-[13px] text-[var(--color-sand)] opacity-55">
+          {pick(data.footerCopyright)}
+        </p>
+      )}
     </footer>
   );
 }

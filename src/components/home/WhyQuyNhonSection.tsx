@@ -12,24 +12,32 @@ export function WhyQuyNhonSection({ content }: { content: HomeWhyQuyNhonContent 
   return (
     <section className="bg-[var(--color-sand)] px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
       <Reveal className="mx-auto max-w-[1440px]">
-        <div className="mb-6 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--color-terracotta-accessible)] uppercase">
-          {t.kicker}
-        </div>
-        <h2 className="m-0 mb-16 max-w-230 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-          {t.statement}
-        </h2>
+        {t.kicker && (
+          <div className="mb-6 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--color-terracotta-accessible)] uppercase">
+            {t.kicker}
+          </div>
+        )}
+        {t.statement && (
+          <h2 className="m-0 mb-16 max-w-230 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
+            {t.statement}
+          </h2>
+        )}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {t.points.map((point) => (
-            <div key={point.label}>
+          {t.points.map((point, i) => (
+            <div key={point.label || i}>
               <div className="mb-5 aspect-4/3">
-                <ImagePlaceholder label={`Ảnh Quy Nhơn: ${point.label}`} />
+                <ImagePlaceholder label={point.label ? `Ảnh Quy Nhơn: ${point.label}` : "Ảnh Quy Nhơn"} />
               </div>
-              <div className="mb-2.5 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--color-deep-earth)] uppercase">
-                {point.label}
-              </div>
-              <p className="m-0 font-body text-[15px] leading-[var(--lh-body)] text-[var(--color-text-muted)]">
-                {point.desc}
-              </p>
+              {point.label && (
+                <div className="mb-2.5 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--color-deep-earth)] uppercase">
+                  {point.label}
+                </div>
+              )}
+              {point.desc && (
+                <p className="m-0 font-body text-[15px] leading-[var(--lh-body)] text-[var(--color-text-muted)]">
+                  {point.desc}
+                </p>
+              )}
             </div>
           ))}
         </div>

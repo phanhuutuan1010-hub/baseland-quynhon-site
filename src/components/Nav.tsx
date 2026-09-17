@@ -54,6 +54,8 @@ export function Nav({ data }: { data: SiteChromeData }) {
 
         <div className="hidden items-center gap-5 lg:flex">
           {data.navLinks.map((link) => {
+            const label = pick(link.label);
+            if (!label) return null;
             const active = pathname === link.href;
             return (
               <Link
@@ -62,7 +64,7 @@ export function Nav({ data }: { data: SiteChromeData }) {
                 className={`font-ui text-xs font-semibold tracking-[0.07em] uppercase no-underline transition-opacity hover:text-[var(--color-brand-green)] hover:opacity-100 ${textColor}`}
                 style={{ opacity: active ? 1 : 0.85 }}
               >
-                {pick(link.label)}
+                {label}
               </Link>
             );
           })}
@@ -73,12 +75,14 @@ export function Nav({ data }: { data: SiteChromeData }) {
             <LangButton active={lang === "vi"} onClick={() => setLang("vi")} label="VI" ariaLabel="Tiếng Việt" light={!solid} />
             <LangButton active={lang === "en"} onClick={() => setLang("en")} label="EN" ariaLabel="English" light={!solid} />
           </div>
-          <Link
-            href="/contact"
-            className="shrink-0 rounded-xs border border-[var(--color-brand-green)] bg-[var(--color-brand-green)] px-[22px] py-[11px] font-ui text-xs font-bold whitespace-nowrap tracking-[0.06em] text-[var(--color-warm-white)] uppercase no-underline transition-colors hover:border-[var(--color-brand-green-dark)] hover:bg-[var(--color-brand-green-dark)]"
-          >
-            {pick(data.navCtaLabel)}
-          </Link>
+          {pick(data.navCtaLabel) && (
+            <Link
+              href="/contact"
+              className="shrink-0 rounded-xs border border-[var(--color-brand-green)] bg-[var(--color-brand-green)] px-[22px] py-[11px] font-ui text-xs font-bold whitespace-nowrap tracking-[0.06em] text-[var(--color-warm-white)] uppercase no-underline transition-colors hover:border-[var(--color-brand-green-dark)] hover:bg-[var(--color-brand-green-dark)]"
+            >
+              {pick(data.navCtaLabel)}
+            </Link>
+          )}
         </div>
 
         <button
@@ -109,24 +113,34 @@ export function Nav({ data }: { data: SiteChromeData }) {
             </button>
           </div>
           <div className="mt-12 flex flex-col gap-6">
-            {data.navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="font-display text-[28px] text-[var(--color-warm-white)] no-underline"
-              >
-                {pick(link.label)}
-              </Link>
-            ))}
+            {data.navLinks.map((link) => {
+              const label = pick(link.label);
+              if (!label) return null;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="font-display text-[28px] text-[var(--color-warm-white)] no-underline"
+                >
+                  {label}
+                </Link>
+              );
+            })}
           </div>
-          <div className="mt-12 flex flex-col gap-2.5 font-body text-[15px] text-[var(--color-sand)]">
-            <a href={data.contactPhoneHref} className="text-[var(--color-sand)] no-underline">
-              {data.contactPhone}
-            </a>
-            <a href={data.contactEmailHref} className="text-[var(--color-sand)] no-underline">
-              {data.contactEmail}
-            </a>
-          </div>
+          {(data.contactPhone || data.contactEmail) && (
+            <div className="mt-12 flex flex-col gap-2.5 font-body text-[15px] text-[var(--color-sand)]">
+              {data.contactPhone && (
+                <a href={data.contactPhoneHref} className="text-[var(--color-sand)] no-underline">
+                  {data.contactPhone}
+                </a>
+              )}
+              {data.contactEmail && (
+                <a href={data.contactEmailHref} className="text-[var(--color-sand)] no-underline">
+                  {data.contactEmail}
+                </a>
+              )}
+            </div>
+          )}
         </div>
       )}
     </>
