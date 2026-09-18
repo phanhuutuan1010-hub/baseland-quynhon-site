@@ -136,6 +136,16 @@ function VideoStoryCard({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
   const [userPaused, setUserPaused] = useState(false);
+  // Ground truth for the play/pause icon — separate from `userPaused`
+  // (which only tracks the user's own intent, for shouldPlay below).
+  // Autoplay-on-scroll can be silently blocked by the browser (common for
+  // first-time visitors even when muted), which used to leave the icon
+  // stuck showing "⏸" as if playing while the video never actually
+  // started — nothing invited the visitor to tap it. Driving the icon from
+  // the video element's real onPlay/onPause events instead means it always
+  // shows "▶" whenever playback truly isn't happening, autoplay-blocked or
+  // not.
+  const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -203,10 +213,15 @@ function VideoStoryCard({
   }
 
   function togglePlay() {
-    setUserPaused((p) => !p);
     const el = videoRef.current;
     if (!el) return;
     if (el.paused) {
+      // A real click carries user activation, so this play() succeeds even
+      // when the earlier autoplay-on-scroll attempt was blocked — must set
+      // userPaused false too, or the [shouldPlay] effect above (still
+      // seeing userPaused from before this click) immediately re-pauses
+      // what the user just started playing.
+      setUserPaused(false);
       el.play().catch(() => {});
       trackEvent("project_video_play", {
         project: projectSlug,
@@ -215,6 +230,7 @@ function VideoStoryCard({
         language: lang,
       });
     } else {
+      setUserPaused(true);
       el.pause();
       trackEvent("project_video_pause", {
         project: projectSlug,
@@ -260,6 +276,8 @@ function VideoStoryCard({
                   const el = e.currentTarget;
                   if (el.duration) setProgress(el.currentTime / el.duration);
                 }}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
                 onEnded={() =>
                   trackEvent("project_video_complete", {
                     project: projectSlug,
@@ -283,13 +301,13 @@ function VideoStoryCard({
                   type="button"
                   onClick={togglePlay}
                   aria-label={pick(
-                    userPaused
-                      ? { vi: "Phát video", en: "Play video" }
-                      : { vi: "Tạm dừng video", en: "Pause video" },
+                    isPlaying
+                      ? { vi: "Tạm dừng video", en: "Pause video" }
+                      : { vi: "Phát video", en: "Play video" },
                   )}
                   className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-none bg-[rgba(23,19,15,0.55)] text-[var(--color-warm-white)] backdrop-blur-sm"
                 >
-                  {userPaused ? "▶" : "❚❚"}
+                  {isPlaying ? "❚❚" : "▶"}
                 </button>
                 <button
                   type="button"
