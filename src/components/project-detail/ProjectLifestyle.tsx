@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
@@ -25,8 +26,18 @@ export function ProjectLifestyle({ id, data }: { id: string; data: ProjectLifest
           <HScroller>
             {data.chapters.map((c) => (
               <div key={c.slotId} className="w-65 flex-none sm:w-80">
-                <div className="mb-4.5 aspect-3/4">
-                  <ImagePlaceholder label={`${c.time} · ${c.label}`} />
+                <div className="mb-4.5 aspect-3/4 overflow-hidden">
+                  {c.image?.src ? (
+                    <Image
+                      src={c.image.src}
+                      alt={pick(c.image.alt)}
+                      width={480}
+                      height={640}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <ImagePlaceholder label={`${c.time} · ${c.label}`} />
+                  )}
                 </div>
                 <div className="mb-2.5 flex items-baseline gap-3.5">
                   <span className="font-ui text-xs font-bold tracking-[0.12em] text-[var(--project-accent)]">
