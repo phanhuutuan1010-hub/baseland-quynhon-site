@@ -15,8 +15,8 @@ export const NAV_LINKS: NavLink[] = [
 
 export const NAV_CTA: Localized = { vi: "Nhận tư vấn", en: "Get in Touch" };
 
-export const CONTACT_PHONE = "0373 910 109";
-export const CONTACT_PHONE_HREF = "tel:+84373910109";
+export const CONTACT_PHONE = "0965 273 179";
+export const CONTACT_PHONE_HREF = "tel:+84965273179";
 export const CONTACT_EMAIL = "baselandquynhon@gmail.com";
 export const CONTACT_EMAIL_HREF = "mailto:baselandquynhon@gmail.com";
 export const CONTACT_ADDRESS: Localized = {

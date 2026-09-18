@@ -115,7 +115,7 @@ export const ABOUT_CONTENT: Localized<AboutContent> = {
     cta: {
       title: "Bạn đang tìm bất động sản tại Quy Nhơn?",
       sub: "Để lại thông tin, chuyên viên Base Land Quy Nhơn sẽ liên hệ tư vấn trong thời gian sớm nhất.",
-      callNow: "Gọi ngay 0373 910 109",
+      callNow: "Gọi ngay 0965 273 179",
     },
   },
   en: {
@@ -204,7 +204,7 @@ export const ABOUT_CONTENT: Localized<AboutContent> = {
     cta: {
       title: "Looking for real estate in Quy Nhon?",
       sub: "Leave your details and a Base Land Quy Nhon advisor will be in touch shortly.",
-      callNow: "Call now 0373 910 109",
+      callNow: "Call now 0965 273 179",
     },
   },
 };
