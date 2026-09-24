@@ -11,16 +11,22 @@ export function RepeatableObjectList<T extends Record<string, string>>({
   onChange,
   fields,
   itemLabel,
+  onImageChange,
 }: {
   items: T[];
   onChange: (items: T[]) => void;
   fields: { key: keyof T & string; label: string; type?: "text" | "image" }[];
   itemLabel: string;
+  /** Called when an image field changes, so a per-language form can mirror
+   * the same image into the other language's item at this index — images
+   * aren't language-specific even though the content is stored per language. */
+  onImageChange?: (index: number, key: keyof T & string, value: string) => void;
 }) {
   function updateItem(index: number, key: keyof T & string, value: string) {
     const next = [...items];
     next[index] = { ...next[index], [key]: value };
     onChange(next);
+    if (fields.find((f) => f.key === key)?.type === "image") onImageChange?.(index, key, value);
   }
 
   function removeItem(index: number) {

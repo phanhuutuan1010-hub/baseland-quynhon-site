@@ -16,6 +16,7 @@ export function WhyQuyNhonForm({ initial }: { initial: { vi: WhyQuyNhonValue; en
   const [lang, setLang] = useState<"vi" | "en">("vi");
   const current = lang === "vi" ? vi : en;
   const setCurrent = lang === "vi" ? setVi : setEn;
+  const setOther = lang === "vi" ? setEn : setVi;
 
   return (
     <div className="flex flex-col">
@@ -34,6 +35,9 @@ export function WhyQuyNhonForm({ initial }: { initial: { vi: WhyQuyNhonValue; en
               { key: "imageSrc", label: "Ảnh (để trống = dùng placeholder)", type: "image" },
             ]}
             itemLabel="Điểm"
+            onImageChange={(index, key, value) =>
+              setOther((prev) => ({ ...prev, points: prev.points.map((p, i) => (i === index ? { ...p, [key]: value } : p)) }))
+            }
           />
         </div>
       </div>

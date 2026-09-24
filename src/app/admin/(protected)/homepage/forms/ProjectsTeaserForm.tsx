@@ -16,6 +16,7 @@ export function ProjectsTeaserForm({ initial }: { initial: { vi: TeaserValue; en
   const [lang, setLang] = useState<"vi" | "en">("vi");
   const current = lang === "vi" ? vi : en;
   const setCurrent = lang === "vi" ? setVi : setEn;
+  const setOther = lang === "vi" ? setEn : setVi;
 
   return (
     <div className="flex flex-col">
@@ -37,6 +38,9 @@ export function ProjectsTeaserForm({ initial }: { initial: { vi: TeaserValue; en
               { key: "imageSrc", label: "Ảnh (để trống = dùng placeholder)", type: "image" },
             ]}
             itemLabel="Dự án"
+            onImageChange={(index, key, value) =>
+              setOther((prev) => ({ ...prev, items: prev.items.map((it, i) => (i === index ? { ...it, [key]: value } : it)) }))
+            }
           />
         </div>
       </div>

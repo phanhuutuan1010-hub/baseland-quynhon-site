@@ -66,6 +66,10 @@ export function FeaturedProjectForm({ initial }: { initial: { vi: FeaturedValue;
               { key: "imageSrc", label: "Ảnh (để trống = dùng placeholder)", type: "image" },
             ]}
             itemLabel="Tiện ích"
+            onImageChange={(index, key, value) => {
+              const setOther = lang === "vi" ? setEn : setVi;
+              setOther((prev) => ({ ...prev, amenities: prev.amenities.map((a, i) => (i === index ? { ...a, [key]: value } : a)) }));
+            }}
           />
         </div>
       </div>
