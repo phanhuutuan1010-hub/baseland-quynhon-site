@@ -5,6 +5,8 @@
 // Cách dùng:
 //   node fetch-project-images.js                      (tất cả dự án)
 //   node fetch-project-images.js phu-gia-royal-park   (1 dự án)
+//   node fetch-project-images.js --stage              (sau khi duyệt: gom ảnh
+//                                   còn giữ vào photos-in/ để resize + upload)
 //
 // Kết quả:
 //   images-fetched/<slug>/          ảnh giữ lại, chờ bạn duyệt
@@ -486,7 +488,86 @@ async function crawlSource(project, source, state, ctx, summary) {
   summary.pages.push(`${source.url}: ${pages} trang`);
 }
 
+// ---------------------------------------------------------------- stage (bước 3)
+
+const PHOTOS_IN = path.join(__dirname, "photos-in");
+const SOURCES_FILE = path.join(PHOTOS_IN, "_nguon.json");
+
+// Gom ảnh bạn đã duyệt (mọi file còn nằm trong images-fetched/<slug>/, trừ
+// _loai/) vào photos-in/ để chạy tiếp resize-photos.js -> upload-photos.js.
+// Ảnh tải tay (không có trong manifest) cũng đi qua cùng bộ lọc kích thước +
+// chống trùng như lúc crawl. Nguồn gốc từng ảnh ghi vào photos-in/_nguon.json.
+async function stage() {
+  fs.mkdirSync(PHOTOS_IN, { recursive: true });
+  if (fs.readdirSync(PHOTOS_IN).some((f) => /\.(jpe?g|png|webp)$/i.test(f))) {
+    console.log("photos-in/ đang có ảnh — dọn trống trước khi gom để không lẫn ảnh khác.");
+    process.exit(1);
+  }
+  const state = loadState();
+  const byFile = new Map(state.records.filter((r) => r.file).map((r) => [r.file.toLowerCase(), r]));
+  const sources = {};
+
+  for (const dirName of fs.readdirSync(OUT_DIR)) {
+    const dir = path.join(OUT_DIR, dirName);
+    if (!fs.statSync(dir).isDirectory()) continue;
+    const project = PROJECTS.find((p) => p.slug === dirName.toLowerCase());
+    if (!project) {
+      console.log(`Bỏ qua thư mục không khớp dự án nào: ${dirName}`);
+      continue;
+    }
+    const fallbackDomain = new URL([...project.sources].sort((a, b) => a.priority - b.priority)[0].url).hostname;
+    const kept = [];
+    const counts = { staged: 0, small: 0, dup: 0 };
+
+    for (const file of fs.readdirSync(dir).sort()) {
+      const fp = path.join(dir, file);
+      if (!fs.statSync(fp).isFile() || !/\.(jpe?g|png|webp)$/i.test(file)) continue;
+      const buf = fs.readFileSync(fp);
+      let meta;
+      try {
+        meta = await sharp(buf).metadata();
+      } catch {
+        console.log(`  hỏng, bỏ qua: ${file}`);
+        continue;
+      }
+      if (Math.max(meta.width, meta.height) < MIN_LONG_EDGE) {
+        counts.small++;
+        continue;
+      }
+      const sha1 = crypto.createHash("sha1").update(buf).digest("hex");
+      const hash = (await dHash(buf)).toString();
+      if (kept.some((k) => k.sha1 === sha1 || hamming(k.hash, hash) <= NEAR_DUPLICATE_DISTANCE)) {
+        counts.dup++;
+        continue;
+      }
+      kept.push({ sha1, hash });
+
+      const rec = byFile.get(`${dirName}/${file}`.toLowerCase());
+      const originalName = file.replace(/\.[^.]+$/, "").replace(/^imgi_\d+_/i, "").replace(/^p[12]-/, "");
+      const baseName = `${project.slug}__${slugify(originalName) || "anh"}`;
+      let staged = baseName;
+      for (let i = 2; sources[staged]; i++) staged = `${baseName}-${i}`;
+      fs.copyFileSync(fp, path.join(PHOTOS_IN, `${staged}${path.extname(file).toLowerCase()}`));
+      sources[staged] = {
+        project: project.slug,
+        projectName: project.name,
+        title: (rec?.alt || originalName.replace(/[-_]+/g, " ")).trim(),
+        domain: rec?.domain ?? fallbackDomain,
+        url: rec?.url ?? "",
+        priority: rec?.priority ?? 1,
+        original: `${dirName}/${file}`,
+      };
+      counts.staged++;
+    }
+    console.log(`${project.name}: gom ${counts.staged} ảnh, bỏ ${counts.small} ảnh nhỏ, bỏ ${counts.dup} ảnh trùng`);
+  }
+
+  fs.writeFileSync(SOURCES_FILE, JSON.stringify(sources, null, 2));
+  console.log(`\nĐã gom ${Object.keys(sources).length} ảnh vào photos-in/. Tiếp theo: node resize-photos.js`);
+}
+
 async function main() {
+  if (process.argv[2] === "--stage") return stage();
   const only = process.argv[2];
   const projects = only ? PROJECTS.filter((p) => p.slug === only) : PROJECTS;
   if (only && projects.length === 0) {
