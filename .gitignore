@@ -43,6 +43,9 @@ yarn-error.log*
 /photos-in
 /photos-out
 
+# fetch-project-images.js output — third-party images pending manual review.
+/images-fetched
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
