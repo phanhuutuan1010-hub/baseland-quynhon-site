@@ -111,15 +111,19 @@ export const getSessionUser = cache(async (): Promise<User | null> => {
   const rawToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   if (!rawToken) return null;
 
-  const session = await prisma.session.findUnique({
-    where: { tokenHash: hashToken(rawToken) },
-    include: { user: true },
+  // One round trip on the hot path: `session.findUnique({ include: user })`
+  // costs two sequential queries (Prisma splits includes), and every admin
+  // page/action starts here.
+  const tokenHash = hashToken(rawToken);
+  const user = await prisma.user.findFirst({
+    where: { sessions: { some: { tokenHash, expiresAt: { gt: new Date() } } } },
   });
-  if (!session || session.expiresAt.getTime() < Date.now()) {
-    if (session) await prisma.session.delete({ where: { id: session.id } }).catch(() => {});
+  if (!user) {
+    // Missing or expired — drop an expired row if there is one (rare path).
+    await prisma.session.deleteMany({ where: { tokenHash, expiresAt: { lte: new Date() } } }).catch(() => {});
     return null;
   }
-  return session.user;
+  return user;
 });
 
 export async function requireUser(): Promise<User> {

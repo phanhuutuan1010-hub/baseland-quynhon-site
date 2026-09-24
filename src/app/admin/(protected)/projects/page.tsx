@@ -13,7 +13,10 @@ const STATUS_COLOR: Record<string, string> = {
 
 export default async function AdminProjectsPage() {
   const user = await requireRole("ADMIN", "SALES");
-  const projects = await prisma.project.findMany({ orderBy: { createdAt: "asc" } });
+  const projects = await prisma.project.findMany({
+    orderBy: { createdAt: "asc" },
+    select: { id: true, name: true, slug: true, publishStatus: true },
+  });
   const canEdit = user.role === "ADMIN";
 
   return (

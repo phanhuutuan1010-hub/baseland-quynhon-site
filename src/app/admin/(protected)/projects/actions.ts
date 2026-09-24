@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/server/db";
 import { requireRole } from "@/lib/server/auth";
-import { logActivity } from "@/lib/server/activityLog";
+import { logActivity, activityLogWrite } from "@/lib/server/activityLog";
 
 // Section keys whose content carries price/legal/progress-adjacent facts —
 // always logged with old/new values, regardless of which specific field
@@ -49,7 +49,11 @@ function isNamedTableKey(key: string): key is NamedTableKey {
 
 async function revalidateProject(projectId: string) {
   const project = await prisma.project.findUnique({ where: { id: projectId }, select: { slug: true } });
-  if (project) revalidatePath(`/projects/${project.slug}`);
+  revalidateProjectPaths(projectId, project?.slug);
+}
+
+function revalidateProjectPaths(projectId: string, slug: string | undefined) {
+  if (slug) revalidatePath(`/projects/${slug}`);
   revalidatePath("/admin/projects");
   // Admin's Next.js Router Cache can otherwise show a stale snapshot of the
   // editor after navigating away and back — revalidate every admin route
@@ -179,31 +183,38 @@ export async function updateProjectSectionContent(
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ" };
 
   const logField = SENSITIVE_SECTION_KEYS.has(key) ? key : undefined;
-  const oldRow = isNamedTableKey(key)
-    ? await getNamedTableRow(key, projectId)
-    : await prisma.projectSection.findUnique({ where: { projectId_type: { projectId, type: KEY_TO_SECTION_TYPE[key] } } });
+  // Old content is only needed for the audit trail of sensitive sections —
+  // skip the extra read for every other section.
+  const oldRow = !logField
+    ? null
+    : isNamedTableKey(key)
+      ? await getNamedTableRow(key, projectId)
+      : await prisma.projectSection.findUnique({ where: { projectId_type: { projectId, type: KEY_TO_SECTION_TYPE[key] } } });
 
   const contentJson = parsed.data as object;
-  if (isNamedTableKey(key)) {
-    await upsertNamedTable(key, projectId, contentJson);
-  } else {
-    const type = KEY_TO_SECTION_TYPE[key];
-    await prisma.projectSection.upsert({
-      where: { projectId_type: { projectId, type } },
-      update: { content: contentJson },
-      create: { projectId, type, content: contentJson },
-    });
-  }
+  const write = isNamedTableKey(key)
+    ? upsertNamedTable(key, projectId, contentJson)
+    : prisma.projectSection.upsert({
+        where: { projectId_type: { projectId, type: KEY_TO_SECTION_TYPE[key] } },
+        update: { content: contentJson },
+        create: { projectId, type: KEY_TO_SECTION_TYPE[key], content: contentJson },
+      });
 
-  await logActivity({
-    userId: user.id,
-    action: "project.section.update",
-    entityType: "Project",
-    entityId: projectId,
-    field: logField,
-    ...(logField ? { oldValue: oldRow?.content ?? null, newValue: parsed.data } : {}),
-  });
-  await revalidateProject(projectId);
+  const [, project] = await Promise.all([
+    prisma.$transaction([
+      write,
+      activityLogWrite({
+        userId: user.id,
+        action: "project.section.update",
+        entityType: "Project",
+        entityId: projectId,
+        field: logField,
+        ...(logField ? { oldValue: oldRow?.content ?? null, newValue: parsed.data } : {}),
+      }),
+    ]),
+    prisma.project.findUnique({ where: { id: projectId }, select: { slug: true } }),
+  ]);
+  revalidateProjectPaths(projectId, project?.slug);
   return {};
 }
 

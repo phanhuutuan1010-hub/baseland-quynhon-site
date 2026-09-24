@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/server/db";
 import { requireRole } from "@/lib/server/auth";
-import { logActivity } from "@/lib/server/activityLog";
+import { logActivity, activityLogWrite } from "@/lib/server/activityLog";
 import { homepageSectionContentSchema, type HomepageSectionTypeKey } from "@/lib/server/validation/homepage";
 
 type ActionResult = { error?: string };
@@ -13,18 +13,26 @@ export async function updateHomepageSectionContent(type: HomepageSectionTypeKey,
   const parsed = homepageSectionContentSchema(type).safeParse(content);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ" };
 
-  const existing = await prisma.homepageSection.findUnique({ where: { type } });
-  const maxOrder = existing ? undefined : await prisma.homepageSection.count();
-
-  await prisma.homepageSection.upsert({
-    where: { type },
-    update: { content: parsed.data },
-    create: { type, content: parsed.data, order: maxOrder ?? 0, enabled: true },
-  });
-
-  await logActivity({ userId: user.id, action: "homepage.section.update", entityType: "HomepageSection", entityId: type });
+  const log = { userId: user.id, action: "homepage.section.update", entityType: "HomepageSection", entityId: type };
+  try {
+    await prisma.$transaction([
+      prisma.homepageSection.update({ where: { type }, data: { content: parsed.data } }),
+      activityLogWrite(log),
+    ]);
+  } catch (err) {
+    if ((err as { code?: string }).code !== "P2025") throw err;
+    // Section row doesn't exist yet (never seeded) — rare, so the extra
+    // count query only runs here, not on every save.
+    const order = await prisma.homepageSection.count();
+    await prisma.$transaction([
+      prisma.homepageSection.create({ data: { type, content: parsed.data, order, enabled: true } }),
+      activityLogWrite(log),
+    ]);
+  }
+  // Only the public page needs re-rendering; the admin form already holds
+  // the saved values, and revalidating its own path would make this action
+  // re-render the whole editor page into the response.
   revalidatePath("/");
-  revalidatePath(`/admin/homepage/${type}`);
   return {};
 }
 

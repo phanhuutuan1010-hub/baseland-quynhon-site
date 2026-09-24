@@ -25,45 +25,12 @@ export async function uploadMediaFile(file: File): Promise<{ item: MediaItem } |
     } catch {
       return { error: "Không thể kết nối máy chủ để upload." };
     }
+    // The route also creates the Media row, so it's one request, not two.
     const body = await res.json().catch(() => null);
-    if (!res.ok || !body?.url) {
+    if (!res.ok || !body?.item) {
       return { error: body?.error ?? "Upload ảnh thất bại." };
     }
-
-    const result = await createMedia({
-      filename: body.filename,
-      url: body.url,
-      mimeType: body.mimeType,
-      size: body.size,
-      width: body.width,
-      height: body.height,
-      titleVi: baseName,
-      titleEn: baseName,
-      altVi: "",
-      altEn: "",
-    });
-    if (result.error || !result.id) return { error: result.error ?? "Có lỗi xảy ra" };
-
-    return {
-      item: {
-        id: result.id,
-        filename: body.filename,
-        url: body.url,
-        mimeType: body.mimeType,
-        size: body.size,
-        kind: "IMAGE",
-        titleVi: baseName,
-        titleEn: baseName,
-        altVi: "",
-        altEn: "",
-        captionVi: "",
-        captionEn: "",
-        focalX: 0.5,
-        focalY: 0.5,
-        requireLeadForDownload: false,
-        createdAt: new Date().toISOString(),
-      },
-    };
+    return { item: body.item as MediaItem };
   }
 
   // Video/PDF: browser uploads straight to Blob storage via a signed

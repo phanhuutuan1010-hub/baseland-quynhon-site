@@ -59,9 +59,9 @@ export function MediaPickerModal({
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
-    listMedia().then((rows) => {
+    listMedia(kindFilter).then((rows) => {
       if (cancelled) return;
-      setItems(rows.filter((r) => !kindFilter || r.kind === kindFilter).map(toItem));
+      setItems(rows.map(toItem));
     });
     return () => {
       cancelled = true;

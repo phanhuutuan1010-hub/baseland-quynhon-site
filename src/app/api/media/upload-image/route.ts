@@ -1,7 +1,10 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import sharp, { type OutputInfo } from "sharp";
 import { getSessionUser } from "@/lib/server/auth";
+import { prisma } from "@/lib/server/db";
+import { activityLogWrite } from "@/lib/server/activityLog";
 import { MAX_RAW_IMAGE_UPLOAD_BYTES, IMAGE_MAX_DIMENSION, IMAGE_WEBP_QUALITY } from "@/lib/server/media";
 
 // Images are the one kind that goes THROUGH this server (not
@@ -57,12 +60,36 @@ export async function POST(request: Request): Promise<NextResponse> {
     addRandomSuffix: true,
   });
 
-  return NextResponse.json({
-    url: blob.url,
+  // Persist the Media row (+ audit log) in this same request — saves the
+  // browser a second round trip to the createMedia Server Action.
+  const id = randomUUID();
+  const title = baseName;
+  const item = {
+    id,
     filename: `${baseName}.webp`,
+    url: blob.url,
     mimeType: "image/webp",
     size: processed.info.size,
-    width: processed.info.width,
-    height: processed.info.height,
+    kind: "IMAGE" as const,
+    titleVi: title,
+    titleEn: title,
+    altVi: "",
+    altEn: "",
+  };
+  await prisma.$transaction([
+    prisma.media.create({ data: { ...item, width: processed.info.width, height: processed.info.height } }),
+    activityLogWrite({ userId: user.id, action: "media.create", entityType: "Media", entityId: id }),
+  ]);
+
+  return NextResponse.json({
+    item: {
+      ...item,
+      captionVi: "",
+      captionEn: "",
+      focalX: 0.5,
+      focalY: 0.5,
+      requireLeadForDownload: false,
+      createdAt: new Date().toISOString(),
+    },
   });
 }

@@ -14,7 +14,9 @@ const STATUS_COLOR: Record<LeadStatus, string> = {
   ARCHIVED: "bg-[var(--color-sand)] text-[var(--color-text-muted)]",
 };
 
-type SearchParams = { q?: string; status?: string; project?: string; from?: string; to?: string };
+type SearchParams = { q?: string; status?: string; project?: string; from?: string; to?: string; page?: string };
+
+const PAGE_SIZE = 50;
 
 export default async function AdminLeadsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   await requireRole("ADMIN", "SALES");
@@ -37,15 +39,35 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: P
     };
   }
 
-  const [leads, projects] = await Promise.all([
+  const page = Math.max(1, Number(params.page) || 1);
+  const [leads, total, projects] = await Promise.all([
     prisma.lead.findMany({
       where,
-      include: { project: { select: { name: true } }, assignedTo: { select: { name: true } } },
+      // Project names come from the filter's project list below — including
+      // project here too would re-query the same table for every page load.
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        status: true,
+        source: true,
+        projectId: true,
+        createdAt: true,
+        assignedTo: { select: { name: true } },
+      },
       orderBy: { createdAt: "desc" },
-      take: 100,
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
     }),
+    prisma.lead.count({ where }),
     prisma.project.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
+  const projectName = new Map(projects.map((p) => [p.id, p.name]));
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const pageHref = (p: number) => {
+    const entries = Object.entries({ ...params, page: String(p) }).filter((e): e is [string, string] => !!e[1]);
+    return `/admin/leads?${new URLSearchParams(entries).toString()}`;
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -128,7 +150,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: P
                   </Link>
                   <p className="m-0 font-body text-xs text-[var(--color-text-muted)]">{lead.phone}</p>
                 </td>
-                <td className="px-4 py-3 font-body text-sm text-[var(--color-text-muted)]">{lead.project?.name ?? "—"}</td>
+                <td className="px-4 py-3 font-body text-sm text-[var(--color-text-muted)]">{(lead.projectId && projectName.get(lead.projectId)) || "—"}</td>
                 <td className="px-4 py-3">
                   <span className={`rounded-full px-2.5 py-1 font-ui text-[10px] font-bold tracking-[0.04em] uppercase ${STATUS_COLOR[lead.status]}`}>
                     {STATUS_LABEL[lead.status]}
@@ -144,6 +166,15 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: P
           </tbody>
         </table>
       </div>
+      {pageCount > 1 && (
+        <nav className="flex items-center gap-4 font-ui text-sm" aria-label="Phân trang Lead">
+          {page > 1 ? <Link href={pageHref(page - 1)}>← Trang trước</Link> : <span className="opacity-40">← Trang trước</span>}
+          <span className="text-[var(--color-text-muted)]">
+            Trang {page}/{pageCount} · {total} lead
+          </span>
+          {page < pageCount ? <Link href={pageHref(page + 1)}>Trang sau →</Link> : <span className="opacity-40">Trang sau →</span>}
+        </nav>
+      )}
     </div>
   );
 }

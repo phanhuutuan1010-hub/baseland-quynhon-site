@@ -20,7 +20,7 @@ export function isSensitiveField(field: string): boolean {
   return SENSITIVE_FIELD_GROUPS.some((group) => normalized.includes(group));
 }
 
-export async function logActivity(params: {
+type ActivityParams = {
   userId: string;
   action: string;
   entityType: string;
@@ -28,12 +28,20 @@ export async function logActivity(params: {
   field?: string;
   oldValue?: unknown;
   newValue?: unknown;
-}): Promise<void> {
+};
+
+export async function logActivity(params: ActivityParams): Promise<void> {
+  await activityLogWrite(params);
+}
+
+// Un-awaited Prisma write, so a caller can put it in the same
+// `prisma.$transaction([...])` as the change it records.
+export function activityLogWrite(params: ActivityParams) {
   const { userId, action, entityType, entityId, field } = params;
   if (field && isSensitiveField(field) && params.oldValue === undefined && params.newValue === undefined) {
     throw new Error(`logActivity: sensitive field "${field}" requires oldValue/newValue`);
   }
-  await prisma.activityLog.create({
+  return prisma.activityLog.create({
     data: {
       userId,
       action,

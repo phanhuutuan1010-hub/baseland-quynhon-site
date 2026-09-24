@@ -1,10 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { randomUUID } from "node:crypto";
 import { del } from "@vercel/blob";
 import { prisma } from "@/lib/server/db";
 import { requireRole } from "@/lib/server/auth";
-import { logActivity } from "@/lib/server/activityLog";
+import { activityLogWrite } from "@/lib/server/activityLog";
+import type { MediaKind } from "@prisma/client";
 import { isAllowedMimeType, kindForMimeType } from "@/lib/server/media";
 import { createMediaSchema, updateMediaSchema } from "@/lib/server/validation/media";
 
@@ -24,25 +25,31 @@ export async function createMedia(input: unknown): Promise<ActionResult & { id?:
   const kind = kindForMimeType(d.mimeType);
   if (!kind) return { error: "Định dạng file không được hỗ trợ" };
 
-  const media = await prisma.media.create({
-    data: {
-      filename: d.filename,
-      url: d.url,
-      mimeType: d.mimeType,
-      size: d.size,
-      width: d.width,
-      height: d.height,
-      kind,
-      titleVi: d.titleVi,
-      titleEn: d.titleEn,
-      altVi: d.altVi || "",
-      altEn: d.altEn || "",
-    },
-  });
-
-  await logActivity({ userId: user.id, action: "media.create", entityType: "Media", entityId: media.id });
-  revalidatePath("/admin/media");
-  return { id: media.id };
+  // Id generated here so the audit row can share the insert's transaction.
+  const id = randomUUID();
+  await prisma.$transaction([
+    prisma.media.create({
+      data: {
+        id,
+        filename: d.filename,
+        url: d.url,
+        mimeType: d.mimeType,
+        size: d.size,
+        width: d.width,
+        height: d.height,
+        kind,
+        titleVi: d.titleVi,
+        titleEn: d.titleEn,
+        altVi: d.altVi || "",
+        altEn: d.altEn || "",
+      },
+    }),
+    activityLogWrite({ userId: user.id, action: "media.create", entityType: "Media", entityId: id }),
+  ]);
+  // No revalidatePath: the library/picker add the new item to their own
+  // client state, and revalidating would re-render the whole media page
+  // into every upload's response.
+  return { id };
 }
 
 export async function updateMedia(id: string, input: unknown): Promise<ActionResult> {
@@ -51,45 +58,58 @@ export async function updateMedia(id: string, input: unknown): Promise<ActionRes
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ" };
   const d = parsed.data;
 
-  const existing = await prisma.media.findUnique({ where: { id } });
-  if (!existing) return { error: "Không tìm thấy media" };
-
-  await prisma.media.update({
-    where: { id },
-    data: {
-      titleVi: d.titleVi,
-      titleEn: d.titleEn,
-      altVi: d.altVi || "",
-      altEn: d.altEn || "",
-      captionVi: d.captionVi || null,
-      captionEn: d.captionEn || null,
-      focalX: d.focalX,
-      focalY: d.focalY,
-      requireLeadForDownload: d.requireLeadForDownload,
-    },
-  });
-
-  await logActivity({ userId: user.id, action: "media.update", entityType: "Media", entityId: id });
-  revalidatePath("/admin/media");
+  try {
+    await prisma.$transaction([
+      prisma.media.update({
+        where: { id },
+        data: {
+          titleVi: d.titleVi,
+          titleEn: d.titleEn,
+          altVi: d.altVi || "",
+          altEn: d.altEn || "",
+          captionVi: d.captionVi || null,
+          captionEn: d.captionEn || null,
+          focalX: d.focalX,
+          focalY: d.focalY,
+          requireLeadForDownload: d.requireLeadForDownload,
+        },
+      }),
+      activityLogWrite({ userId: user.id, action: "media.update", entityType: "Media", entityId: id }),
+    ]);
+  } catch (err) {
+    if ((err as { code?: string }).code === "P2025") return { error: "Không tìm thấy media" };
+    throw err;
+  }
   return {};
 }
 
 export async function deleteMedia(id: string): Promise<ActionResult> {
   const user = await requireRole("ADMIN");
-  const media = await prisma.media.findUnique({ where: { id } });
+  const media = await prisma.media.findUnique({ where: { id }, select: { url: true } });
   if (!media) return { error: "Không tìm thấy media" };
 
   await del(media.url).catch(() => {
     // Blob object may already be gone (e.g. deleted directly on Vercel) —
     // still proceed to remove the DB row so the library doesn't get stuck.
   });
-  await prisma.media.delete({ where: { id } });
-  await logActivity({ userId: user.id, action: "media.delete", entityType: "Media", entityId: id });
-  revalidatePath("/admin/media");
+  await prisma.$transaction([
+    prisma.media.delete({ where: { id } }),
+    activityLogWrite({ userId: user.id, action: "media.delete", entityType: "Media", entityId: id }),
+  ]);
   return {};
 }
 
-export async function listMedia() {
+// Media Picker: filtered in the DB instead of shipping every row to the
+// browser and filtering there.
+export async function listMedia(kind?: MediaKind) {
   await requireRole("ADMIN");
-  return prisma.media.findMany({ orderBy: { createdAt: "desc" } });
+  return prisma.media.findMany({
+    where: kind ? { kind } : undefined,
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true, filename: true, url: true, mimeType: true, size: true, kind: true,
+      titleVi: true, titleEn: true, altVi: true, altEn: true, captionVi: true, captionEn: true,
+      focalX: true, focalY: true, requireLeadForDownload: true, createdAt: true,
+    },
+  });
 }
