@@ -36,7 +36,7 @@ export function ArticleView({ article, relatedArticles }: { article: NewsArticle
       {/* Hero image */}
       <section className="relative h-[clamp(320px,52vh,540px)] w-full overflow-hidden">
         {article.featuredImageUrl ? (
-          <Image src={article.featuredImageUrl} alt={pick(article.title)} fill className="object-cover" priority />
+          <Image src={article.featuredImageUrl} alt={pick(article.title)} fill sizes="100vw" className="object-cover" priority />
         ) : (
           <ImagePlaceholder label={`${article.slug}.jpg`} tone="dark" className="rounded-none border-none" />
         )}

@@ -67,6 +67,11 @@ export const getPublishedArticleBySlug = cache(async (slug: string): Promise<New
   return row ? toArticleData(row) : null;
 });
 
+export async function getPublishedArticleSlugs(): Promise<string[]> {
+  const rows = await prisma.news.findMany({ where: { status: "PUBLISHED" }, select: { slug: true } });
+  return rows.map((r) => r.slug);
+}
+
 export const getCategories = cache(async () => {
   return prisma.category.findMany({ orderBy: { order: "asc" } });
 });

@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPublishedArticleBySlug, getPublishedArticles, getRelatedArticles } from "@/lib/server/mappers/news";
+import { getPublishedArticleBySlug, getPublishedArticles, getPublishedArticleSlugs, getRelatedArticles } from "@/lib/server/mappers/news";
 import { ArticleView } from "@/components/ArticleView";
 import { toJsonLdString } from "@/lib/jsonLd";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+// Prerendered at build; articles published later render on first visit and
+// are cached. Admin news actions call revalidatePath to refresh them.
+export async function generateStaticParams() {
+  return (await getPublishedArticleSlugs()).map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;

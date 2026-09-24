@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPublishedProjectBySlug } from "@/lib/server/mappers/project";
+import { getPublishedProjectBySlug, getPublishedProjectSlugs } from "@/lib/server/mappers/project";
 import { ProjectPage } from "@/components/project-detail/ProjectPage";
 import { ProjectNav } from "@/components/project-detail/ProjectNav";
 import { toJsonLdString } from "@/lib/jsonLd";
 
 type Params = { slug: string };
+
+// Prerendered at build; projects published later render on first visit and
+// are cached. Admin project actions call revalidatePath to refresh them.
+export async function generateStaticParams() {
+  return (await getPublishedProjectSlugs()).map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;

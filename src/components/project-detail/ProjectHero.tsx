@@ -24,7 +24,7 @@ export function ProjectHero({ id, name, data }: { id: string; name: string; data
     <section id={id} className="relative h-screen min-h-[640px] w-full overflow-hidden">
       <div className="absolute inset-0" style={{ opacity: entered ? 1 : 0, transition: "opacity 600ms var(--ease-editorial)" }}>
         {data.image?.src ? (
-          <Image src={data.image.src} alt={pick(data.image.alt)} fill priority className="object-cover" />
+          <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="100vw" priority className="object-cover" />
         ) : (
           <ImagePlaceholder
             label={pick(data.placeholderLabel ?? data.subhead)}

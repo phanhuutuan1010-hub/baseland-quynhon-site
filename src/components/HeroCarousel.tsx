@@ -23,7 +23,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
           style={{ opacity: active === i ? 1 : 0 }}
         >
           {"src" in slide ? (
-            <Image src={slide.src} alt={slide.alt} fill priority={i === 0} className="object-cover" />
+            <Image src={slide.src} alt={slide.alt} fill sizes="100vw" priority={i === 0} className="object-cover" />
           ) : (
             <ImagePlaceholder label={slide.placeholder} tone="dark" className="rounded-none border-none" />
           )}

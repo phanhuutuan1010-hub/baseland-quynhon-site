@@ -11,10 +11,14 @@ import type { NewsStatus } from "@prisma/client";
 
 type ActionResult = { error?: string };
 
-function revalidateNews(slug?: string) {
+// Article pages are statically generated, and each one lists related
+// articles + category labels — so any article/category change refreshes
+// every article page, not just the edited one (also covers a renamed slug).
+function revalidateNews() {
   revalidatePath("/news");
   revalidatePath("/");
-  if (slug) revalidatePath(`/news/${slug}`);
+  // Pattern must include the (site) route group, or it matches nothing.
+  revalidatePath("/(site)/news/[slug]", "page");
 }
 
 export async function createNews(input: unknown): Promise<ActionResult & { id?: string }> {
@@ -80,8 +84,7 @@ export async function updateNews(id: string, input: unknown): Promise<ActionResu
   });
 
   await logActivity({ userId: user.id, action: "news.update", entityType: "News", entityId: id });
-  revalidateNews(existing.slug);
-  if (d.slug !== existing.slug) revalidateNews(d.slug);
+  revalidateNews();
   revalidatePath("/admin/news");
   revalidatePath(`/admin/news/${id}`);
   return {};
@@ -106,7 +109,7 @@ export async function setNewsStatus(id: string, status: NewsStatus): Promise<Act
     oldValue: news.status,
     newValue: status,
   });
-  revalidateNews(news.slug);
+  revalidateNews();
   return {};
 }
 
@@ -117,7 +120,7 @@ export async function deleteNews(id: string): Promise<ActionResult> {
 
   await prisma.news.delete({ where: { id } });
   await logActivity({ userId: user.id, action: "news.delete", entityType: "News", entityId: id });
-  revalidateNews(news.slug);
+  revalidateNews();
   revalidatePath("/admin/news");
   redirect("/admin/news");
 }

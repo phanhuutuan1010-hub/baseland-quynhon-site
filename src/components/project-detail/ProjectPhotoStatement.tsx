@@ -64,7 +64,7 @@ export function ProjectPhotoStatement({
         }}
       >
         {data.image?.src ? (
-          <Image src={data.image.src} alt={pick(data.image.alt)} fill className="object-cover" />
+          <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="100vw" className="object-cover" />
         ) : (
           <ImagePlaceholder
             label={pick(data.placeholderLabel ?? data.headline)}
