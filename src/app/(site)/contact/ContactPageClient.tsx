@@ -6,6 +6,7 @@ import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_EMAIL_HREF, CONTACT_PHONE, CONT
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { LeadFormFull } from "@/components/LeadFormFull";
+import { Accent } from "@/components/Accent";
 
 export function ContactPageClient() {
   const { pick } = useLang();
@@ -21,7 +22,7 @@ export function ContactPageClient() {
             {pick(CONTACT_COPY.heroEyebrow)}
           </div>
           <h1 className="m-0 mb-5 font-display text-[length:var(--fs-hero)] leading-[1.05] font-normal text-[var(--color-warm-white)]">
-            {pick(CONTACT_COPY.heroHeadline)}
+            <Accent text={pick(CONTACT_COPY.heroHeadline)} onDark />
           </h1>
           <p className="m-0 max-w-140 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]">
             {pick(CONTACT_COPY.heroSub)}

@@ -383,7 +383,7 @@ export const THE_SAILING_PROJECT: ProjectDetailData = {
           en: "Comparing the two towers by their reference floor counts and unit orientation, to help shape your preference ahead of the official unit list.",
         },
         topicSlug: "maestro-vs-sailing",
-        prefillNeed: "Mua để ở",
+        prefillNeed: "Căn hộ",
         enabled: true,
         sortOrder: 2,
       },

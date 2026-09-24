@@ -5,6 +5,7 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectLocation as ProjectLocationData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 export function ProjectLocation({ id, data }: { id: string; data: ProjectLocationData }) {
   const { pick } = useLang();
@@ -30,14 +31,14 @@ export function ProjectLocation({ id, data }: { id: string; data: ProjectLocatio
                 hasJourney ? "text-[var(--color-warm-white)]" : "text-[var(--color-charcoal)]"
               }`}
             >
-              {pick(data.headline)}
+              <Accent text={pick(data.headline)} onDark />
             </h2>
             <p
               className={`m-0 max-w-[520px] font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] ${
                 hasJourney ? "text-[var(--color-sand)]" : "text-[var(--color-text-muted)]"
               }`}
             >
-              {pick(data.body)}
+              <Accent text={pick(data.body)} onDark />
             </p>
           </div>
           <div className="min-w-70 flex-1 basis-105">

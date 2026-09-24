@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectInvestment as ProjectInvestmentData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 export function InvestmentSection({ id, data }: { id: string; data: ProjectInvestmentData }) {
   const { pick } = useLang();
@@ -19,7 +20,7 @@ export function InvestmentSection({ id, data }: { id: string; data: ProjectInves
               className="m-0 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-warm-white)]"
               style={{ maxWidth: data.headlineMaxWidth ? pick(data.headlineMaxWidth) : "24ch" }}
             >
-              {pick(data.headline)}
+              <Accent text={pick(data.headline)} onDark />
             </h2>
           </div>
           <div className="min-w-70 flex flex-1 basis-120 flex-col">

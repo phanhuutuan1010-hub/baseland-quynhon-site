@@ -8,6 +8,7 @@ import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { useInView } from "@/lib/useInView";
 import type { ProjectTowers as ProjectTowersData, ProjectTower } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 /**
  * Split-screen tower comparison (Simona Heights: The Sea / The Harbour).
@@ -27,7 +28,7 @@ export function ProjectTowerSplit({ id, data }: { id: string; data: ProjectTower
               {pick(data.eyebrow)}
             </div>
             <h2 className="m-0 mb-10 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-warm-white)] md:mb-16">
-              {pick(data.headline)}
+              <Accent text={pick(data.headline)} onDark />
             </h2>
           </div>
         </div>

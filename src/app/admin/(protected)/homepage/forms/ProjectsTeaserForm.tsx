@@ -7,7 +7,7 @@ import { SaveBar } from "@/components/admin/SaveBar";
 import { RepeatableObjectList } from "@/components/admin/RepeatableList";
 import { updateHomepageSectionContent } from "../actions";
 
-type TeaserItem = { slotId: string; name: string; location: string; status: string; cta: string; imageSrc?: string };
+type TeaserItem = { slotId: string; name: string; location: string; status: string; cta: string; blurb?: string; href?: string; imageSrc?: string };
 type TeaserValue = { kicker: string; title: string; items: TeaserItem[] };
 
 export function ProjectsTeaserForm({ initial }: { initial: { vi: TeaserValue; en: TeaserValue } }) {
@@ -34,7 +34,9 @@ export function ProjectsTeaserForm({ initial }: { initial: { vi: TeaserValue; en
               { key: "name", label: "Tên dự án" },
               { key: "location", label: "Vị trí" },
               { key: "status", label: "Trạng thái" },
+              { key: "blurb", label: "Mô tả ngắn (1 câu)" },
               { key: "cta", label: "Nhãn CTA" },
+              { key: "href", label: "Link CTA (vd: /projects/the-sailing)" },
               { key: "imageSrc", label: "Ảnh (để trống = dùng placeholder)", type: "image" },
             ]}
             itemLabel="Dự án"

@@ -1,26 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 /** Counts up to `target` once it scrolls into view — used by ProjectStats
  * for animated key numbers (e.g. "864 residences"). Respects
  * prefers-reduced-motion (jumps straight to the target). */
 export function AnimatedNumber({ target }: { target: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  // Plain `0` initial value (never window-dependent) so server and client
-  // render identically on hydration — see useSequenceReveal.ts for why a
-  // matchMedia-dependent lazy initializer here caused a hydration mismatch.
-  const [value, setValue] = useState(0);
 
+  // The server HTML always carries the real number (crawlers, link
+  // previews and no-JS readers used to get "0" — the count-up's start
+  // value). The count-up only runs client-side for numbers still below the
+  // fold, writing to the DOM directly so React state/hydration never sees 0.
   useEffect(() => {
-    const reduced =
-      typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      setValue(target);
-      return;
-    }
     const el = ref.current;
     if (!el) return;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || el.getBoundingClientRect().top < window.innerHeight) return;
+    el.textContent = "0";
     let raf = 0;
     const io = new IntersectionObserver(
       (entries) => {
@@ -30,8 +27,7 @@ export function AnimatedNumber({ target }: { target: number }) {
           const dur = 1400;
           const step = (now: number) => {
             const p = Math.min(1, (now - t0) / dur);
-            const eased = 1 - Math.pow(1 - p, 3);
-            setValue(Math.round(target * eased));
+            el.textContent = String(Math.round(target * (1 - Math.pow(1 - p, 3))));
             if (p < 1) raf = requestAnimationFrame(step);
           };
           raf = requestAnimationFrame(step);
@@ -44,10 +40,11 @@ export function AnimatedNumber({ target }: { target: number }) {
     return () => {
       io.disconnect();
       if (raf) cancelAnimationFrame(raf);
+      el.textContent = String(target);
     };
   }, [target]);
 
-  return <div ref={ref}>{value}</div>;
+  return <div ref={ref}>{target}</div>;
 }
 
 /** Pill/tab chip shared by the unit-type selector (ResidenceSelector) and

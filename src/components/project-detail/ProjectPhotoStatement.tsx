@@ -6,6 +6,7 @@ import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { useInView } from "@/lib/useInView";
 import type { ProjectPhotoStatement as ProjectPhotoStatementData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 const TONE_BG: Record<NonNullable<ProjectPhotoStatementData["tone"]>, string> = {
   charcoal: "var(--color-charcoal)",
@@ -84,20 +85,20 @@ export function ProjectPhotoStatement({
               </div>
             )}
             <h2 className="m-0 font-display text-[clamp(2.25rem,6vw,4.5rem)] leading-[1.1] font-normal text-[var(--color-warm-white)]">
-              {pick(data.headline)}
+              <Accent text={pick(data.headline)} onDark />
             </h2>
           </div>
           <p className="m-0 max-w-[480px] self-end font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]">
-            {pick(data.body)}
+            <Accent text={pick(data.body)} onDark />
           </p>
         </Reveal>
       ) : (
         <Reveal className="relative z-[2] mx-auto flex h-full max-w-[1440px] flex-col justify-end px-5 py-12 sm:px-8 md:px-12 md:py-16">
           <h2 className="m-0 mb-5 max-w-[16ch] font-display text-[clamp(2rem,6.5vw,5rem)] leading-[1.05] font-normal text-[var(--color-warm-white)]">
-            {pick(data.headline)}
+            <Accent text={pick(data.headline)} onDark />
           </h2>
           <p className="m-0 font-ui text-[13px] font-semibold tracking-[0.14em] text-[var(--color-sand)] uppercase">
-            {pick(data.body)}
+            <Accent text={pick(data.body)} onDark />
           </p>
         </Reveal>
       )}

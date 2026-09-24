@@ -5,6 +5,7 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectAmenities as ProjectAmenitiesData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 export function AmenitySection({ id, data }: { id: string; data: ProjectAmenitiesData }) {
   const { pick } = useLang();
@@ -15,7 +16,7 @@ export function AmenitySection({ id, data }: { id: string; data: ProjectAmenitie
           {pick(data.eyebrow)}
         </div>
         <h2 className="m-0 mb-10 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)] md:mb-18">
-          {pick(data.headline)}
+          <Accent text={pick(data.headline)} />
         </h2>
         <div className="flex flex-col gap-10 md:gap-20">
           {data.chapters.map((ch) => (

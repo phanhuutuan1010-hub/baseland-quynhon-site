@@ -73,6 +73,20 @@ Trang chủ gồm 9 section cố định: Hero, Giới thiệu, Vì sao Quy Nhơ
 - **Sắp xếp lại**: kéo-thả để đổi thứ tự hiển thị (trang chủ là nơi DUY NHẤT cho phép đổi thứ tự section tự do — trang Dự án thì không, xem mục 4).
 - **Sửa nội dung**: bấm vào tên section để vào form chỉnh từng field song ngữ VI/EN.
 
+### Tô màu nhấn (accent) cho cụm từ quan trọng
+
+Trong các field **tiêu đề / headline / mô tả ngắn** (trang chủ và trang Dự án), bọc cụm từ cần nhấn trong hai cặp ngoặc vuông:
+
+```
+864 căn hộ giữa [[trung tâm Quy Nhơn]] — nơi thành phố, biển và nhịp sống gặp nhau.
+```
+
+Cụm `trung tâm Quy Nhơn` sẽ hiển thị bằng màu accent của dự án (màu sáng hơn trên nền tối), dấu `[[ ]]` tự ẩn. Khi dùng làm meta description/SEO, dấu cũng được tự bỏ.
+
+- Tối đa **1–2 cụm nhấn mỗi section** — nhấn quá nhiều sẽ mất tác dụng.
+- Ưu tiên nhấn: vị trí, khoảng cách, con số đã xác nhận, điểm khác biệt.
+- Không dùng trong nội dung bài viết Tin tức (rich text) — ở đó dùng **in đậm**.
+
 ---
 
 ## 4. Quản lý Dự án (`/admin/projects`)

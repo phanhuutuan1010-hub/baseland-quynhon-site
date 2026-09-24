@@ -36,6 +36,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Keep <html lang> in step with the visible language (screen readers,
+  // browser translate prompts) — the server always renders "vi".
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
   const setLang = useCallback((next: Lang) => {
     setLangState(next);
     try {

@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getPublishedProjectSlugs } from "@/lib/server/mappers/project";
 import { getPublishedArticles } from "@/lib/server/mappers/news";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+import { SITE_URL } from "@/lib/site";
 
 // Only published content is listed — draft/archived projects and draft
 // news are intentionally excluded so the sitemap never advertises a URL

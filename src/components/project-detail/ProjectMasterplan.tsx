@@ -7,6 +7,7 @@ import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { useInView } from "@/lib/useInView";
 import type { ProjectMasterplan as ProjectMasterplanData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 /**
  * Masterplan as a "product exploration" read: a large site image paired
@@ -29,10 +30,10 @@ export function ProjectMasterplan({ id, data }: { id: string; data: ProjectMaste
             {pick(data.eyebrow)}
           </div>
           <h2 className="m-0 mb-5 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-            {pick(data.headline)}
+            <Accent text={pick(data.headline)} />
           </h2>
           <p className="m-0 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--project-muted)]">
-            {pick(data.body)}
+            <Accent text={pick(data.body)} />
           </p>
         </div>
 

@@ -44,7 +44,7 @@ export type HomeContent = {
     title: string;
     /** imageSrc optional — falls back to the decorative ImagePlaceholder
      * (see ProjectsTeaserSection) when unset. */
-    items: { slotId: string; name: string; location: string; status: string; cta: string; imageSrc?: string }[];
+    items: { slotId: string; name: string; location: string; status: string; cta: string; blurb?: string; href?: string; imageSrc?: string }[];
   };
   services: { kicker: string; title: string; items: { num: string; title: string; desc: string }[] };
   whybl: { kicker: string; title: string; values: { name: string; desc: string }[] };

@@ -53,6 +53,8 @@ const projectsTeaserContent = z.object({
       location: z.string().trim(),
       status: z.string().trim(),
       cta: z.string().trim(),
+      blurb: z.string().trim().optional(),
+      href: z.string().trim().optional(),
       imageSrc: z.string().trim().optional().or(z.literal("")),
     }),
   ),

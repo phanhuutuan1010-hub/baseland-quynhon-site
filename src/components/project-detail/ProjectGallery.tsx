@@ -5,6 +5,7 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectGallery as ProjectGalleryData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 /** Nearby-destinations / gallery grid (Q'Terra: "6 điểm đến lân cận"). */
 export function ProjectGallery({ id, data }: { id: string; data: ProjectGalleryData }) {
@@ -13,7 +14,7 @@ export function ProjectGallery({ id, data }: { id: string; data: ProjectGalleryD
     <section id={id} className="bg-[var(--color-warm-white)] px-5 pb-16 sm:px-8 sm:pb-20 md:px-12 md:pb-28">
       <Reveal className="mx-auto max-w-[1440px]">
         <h2 className="m-0 mb-10 max-w-[900px] font-display text-[clamp(1.5rem,3vw,2.1rem)] leading-[1.4] font-normal text-[var(--color-charcoal)] md:mb-16">
-          {pick(data.intro)}
+          <Accent text={pick(data.intro)} />
         </h2>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {data.items.map((d) => (

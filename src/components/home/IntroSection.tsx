@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { HomeIntroContent } from "@/lib/content/home";
+import { Accent } from "@/components/Accent";
 
 export function IntroSection({ content }: { content: HomeIntroContent }) {
   const { pick } = useLang();
@@ -20,12 +21,12 @@ export function IntroSection({ content }: { content: HomeIntroContent }) {
           )}
           {t.title && (
             <h2 className="m-0 mb-6 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-              {t.title}
+              <Accent text={t.title} />
             </h2>
           )}
           {t.body && (
             <p className="m-0 max-w-[560px] font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-text-muted)]">
-              {t.body}
+              <Accent text={t.body} />
             </p>
           )}
         </div>

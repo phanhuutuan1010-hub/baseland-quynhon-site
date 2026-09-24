@@ -6,6 +6,7 @@ import { ABOUT_CONTENT } from "@/lib/content/about";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { LeadFormFull } from "@/components/LeadFormFull";
+import { Accent } from "@/components/Accent";
 import { useParallax } from "@/lib/useParallax";
 import { CONTACT_EMAIL, CONTACT_EMAIL_HREF, CONTACT_PHONE, CONTACT_PHONE_HREF } from "@/lib/content/nav";
 
@@ -52,7 +53,7 @@ export function AboutPageClient() {
       <section className="bg-[var(--color-warm-white)] px-5 py-18 sm:px-8 sm:py-24 md:px-12 md:py-35">
         <Reveal className="mx-auto max-w-240 text-center">
           <h2 className="m-0 font-display text-[clamp(1.5rem,3.6vw,2.5rem)] leading-[1.4] font-normal text-[var(--color-charcoal)]">
-            {t.statement}
+            <Accent text={t.statement} />
           </h2>
         </Reveal>
       </section>
@@ -90,7 +91,7 @@ export function AboutPageClient() {
             {t.whyqn.kicker}
           </div>
           <h2 className="m-0 mb-16 max-w-none font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-            {t.whyqn.statement}
+            <Accent text={t.whyqn.statement} />
           </h2>
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {t.whyqn.points.map((point) => (
@@ -117,7 +118,7 @@ export function AboutPageClient() {
             {t.expertise.kicker}
           </div>
           <h2 className="m-0 mb-14 max-w-190 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-warm-white)]">
-            {t.expertise.title}
+            <Accent text={t.expertise.title} onDark />
           </h2>
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {t.expertise.points.map((e) => (
@@ -140,7 +141,7 @@ export function AboutPageClient() {
               {t.values.kicker}
             </div>
             <h2 className="m-0 max-w-90 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-              {t.values.title}
+              <Accent text={t.values.title} />
             </h2>
           </div>
           <div className="flex min-w-[280px] flex-2 basis-120 flex-col">
@@ -198,7 +199,7 @@ export function AboutPageClient() {
         <Reveal className="mx-auto flex max-w-[1440px] flex-wrap gap-10 md:gap-20">
           <div className="min-w-[280px] flex-1 basis-95">
             <h2 className="m-0 mb-6 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-warm-white)]">
-              {t.cta.title}
+              <Accent text={t.cta.title} onDark />
             </h2>
             <p className="m-0 mb-9 max-w-110 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]">
               {t.cta.sub}
@@ -215,7 +216,7 @@ export function AboutPageClient() {
               href={CONTACT_PHONE_HREF}
               className="inline-flex items-center rounded-xs border border-[var(--color-terracotta-light)] bg-transparent px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--color-warm-white)] uppercase no-underline hover:bg-[rgba(193,99,60,0.15)]"
             >
-              {t.cta.callNow}
+              {t.cta.callNow} {CONTACT_PHONE}
             </a>
           </div>
           <div className="min-w-[280px] flex-1 basis-95 rounded-sm bg-[var(--color-warm-white)] p-7 sm:p-11">

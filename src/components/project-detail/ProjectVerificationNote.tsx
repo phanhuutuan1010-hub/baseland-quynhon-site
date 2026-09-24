@@ -3,6 +3,7 @@
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectVerification as ProjectVerificationData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 /**
  * Data-governance disclosure (see The Sailing brief mục 6): a project whose
@@ -21,10 +22,10 @@ export function ProjectVerificationNote({ id, data }: { id: string; data: Projec
           {pick(data.eyebrow)}
         </div>
         <h2 className="m-0 mb-4 font-display text-[length:var(--fs-h3)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-          {pick(data.headline)}
+          <Accent text={pick(data.headline)} />
         </h2>
         <p className="m-0 mb-8 max-w-170 font-body text-sm leading-[var(--lh-body)] text-[var(--color-text-muted-accessible)]">
-          {pick(data.body)}
+          <Accent text={pick(data.body)} />
         </p>
         <div className="flex flex-col">
           {data.items.map((item, i) => (

@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { getPublishedArticleBySlug, getPublishedArticles, getPublishedArticleSlugs, getRelatedArticles } from "@/lib/server/mappers/news";
 import { ArticleView } from "@/components/ArticleView";
 import { toJsonLdString } from "@/lib/jsonLd";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+import { buildMetadata } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
 
 // Prerendered at build; articles published later render on first visit and
 // are cached. Admin news actions call revalidatePath to refresh them.
@@ -17,20 +17,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const article = await getPublishedArticleBySlug(slug);
   if (!article) return {};
 
-  const title = article.seo.title || `${article.title.vi} — Base Land Quy Nhơn`;
-  const description = article.seo.description || article.excerpt.vi;
-
-  return {
-    title,
-    description,
-    alternates: { canonical: `/news/${slug}` },
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      images: article.featuredImageUrl ? [{ url: article.featuredImageUrl }] : undefined,
-    },
-  };
+  return buildMetadata({
+    title: article.seo.title || `${article.title.vi} | Base Land Quy Nhơn`,
+    description: article.seo.description || article.excerpt.vi,
+    path: `/news/${slug}`,
+    image: article.featuredImageUrl,
+    type: "article",
+    publishedTime: article.date,
+  });
 }
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {

@@ -3,6 +3,7 @@
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { HomeServicesContent } from "@/lib/content/home";
+import { Accent } from "@/components/Accent";
 
 export function ServicesSection({ content }: { content: HomeServicesContent }) {
   const { pick } = useLang();
@@ -18,7 +19,7 @@ export function ServicesSection({ content }: { content: HomeServicesContent }) {
         )}
         {t.title && (
           <h2 className="m-0 mb-14 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-            {t.title}
+            <Accent text={t.title} />
           </h2>
         )}
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">

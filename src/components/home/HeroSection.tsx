@@ -5,6 +5,7 @@ import { useLang } from "@/lib/i18n";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { useSequenceReveal, stepStyle, stepScaleStyle, lineRevealStyle } from "@/lib/useSequenceReveal";
 import type { HomeHeroContent } from "@/lib/content/home";
+import { Accent } from "@/components/Accent";
 
 // The two CTA hrefs (#featured / /contact) are structural — #featured must
 // keep matching FeaturedProjectSection's anchor id, so they aren't exposed
@@ -51,12 +52,12 @@ export function HeroSection({ content }: { content: HomeHeroContent }) {
           <h1 className="m-0 mb-5 max-w-full font-display text-[length:var(--fs-hero)] leading-[var(--lh-tight)] font-normal tracking-[-0.01em] text-[var(--color-warm-white)]">
             {t.headlineLines[0] && (
               <span style={stepStyle(entered, 250, 600)} className="block">
-                {t.headlineLines[0]}
+                <Accent text={t.headlineLines[0]} onDark />
               </span>
             )}
             {t.headlineLines[1] && (
               <span style={stepStyle(entered, 400, 600)} className="block">
-                {t.headlineLines[1]}
+                <Accent text={t.headlineLines[1]} onDark />
               </span>
             )}
           </h1>
@@ -67,7 +68,7 @@ export function HeroSection({ content }: { content: HomeHeroContent }) {
             style={stepStyle(entered, 750, 500)}
             className="m-0 mb-10 max-w-[520px] font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]"
           >
-            {t.tagline}
+            <Accent text={t.tagline} onDark />
           </p>
         )}
         {(t.ctaPrimary || t.ctaSecondary) && (

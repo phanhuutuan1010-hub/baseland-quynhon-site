@@ -8,6 +8,7 @@ import { StickyCta } from "@/components/StickyCta";
 import { Analytics } from "@/components/Analytics";
 import { getSiteChromeData, getSiteMetaSettings } from "@/lib/server/mappers/siteChrome";
 import { toJsonLdString } from "@/lib/jsonLd";
+import { SITE_URL } from "@/lib/site";
 
 const prata = Prata({
   subsets: ["latin"],
@@ -30,8 +31,8 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const DEFAULT_DESCRIPTION = "Base Land Quy Nhơn — an cư & đầu tư bên bờ biển Quy Nhơn.";
+const DEFAULT_DESCRIPTION =
+  "Khám phá các dự án bất động sản tại Quy Nhơn cùng Base Land Quy Nhơn. Căn hộ, nhà phố, shophouse và cơ hội đầu tư.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const meta = await getSiteMetaSettings();
@@ -40,14 +41,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteName = meta.siteName || "Base Land Quy Nhơn";
   return {
     metadataBase: new URL(SITE_URL),
-    title: siteName,
+    title: { default: siteName, template: `%s | ${siteName}` },
     description: DEFAULT_DESCRIPTION,
     icons: meta.faviconUrl ? { icon: meta.faviconUrl } : undefined,
     openGraph: {
       title: siteName,
       description: DEFAULT_DESCRIPTION,
       siteName,
+      url: SITE_URL,
       locale: "vi_VN",
+      alternateLocale: ["en_US"],
       type: "website",
       images: meta.defaultOgImageUrl ? [{ url: meta.defaultOgImageUrl }] : undefined,
     },
@@ -87,6 +90,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     },
   };
 
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Base Land Quy Nhơn",
+    url: SITE_URL,
+    inLanguage: ["vi", "en"],
+  };
+
   return (
     <html lang="vi" className={`${prata.variable} ${jakarta.variable} ${montserrat.variable}`}>
       <body className="flex min-h-screen flex-col overflow-x-clip bg-[var(--color-bg)] pb-[calc(72px+env(safe-area-inset-bottom,0px))] md:pb-0">
@@ -104,6 +115,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: toJsonLdString(organizationSchema) }}
         />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLdString(websiteSchema) }} />
         <Analytics gaId={meta.gaId} gtmId={meta.gtmId} metaPixelId={meta.metaPixelId} />
         <LanguageProvider>
           <SiteChrome data={chrome} />

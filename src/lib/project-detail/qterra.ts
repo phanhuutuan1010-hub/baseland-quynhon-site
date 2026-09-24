@@ -480,7 +480,7 @@ export const QTERRA_PROJECT: ProjectDetailData = {
           en: "Comparing views and floor position across Q'Terra's 1-Bedroom units.",
         },
         topicSlug: "1br-location",
-        prefillNeed: "Quan tâm Q'Terra",
+        prefillNeed: "Căn hộ",
         enabled: true,
         sortOrder: 2,
       },

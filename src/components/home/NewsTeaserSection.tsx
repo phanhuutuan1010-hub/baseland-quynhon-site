@@ -8,6 +8,7 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { formatArticleDate } from "@/lib/content/news";
 import type { HomeNewsTeaserContent } from "@/lib/content/home";
 import type { NewsArticleData } from "@/lib/server/mappers/news";
+import { Accent } from "@/components/Accent";
 
 export function NewsTeaserSection({
   content,
@@ -31,7 +32,7 @@ export function NewsTeaserSection({
             )}
             {t.title && (
               <h2 className="m-0 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-                {t.title}
+                <Accent text={t.title} />
               </h2>
             )}
           </div>

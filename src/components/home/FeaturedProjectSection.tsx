@@ -7,6 +7,7 @@ import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { HScroller } from "@/components/HScroller";
 import type { HomeFeaturedProjectContent } from "@/lib/content/home";
+import { Accent } from "@/components/Accent";
 
 // The id="featured" anchor is targeted by HeroSection's primary CTA — kept
 // structural (not admin-editable) for the same reason as that href.
@@ -38,12 +39,12 @@ export function FeaturedProjectSection({ content }: { content: HomeFeaturedProje
             )}
             {t.title && (
               <h2 className="m-0 mb-6 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-warm-white)]">
-                {t.title}
+                <Accent text={t.title} onDark />
               </h2>
             )}
             {t.desc && (
               <p className="m-0 mb-9 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]">
-                {t.desc}
+                <Accent text={t.desc} onDark />
               </p>
             )}
             {(t.locationLabel || t.locationValue || t.scaleLabel || t.scaleValue) && (

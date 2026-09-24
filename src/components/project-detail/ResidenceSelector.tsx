@@ -8,6 +8,7 @@ import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectResidences as ProjectResidencesData } from "@/lib/project-detail/types";
 import { chipClass } from "./shared";
+import { Accent } from "@/components/Accent";
 
 export function ResidenceSelector({ id, data }: { id: string; data: ProjectResidencesData }) {
   const { pick } = useLang();
@@ -21,10 +22,10 @@ export function ResidenceSelector({ id, data }: { id: string; data: ProjectResid
           {pick(data.eyebrow)}
         </div>
         <h2 className="m-0 mb-5 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-          {pick(data.headline)}
+          <Accent text={pick(data.headline)} />
         </h2>
         <p className="m-0 mb-8 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-text-muted)] md:mb-12">
-          {pick(data.body)}
+          <Accent text={pick(data.body)} />
         </p>
 
         <div

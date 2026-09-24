@@ -4,6 +4,7 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { LeadFormSimple } from "@/components/LeadFormSimple";
 import type { HomeLeadCtaContent } from "@/lib/content/home";
+import { Accent } from "@/components/Accent";
 
 export function LeadCtaSection({
   content,
@@ -27,12 +28,12 @@ export function LeadCtaSection({
         <div className="min-w-[280px] flex-1 basis-95">
           {t.title && (
             <h2 className="m-0 mb-6 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-warm-white)]">
-              {t.title}
+              <Accent text={t.title} onDark />
             </h2>
           )}
           {t.sub && (
             <p className="m-0 mb-10 max-w-110 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]">
-              {t.sub}
+              <Accent text={t.sub} onDark />
             </p>
           )}
           {contactPhoneHref && contactPhone && (

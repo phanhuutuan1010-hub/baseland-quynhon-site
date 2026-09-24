@@ -3,6 +3,7 @@
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { HomeWhyBaseLandContent } from "@/lib/content/home";
+import { Accent } from "@/components/Accent";
 
 export function WhyBaseLandSection({ content }: { content: HomeWhyBaseLandContent }) {
   const { pick } = useLang();
@@ -19,7 +20,7 @@ export function WhyBaseLandSection({ content }: { content: HomeWhyBaseLandConten
           )}
           {t.title && (
             <h2 className="m-0 max-w-90 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-              {t.title}
+              <Accent text={t.title} />
             </h2>
           )}
         </div>

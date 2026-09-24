@@ -14,6 +14,7 @@ import type {
   ProjectVideoItem,
   ProjectAdvisor,
 } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 const DEFAULT_CTA_LABEL: Localized<string> = {
   vi: "Liên hệ ngay với TVBH",
@@ -81,11 +82,11 @@ export function ProjectVideoDuo({
             {pick(data.eyebrow)}
           </div>
           <h2 className="m-0 mb-5 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-            {pick(data.headline)}
+            <Accent text={pick(data.headline)} />
           </h2>
           {data.body && (
             <p className="m-0 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--project-muted)]">
-              {pick(data.body)}
+              <Accent text={pick(data.body)} />
             </p>
           )}
         </div>

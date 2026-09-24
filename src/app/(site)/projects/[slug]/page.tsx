@@ -4,6 +4,8 @@ import { getPublishedProjectBySlug, getPublishedProjectSlugs } from "@/lib/serve
 import { ProjectPage } from "@/components/project-detail/ProjectPage";
 import { ProjectNav } from "@/components/project-detail/ProjectNav";
 import { toJsonLdString } from "@/lib/jsonLd";
+import { buildMetadata } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
 
 type Params = { slug: string };
 
@@ -18,23 +20,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const project = await getPublishedProjectBySlug(slug);
   if (!project) return {};
 
-  const title = project.seo?.title || `${project.name} — Base Land Quy Nhơn`;
-  const description = project.seo?.description || project.hero.subhead.vi;
-  const ogImage = project.seo?.ogImageUrl || project.hero.image?.src;
-
-  return {
-    title,
-    description,
-    alternates: { canonical: `/projects/${project.slug}` },
-    openGraph: {
-      title,
-      description,
-      images: ogImage ? [{ url: ogImage }] : undefined,
-    },
-  };
+  return buildMetadata({
+    title: project.seo?.title || `${project.name} | Base Land Quy Nhơn`,
+    description: project.seo?.description || project.hero.subhead.vi,
+    path: `/projects/${project.slug}`,
+    image: project.seo?.ogImageUrl || project.hero.image?.src,
+  });
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export default async function ProjectDetailPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;

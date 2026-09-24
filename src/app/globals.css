@@ -389,3 +389,14 @@ textarea {
     transform: translateX(0);
   }
 }
+
+/* Key-phrase highlight for `[[phrase]]` content marks (see components/
+ * Accent.tsx). Reuses the existing accent tokens — terracotta site-wide,
+ * each project's own accent inside [data-project-theme]. Max 1–2 per
+ * section, so it stays a signal rather than decoration. */
+.accent-text {
+  color: var(--project-accent);
+}
+.accent-text--on-dark {
+  color: var(--project-accent-light);
+}

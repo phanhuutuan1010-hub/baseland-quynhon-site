@@ -7,6 +7,7 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectFloorPlans as ProjectFloorPlansData } from "@/lib/project-detail/types";
 import { chipClass } from "./shared";
+import { Accent } from "@/components/Accent";
 
 export function FloorPlanViewer({ id, data }: { id: string; data: ProjectFloorPlansData }) {
   const { pick } = useLang();
@@ -27,7 +28,7 @@ export function FloorPlanViewer({ id, data }: { id: string; data: ProjectFloorPl
               {pick(data.eyebrow)}
             </div>
             <h2 className="m-0 max-w-[22ch] font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-              {pick(data.headline)}
+              <Accent text={pick(data.headline)} />
             </h2>
           </div>
           <p className="min-w-70 max-w-110 flex-1 basis-80 font-body text-[length:var(--fs-body)] leading-[var(--lh-body)] text-[var(--color-text-muted)]">

@@ -5,6 +5,7 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectMaterialStory as ProjectMaterialStoryData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 export function ProjectMaterialStory({ data }: { data: ProjectMaterialStoryData }) {
   const { pick } = useLang();
@@ -17,10 +18,10 @@ export function ProjectMaterialStory({ data }: { data: ProjectMaterialStoryData 
               {pick(data.kicker)}
             </div>
             <h2 className="m-0 mb-6 max-w-[20ch] font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-              {pick(data.headline)}
+              <Accent text={pick(data.headline)} />
             </h2>
             <p className="m-0 max-w-[520px] font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-text-muted)]">
-              {pick(data.body)}
+              <Accent text={pick(data.body)} />
             </p>
           </div>
           <div className="min-w-75 grid flex-1 basis-75 grid-cols-4 gap-0.5">

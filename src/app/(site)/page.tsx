@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { getHomepageSections } from "@/lib/server/mappers/homepage";
 import { getSiteChromeData } from "@/lib/server/mappers/siteChrome";
 import { getPublishedArticles } from "@/lib/server/mappers/news";
@@ -10,6 +12,13 @@ import { ServicesSection } from "@/components/home/ServicesSection";
 import { WhyBaseLandSection } from "@/components/home/WhyBaseLandSection";
 import { NewsTeaserSection } from "@/components/home/NewsTeaserSection";
 import { LeadCtaSection } from "@/components/home/LeadCtaSection";
+
+export const metadata: Metadata = buildMetadata({
+  title: "Bất động sản Quy Nhơn | Base Land Quy Nhơn",
+  description:
+    "Khám phá các dự án bất động sản tại Quy Nhơn cùng Base Land Quy Nhơn. Căn hộ, nhà phố, shophouse và cơ hội đầu tư.",
+  path: "/",
+});
 
 // Data-driven orchestrator — mirrors ProjectPage.tsx's pattern (section list
 // decides what renders), except here the Admin-controlled `enabled`/`order`

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectLegal as ProjectLegalData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 /** "Legal / Trust" section — Base Land credibility block. */
 export function TrustSection({ data }: { data: ProjectLegalData }) {
@@ -16,7 +17,7 @@ export function TrustSection({ data }: { data: ProjectLegalData }) {
         </div>
         <div className="min-w-70 flex-1 basis-105">
           <h2 className="m-0 mb-6 max-w-155 font-display text-[clamp(1.25rem,2.4vw,1.75rem)] leading-[1.45] font-normal text-[var(--color-charcoal)]">
-            {pick(data.body)}
+            <Accent text={pick(data.body)} />
           </h2>
           <div className="flex flex-wrap gap-6 md:gap-12">
             {data.points.map((p, i) => (

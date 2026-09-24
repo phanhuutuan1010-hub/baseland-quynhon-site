@@ -2,39 +2,45 @@ import type { Localized } from "@/lib/i18n";
 
 export const CONTACT_COPY = {
   heroEyebrow: { vi: "Liên hệ", en: "Contact" },
-  heroHeadline: { vi: "Cùng trò chuyện về Quy Nhơn", en: "Let's talk about Quy Nhon" },
-  heroSub: {
-    vi: "Base Land Quy Nhơn sẵn sàng lắng nghe nhu cầu của bạn và đưa ra tư vấn phù hợp.",
-    en: "Base Land Quy Nhon is ready to listen and offer advice that fits your needs.",
+  heroHeadline: {
+    vi: "Tìm đúng bất động sản bắt đầu từ [[một cuộc trò chuyện]].",
+    en: "Let's talk about your [[property search]].",
   },
-  infoKicker: { vi: "Thông tin liên hệ", en: "Contact Information" },
+  heroSub: {
+    vi: "Hãy cho chúng tôi biết bạn đang tìm điều gì tại Quy Nhơn.",
+    en: "Tell us what you're looking for in Quy Nhon.",
+  },
+  infoKicker: { vi: "Thông tin liên hệ", en: "Contact details" },
   trustKicker: { vi: "Vì sao chọn Base Land", en: "Why Base Land" },
 } satisfies Record<string, Localized>;
 
 export const TRUST_POINTS: { title: Localized; desc: Localized }[] = [
   {
-    title: { vi: "Base Land Quy Nhơn", en: "Base Land Quy Nhon" },
-    desc: { vi: "Chi nhánh của Base Land tại thành phố biển Quy Nhơn.", en: "Base Land's branch in the coastal city of Quy Nhon." },
-  },
-  {
-    title: { vi: "Am hiểu Quy Nhơn", en: "Local expertise" },
+    title: { vi: "Làm việc tại Quy Nhơn", en: "Based in Quy Nhon" },
     desc: {
-      vi: "Làm việc trực tiếp tại thị trường bất động sản Quy Nhơn.",
-      en: "Working directly in the Quy Nhon real estate market.",
+      vi: "Đội ngũ ở ngay thành phố, đi thực địa cùng khách hàng.",
+      en: "Our team is in the city and visits sites with you.",
     },
   },
   {
-    title: { vi: "4 dự án đã triển khai", en: "4 projects underway" },
+    title: { vi: "Thông tin đã xác nhận", en: "Verified information" },
     desc: {
-      vi: "Q'Terra, The Sailing Quy Nhơn, Simona Heights, Phú Gia Royal Park Quy Nhơn.",
-      en: "Q'Terra, The Sailing Quy Nhon, Simona Heights, Phu Gia Royal Park Quy Nhon.",
+      vi: "Ưu tiên dữ liệu và tài liệu chính thức từ chủ đầu tư.",
+      en: "We prioritize official data and documents from developers.",
     },
   },
   {
-    title: { vi: "Hỗ trợ chuyên nghiệp", en: "Professional support" },
+    title: { vi: "4 dự án đang phân phối", en: "4 projects we distribute" },
     desc: {
-      vi: "Đội ngũ tư vấn đồng hành từ bước đầu tiên đến khi hoàn tất giao dịch.",
-      en: "An advisory team guiding you from the first conversation through to closing.",
+      vi: "Q'Terra, The Sailing, Simona Heights và Phú Gia Royal Park.",
+      en: "Q'Terra, The Sailing, Simona Heights and Phu Gia Royal Park.",
+    },
+  },
+  {
+    title: { vi: "Đồng hành đến cuối", en: "Support to the end" },
+    desc: {
+      vi: "Từ lúc tìm hiểu đến khi hoàn tất giao dịch.",
+      en: "From your first question to the finished transaction.",
     },
   },
 ];

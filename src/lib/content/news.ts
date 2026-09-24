@@ -179,40 +179,40 @@ export function getRelatedArticles(current: Article, max = 3): Article[] {
 
 // Page-level bilingual copy shared by the News list page.
 export const NEWS_PAGE_COPY = {
-  pageEyebrow: { vi: "Insights", en: "Insights" },
+  pageEyebrow: { vi: "Tin tức & góc nhìn", en: "Insights" },
   pageTitle: {
-    vi: "Quy Nhơn Real Estate & Lifestyle Insights",
-    en: "Quy Nhon Real Estate & Lifestyle Insights",
+    vi: "Góc nhìn bất động sản Quy Nhơn",
+    en: "Quy Nhon property insights",
   },
   readMore: { vi: "Đọc bài viết", en: "Read article" },
-  featuredKicker: { vi: "Bài viết nổi bật", en: "Featured Articles" },
-  latestTitle: { vi: "Insights mới nhất", en: "Latest Insights" },
+  featuredKicker: { vi: "Bài viết nổi bật", en: "Featured" },
+  latestTitle: { vi: "Bài viết mới nhất", en: "Latest articles" },
   emptyMsg: { vi: "Chưa có bài viết trong danh mục này.", en: "No articles in this category yet." },
-  projectCtaTitle: { vi: "Khám phá dự án tại Quy Nhơn", en: "Explore projects in Quy Nhon" },
+  projectCtaTitle: { vi: "Đang tìm dự án tại Quy Nhơn?", en: "Looking at projects in Quy Nhon?" },
   projectCtaBody: {
-    vi: "Xem danh mục dự án bất động sản đang được Base Land Quy Nhơn phân phối và tư vấn.",
-    en: "Browse the real estate projects currently marketed and advised by Base Land Quy Nhon.",
+    vi: "Xem 4 dự án Base Land Quy Nhơn đang phân phối — vị trí, sản phẩm và thông tin đã xác nhận.",
+    en: "See the 4 projects Base Land Quy Nhon distributes — location, product and verified information.",
   },
-  projectCtaBtn: { vi: "Xem dự án", en: "View Projects" },
+  projectCtaBtn: { vi: "Xem dự án", en: "Explore projects" },
 } satisfies Record<string, Localized<string>>;
 
 // Page-level bilingual copy shared by the Article detail page.
 export const ARTICLE_PAGE_COPY = {
-  backToInsights: { vi: "Tất cả Insights", en: "All Insights" },
+  backToInsights: { vi: "Tất cả bài viết", en: "All articles" },
   authorName: { vi: "Base Land Quy Nhơn", en: "Base Land Quy Nhon" },
   viewProject: { vi: "Xem dự án", en: "View project" },
-  relatedProjectKicker: { vi: "Dự án liên quan", en: "Related Project" },
-  relatedArticlesKicker: { vi: "Bài viết liên quan", en: "Related Articles" },
+  relatedProjectKicker: { vi: "Dự án liên quan", en: "Related project" },
+  relatedArticlesKicker: { vi: "Bài viết liên quan", en: "Related articles" },
 } satisfies Record<string, Localized<string>>;
 
 // Shared lead-CTA copy (identical gradient section on both News and Article).
 export const NEWS_LEAD_COPY = {
   ctaTitle: {
-    vi: "Bạn đang quan tâm bất động sản tại Quy Nhơn?",
-    en: "Interested in real estate in Quy Nhon?",
+    vi: "Bạn đang tìm bất động sản tại Quy Nhơn?",
+    en: "Looking for property in Quy Nhon?",
   },
   ctaSub: {
-    vi: "Để lại thông tin, chuyên viên Base Land Quy Nhơn sẽ liên hệ tư vấn trong thời gian sớm nhất.",
-    en: "Leave your details and a Base Land Quy Nhon advisor will be in touch shortly.",
+    vi: "Cho chúng tôi biết bạn đang tìm căn hộ, nhà phố, shophouse hay cơ hội đầu tư.",
+    en: "Tell us what you are looking for — an apartment, townhouse, shophouse or investment opportunity.",
   },
 } satisfies Record<string, Localized<string>>;

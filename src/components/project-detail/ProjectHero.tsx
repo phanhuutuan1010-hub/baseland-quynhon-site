@@ -6,6 +6,8 @@ import { useLang } from "@/lib/i18n";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { useSequenceReveal, stepStyle, stepScaleStyle, lineRevealStyle } from "@/lib/useSequenceReveal";
 import type { ProjectHero as ProjectHeroData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
+import { stripAccent } from "@/lib/accent";
 
 /**
  * Staged hero reveal per the Q'Terra brief's mục 5 ("image reveal → project
@@ -27,7 +29,7 @@ export function ProjectHero({ id, name, data }: { id: string; name: string; data
           <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="100vw" priority className="object-cover" />
         ) : (
           <ImagePlaceholder
-            label={pick(data.placeholderLabel ?? data.subhead)}
+            label={stripAccent(pick(data.placeholderLabel ?? data.subhead))}
             tone="dark"
             className="rounded-none border-none"
           />
@@ -70,7 +72,7 @@ export function ProjectHero({ id, name, data }: { id: string; name: string; data
             style={stepStyle(entered, 850, 500)}
             className="m-0 mb-9.5 max-w-[520px] font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]"
           >
-            {pick(data.subhead)}
+            <Accent text={pick(data.subhead)} onDark />
           </p>
         )}
         {(pick(data.ctaExploreLabel) || pick(data.ctaConsultLabel)) && (

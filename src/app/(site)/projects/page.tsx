@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { ProjectsPageClient } from "./ProjectsPageClient";
 
-export const metadata: Metadata = {
-  title: "Khám phá Quy Nhơn — Dự án bất động sản — Base Land Quy Nhơn",
+export const metadata: Metadata = buildMetadata({
+  title: "Dự án bất động sản Quy Nhơn | Base Land",
   description:
-    "Các dự án bất động sản tại Quy Nhơn được Base Land phân phối và tư vấn — chọn lọc, xác thực và cập nhật liên tục.",
-  alternates: { canonical: "/projects" },
-};
+    "Tổng hợp các dự án bất động sản được Base Land Quy Nhơn phân phối và tư vấn — từ căn hộ trung tâm đến khu đô thị thấp tầng.",
+  path: "/projects",
+});
 
 export default function ProjectsPage() {
   return <ProjectsPageClient />;

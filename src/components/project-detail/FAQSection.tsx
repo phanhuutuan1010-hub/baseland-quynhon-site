@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectFAQ as ProjectFAQData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 /**
  * Grouped FAQ accordion — generic across projects (group keys/labels come
@@ -24,7 +25,7 @@ export function FAQSection({ id, data }: { id: string; data: ProjectFAQData }) {
           {pick(data.eyebrow)}
         </div>
         <h2 className="m-0 mb-10 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)] md:mb-14">
-          {pick(data.headline)}
+          <Accent text={pick(data.headline)} />
         </h2>
 
         <div className="flex flex-col gap-12 md:gap-16">

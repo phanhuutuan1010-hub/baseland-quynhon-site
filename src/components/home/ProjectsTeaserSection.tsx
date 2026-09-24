@@ -6,6 +6,7 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { HomeProjectsTeaserContent } from "@/lib/content/home";
+import { Accent } from "@/components/Accent";
 
 export function ProjectsTeaserSection({ content }: { content: HomeProjectsTeaserContent }) {
   const { pick } = useLang();
@@ -21,7 +22,7 @@ export function ProjectsTeaserSection({ content }: { content: HomeProjectsTeaser
         )}
         {t.title && (
           <h2 className="m-0 mb-14 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-            {t.title}
+            <Accent text={t.title} />
           </h2>
         )}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -47,9 +48,10 @@ export function ProjectsTeaserSection({ content }: { content: HomeProjectsTeaser
               </div>
               {item.name && <h3 className="m-0 mb-1.5 font-display text-xl font-normal text-[var(--color-charcoal)]">{item.name}</h3>}
               {item.location && <div className="mb-3.5 font-body text-sm text-[var(--color-text-muted)]">{item.location}</div>}
+              {item.blurb && <p className="m-0 mb-4 font-body text-[15px] leading-[var(--lh-body)] text-[var(--color-charcoal)]">{item.blurb}</p>}
               {item.cta && (
                 <Link
-                  href="/projects#grid"
+                  href={item.href || "/projects#grid"}
                   className="font-ui text-xs font-bold tracking-[0.06em] text-[var(--color-brand-green)] uppercase no-underline hover:text-[var(--color-brand-green-dark)]"
                 >
                   {item.cta} →

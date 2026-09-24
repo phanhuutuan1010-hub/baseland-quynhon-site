@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectDocuments as ProjectDocumentsData } from "@/lib/project-detail/types";
+import { Accent } from "@/components/Accent";
 
 export function DocumentSection({ id, data }: { id: string; data: ProjectDocumentsData }) {
   const { pick } = useLang();
@@ -14,7 +15,7 @@ export function DocumentSection({ id, data }: { id: string; data: ProjectDocumen
           {pick(data.eyebrow)}
         </div>
         <h2 className="m-0 mb-8 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)] md:mb-14">
-          {pick(data.headline)}
+          <Accent text={pick(data.headline)} />
         </h2>
         <div className="flex flex-col">
           {data.items.map((d, i) => (

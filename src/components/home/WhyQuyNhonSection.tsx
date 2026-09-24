@@ -5,6 +5,7 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { HomeWhyQuyNhonContent } from "@/lib/content/home";
+import { Accent } from "@/components/Accent";
 
 export function WhyQuyNhonSection({ content }: { content: HomeWhyQuyNhonContent }) {
   const { pick } = useLang();
@@ -20,7 +21,7 @@ export function WhyQuyNhonSection({ content }: { content: HomeWhyQuyNhonContent 
         )}
         {t.statement && (
           <h2 className="m-0 mb-16 max-w-230 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-            {t.statement}
+            <Accent text={t.statement} />
           </h2>
         )}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
