@@ -12,9 +12,9 @@ export const QTERRA_LAUNCH = {
   HOTLINE,
   hotlineHref: CONTACT_PHONE_HREF, // tel:+84373910109
   hotlineDisplay: CONTACT_PHONE, // 0373 910 109
-  ZALO_URL: "", // rỗng = ẩn nút Zalo
-  BOOKING_ENABLED: false,
+  ZALO_URL: "https://zalo.me/0373910109", // rỗng = ẩn nút Zalo
   OPEN_DATE_TEXT: "Dự kiến 30/10/2026",
+  OPEN_DATE: "30/10/2026", // hiển thị lớn trong khối "Giai đoạn mở bán"
 
   section: {
     eyebrow: "Q'Terra Quy Nhơn",
@@ -25,8 +25,6 @@ export const QTERRA_LAUNCH = {
       register: {
         title: "Đăng ký nguyện vọng",
         body: "Chọn tầng, loại căn, hướng bạn quan tâm. Điều kiện giữ chỗ (nếu có) gửi bằng văn bản trước khi bạn chuyển tiền.",
-        badgeOpen: "Đang mở giữ chỗ",
-        badgeClosed: "Đăng ký quan tâm, chưa thu tiền",
       },
       launch: {
         title: "Mở bán · chọn căn",
@@ -37,7 +35,10 @@ export const QTERRA_LAUNCH = {
         body: "Các căn còn lại mở bán công khai theo bảng hàng cập nhật.",
       },
     },
-    note: "Loại hình: căn hộ du lịch · đất thuê đến 2069.",
+    dateLabel: "Mở bán dự kiến",
+    dateCaption: "Ngày chính xác theo thông báo của chủ đầu tư.",
+    stepTag: "Mốc mở bán",
+    ctaZalo: "Chat Zalo",
     ctaLead: "Nhận tư vấn chọn căn",
     ctaCall: "Gọi ngay",
   },

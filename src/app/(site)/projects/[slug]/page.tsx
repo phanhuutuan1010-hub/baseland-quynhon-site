@@ -58,7 +58,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
           lookup, since project content is DB-backed and can change per edit. */}
       <ProjectNav project={project} />
       {project.slug === QTERRA_LAUNCH.slug ? (
-        <ProjectPage project={project} beforeLocation={<QterraLaunchSection />} extras={<QterraLeadPopup />} />
+        <ProjectPage project={project} beforeLocation={
+            <QterraLaunchSection bgImage={project.architecture?.image?.src || project.hero.image?.src} />
+          } extras={<QterraLeadPopup />} />
       ) : (
         <ProjectPage project={project} />
       )}
