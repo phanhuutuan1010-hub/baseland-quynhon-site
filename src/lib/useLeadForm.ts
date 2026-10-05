@@ -15,6 +15,17 @@ const INITIAL: LeadFormState = { name: "", phone: "", email: "", need: "", conse
 
 type Status = "idle" | "loading" | "success" | "error";
 
+export const LEAD_SUBMITTED_KEY = "bl_lead_submitted_at";
+export const LEAD_SUBMITTED_EVENT = "bl:lead-submitted";
+
+/** Records that a lead form was sent (read by QterraLeadPopup to stay hidden). */
+export function markLeadSubmitted() {
+  try {
+    localStorage.setItem(LEAD_SUBMITTED_KEY, String(Date.now()));
+  } catch {}
+  window.dispatchEvent(new Event(LEAD_SUBMITTED_EVENT));
+}
+
 /** Shared validation/submit logic behind both the simple (Homepage) and
  * full (Contact) lead-capture forms — both post to /api/lead. `initial`
  * lets a caller prefill fields (e.g. the video-story lead modal
@@ -57,6 +68,7 @@ export function useLeadForm(source: string, { requireConsent = false, initial }:
       });
       if (!res.ok) throw new Error("request_failed");
       setStatus("success");
+      markLeadSubmitted();
     } catch {
       setStatus("error");
     }

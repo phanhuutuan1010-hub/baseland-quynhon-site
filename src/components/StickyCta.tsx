@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { QTERRA_LAUNCH } from "@/lib/content/qterraLaunch";
 import { useLang } from "@/lib/i18n";
 import type { SiteChromeData } from "@/lib/siteChrome";
 
@@ -9,6 +11,8 @@ import type { SiteChromeData } from "@/lib/siteChrome";
  * / ct-sticky-mobile treatment, applied site-wide rather than only on Contact. */
 export function StickyCta({ data }: { data: SiteChromeData }) {
   const { pick } = useLang();
+  // Q'Terra renders its own mobile bottom bar (QterraLeadPopup).
+  const hideMobileBar = usePathname()?.replace(/\/$/, "") === QTERRA_LAUNCH.path;
 
   return (
     <>
@@ -31,7 +35,7 @@ export function StickyCta({ data }: { data: SiteChromeData }) {
         )}
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-[90] grid grid-cols-2 border-t border-[rgba(250,245,238,0.18)] bg-[var(--color-deep-earth)] pb-[env(safe-area-inset-bottom,0px)] md:hidden">
+      <div className={`fixed inset-x-0 bottom-0 z-[90] grid-cols-2 ${hideMobileBar ? "hidden" : "grid"} border-t border-[rgba(250,245,238,0.18)] bg-[var(--color-deep-earth)] pb-[env(safe-area-inset-bottom,0px)] md:hidden`}>
         {data.contactPhoneHref && (
           <a
             href={data.contactPhoneHref}

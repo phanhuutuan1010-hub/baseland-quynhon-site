@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { getPublishedProjectBySlug, getPublishedProjectSlugs } from "@/lib/server/mappers/project";
 import { ProjectPage } from "@/components/project-detail/ProjectPage";
 import { ProjectNav } from "@/components/project-detail/ProjectNav";
+import { QterraLaunchSection } from "@/components/project-detail/QterraLaunchSection";
+import { QterraLeadPopup } from "@/components/project-detail/QterraLeadPopup";
+import { QTERRA_LAUNCH } from "@/lib/content/qterraLaunch";
 import { toJsonLdString } from "@/lib/jsonLd";
 import { buildMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
@@ -54,7 +57,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
           rendered here, not derived from a client-side static-registry
           lookup, since project content is DB-backed and can change per edit. */}
       <ProjectNav project={project} />
-      <ProjectPage project={project} />
+      {project.slug === QTERRA_LAUNCH.slug ? (
+        <ProjectPage project={project} beforeLocation={<QterraLaunchSection />} extras={<QterraLeadPopup />} />
+      ) : (
+        <ProjectPage project={project} />
+      )}
     </>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { ProjectDetailData } from "@/lib/project-detail/types";
 import { isSectionVisible } from "@/lib/project-detail/types";
 import { ProjectHero } from "./ProjectHero";
@@ -32,7 +33,18 @@ import { ProjectCTA } from "./ProjectCTA";
  * project = writing a new ProjectDetailData object; this component and the
  * section components underneath it never change per project.
  */
-export function ProjectPage({ project }: { project: ProjectDetailData }) {
+export function ProjectPage({
+  project,
+  beforeLocation,
+  extras,
+}: {
+  project: ProjectDetailData;
+  /** Optional server-rendered slot shown right before the Location section
+   * (e.g. Q'Terra's "Giai đoạn mở bán" block). */
+  beforeLocation?: ReactNode;
+  /** Optional overlays mounted at the end (e.g. Q'Terra's lead pop-up). */
+  extras?: ReactNode;
+}) {
   return (
     <div className="relative w-full" data-project-theme={project.theme}>
       <ProjectHero id={project.slug} name={project.name} data={project.hero} />
@@ -44,6 +56,8 @@ export function ProjectPage({ project }: { project: ProjectDetailData }) {
       {isSectionVisible(project, "towers") && project.towers && (
         <ProjectTowerSplit id="towers" data={project.towers} />
       )}
+
+      {beforeLocation}
 
       {isSectionVisible(project, "location") && project.location && (
         <ProjectLocation id="location" data={project.location} />
@@ -112,6 +126,8 @@ export function ProjectPage({ project }: { project: ProjectDetailData }) {
       {isSectionVisible(project, "legal") && project.legal && <TrustSection data={project.legal} />}
 
       <ProjectCTA id="lead" data={project.cta} />
+
+      {extras}
     </div>
   );
 }

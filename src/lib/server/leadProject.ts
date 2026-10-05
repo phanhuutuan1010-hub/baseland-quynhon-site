@@ -11,7 +11,8 @@ import { prisma } from "./db";
 // server-side, rather than adding a new prop to every lead form call site.
 export async function resolveProjectIdFromSource(source: string): Promise<string | null> {
   const videoMatch = source.match(/^project-video\/([^/]+)\//);
-  const candidateSlug = videoMatch ? videoMatch[1] : source;
+  const popupMatch = source.match(/^(.+)-popup$/); // e.g. "qterra-popup"
+  const candidateSlug = videoMatch ? videoMatch[1] : popupMatch ? popupMatch[1] : source;
 
   const project = await prisma.project.findUnique({ where: { slug: candidateSlug }, select: { id: true } });
   return project?.id ?? null;

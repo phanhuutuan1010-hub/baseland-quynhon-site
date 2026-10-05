@@ -24,6 +24,7 @@ type LeadBody = {
   source?: unknown;
   lang?: unknown;
   requireConsent?: unknown;
+  website?: unknown; // honeypot — real visitors never fill it
 };
 
 function isNonEmptyString(v: unknown): v is string {
@@ -54,6 +55,11 @@ export async function POST(request: Request) {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "invalid_json" }, { status: 400 });
+  }
+
+  // Honeypot filled → bot. Answer "ok" so it doesn't retry, but save nothing.
+  if (isNonEmptyString(body.website)) {
+    return NextResponse.json({ ok: true });
   }
 
   const name = isNonEmptyString(body.name) ? body.name.trim() : "";
