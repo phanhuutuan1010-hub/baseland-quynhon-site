@@ -47,22 +47,24 @@ export function SalesPhasesSection({
       />
 
       <div className="mx-auto max-w-[1440px]">
+        {/* Headline spans the full width on one line; body + date card sit
+            in the row below. Font scales with the viewport so it fits. */}
+        {pick(data.eyebrow) && (
+          <div className="mb-5 flex items-center gap-3 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent-light)] uppercase">
+            <span aria-hidden="true" className="h-px w-10 bg-[var(--project-accent-light)]" />
+            {pick(data.eyebrow)}
+          </div>
+        )}
+        <h2
+          id={`${id}-title`}
+          className="m-0 mb-8 font-display text-[clamp(1.75rem,8vw,4.75rem)] leading-[1.02] font-normal whitespace-nowrap text-[var(--color-warm-white)] md:mb-10"
+        >
+          {pick(data.headline)}
+        </h2>
         <div
-          className={`mb-12 grid grid-cols-1 items-end gap-10 md:mb-18 md:gap-16 ${hasDate ? "md:grid-cols-[1.25fr_1fr]" : ""}`}
+          className={`mb-12 grid grid-cols-1 items-end gap-8 md:mb-18 md:gap-16 ${hasDate ? "md:grid-cols-[1.25fr_1fr]" : ""}`}
         >
           <div>
-            {pick(data.eyebrow) && (
-              <div className="mb-5 flex items-center gap-3 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent-light)] uppercase">
-                <span aria-hidden="true" className="h-px w-10 bg-[var(--project-accent-light)]" />
-                {pick(data.eyebrow)}
-              </div>
-            )}
-            <h2
-              id={`${id}-title`}
-              className="m-0 mb-6 font-display text-[clamp(2.5rem,6vw,4.75rem)] leading-[1.02] font-normal text-[var(--color-warm-white)]"
-            >
-              {pick(data.headline)}
-            </h2>
             {pick(data.body) && (
               <p className="m-0 max-w-[560px] font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]">
                 {pick(data.body)}
