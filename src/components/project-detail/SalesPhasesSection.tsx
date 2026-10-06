@@ -8,6 +8,17 @@ import type { ProjectSalesPhases } from "@/lib/project-detail/types";
 const btnOutline =
   "inline-flex min-h-12 items-center justify-center rounded-xs border border-[rgba(250,245,238,0.45)] bg-transparent px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--color-warm-white)] uppercase no-underline transition-colors hover:border-[var(--color-warm-white)] hover:bg-[rgba(250,245,238,0.08)]";
 
+/** Font size that keeps `text` on one line inside its `@container` column:
+ * column width (100cqw) divided by the text's estimated width in em
+ * (chars × average glyph width — wider for ALL-CAPS), capped at `maxRem`.
+ * Pure string math, so it renders identically on server and client (no
+ * layout shift) and adapts to each language and each project's copy. */
+function fitOneLine(text: string, maxRem: number, upperEm: number, mixedEm: number) {
+  const upper = text === text.toUpperCase();
+  const em = Math.max(text.length, 6) * (upper ? upperEm : mixedEm);
+  return `min(${maxRem}rem, calc(100cqw / ${em.toFixed(2)}))`;
+}
+
 /**
  * "Giai đoạn bán hàng" — admin-editable per project (Admin → Dự án → Sections
  * → Giai đoạn bán hàng). Dark, image-backed timeline with a large key date.
@@ -27,6 +38,7 @@ export function SalesPhasesSection({
   const bgImage = data.backgroundImage?.src || fallbackImage;
   const steps = (data.steps ?? []).filter((step) => pick(step.title) || pick(step.body));
   const hasDate = !!data.date?.trim();
+  const headline = pick(data.headline);
 
   return (
     <section
@@ -49,7 +61,7 @@ export function SalesPhasesSection({
       <div className="mx-auto max-w-[1440px]">
         {/* Two balanced columns: eyebrow + one-line headline + body on the
             left, date card on the right (vertically centred). Headline and
-            date sizes use container units (cqw) so they fit their column. */}
+            date sizes come from fitOneLine() so any language fits one line. */}
         <div
           className={`mb-12 grid grid-cols-1 gap-8 md:mb-18 md:items-center md:gap-16 ${hasDate ? "md:grid-cols-[1.4fr_1fr]" : ""}`}
         >
@@ -62,9 +74,10 @@ export function SalesPhasesSection({
             )}
             <h2
               id={`${id}-title`}
-              className="m-0 mb-6 font-display text-[min(9cqw,4.75rem)] leading-[1.02] font-normal whitespace-nowrap text-[var(--color-warm-white)]"
+              className="m-0 mb-6 font-display leading-[1.02] font-normal whitespace-nowrap text-[var(--color-warm-white)]"
+              style={{ fontSize: fitOneLine(headline, 4.75, 0.8, 0.6) }}
             >
-              {pick(data.headline)}
+              {headline}
             </h2>
             {pick(data.body) && (
               <p className="m-0 max-w-[560px] font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]">
@@ -81,7 +94,10 @@ export function SalesPhasesSection({
                   {pick(data.dateLabel)}
                 </div>
               )}
-              <div className="font-display text-[min(15cqw,5.5rem)] leading-none text-[var(--color-warm-white)] tabular-nums">
+              <div
+                className="font-display leading-none whitespace-nowrap text-[var(--color-warm-white)] tabular-nums"
+                style={{ fontSize: fitOneLine(data.date, 5.5, 0.68, 0.66) }}
+              >
                 {data.date}
               </div>
               {pick(data.dateCaption) && (
