@@ -47,24 +47,25 @@ export function SalesPhasesSection({
       />
 
       <div className="mx-auto max-w-[1440px]">
-        {/* Headline spans the full width on one line; body + date card sit
-            in the row below. Font scales with the viewport so it fits. */}
-        {pick(data.eyebrow) && (
-          <div className="mb-5 flex items-center gap-3 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent-light)] uppercase">
-            <span aria-hidden="true" className="h-px w-10 bg-[var(--project-accent-light)]" />
-            {pick(data.eyebrow)}
-          </div>
-        )}
-        <h2
-          id={`${id}-title`}
-          className="m-0 mb-8 font-display text-[clamp(1.75rem,8vw,4.75rem)] leading-[1.02] font-normal whitespace-nowrap text-[var(--color-warm-white)] md:mb-10"
-        >
-          {pick(data.headline)}
-        </h2>
+        {/* Two balanced columns: eyebrow + one-line headline + body on the
+            left, date card on the right (vertically centred). Headline and
+            date sizes use container units (cqw) so they fit their column. */}
         <div
-          className={`mb-12 grid grid-cols-1 items-end gap-8 md:mb-18 md:gap-16 ${hasDate ? "md:grid-cols-[1.25fr_1fr]" : ""}`}
+          className={`mb-12 grid grid-cols-1 gap-8 md:mb-18 md:items-center md:gap-16 ${hasDate ? "md:grid-cols-[1.4fr_1fr]" : ""}`}
         >
-          <div>
+          <div className="@container min-w-0">
+            {pick(data.eyebrow) && (
+              <div className="mb-5 flex items-center gap-3 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent-light)] uppercase">
+                <span aria-hidden="true" className="h-px w-10 bg-[var(--project-accent-light)]" />
+                {pick(data.eyebrow)}
+              </div>
+            )}
+            <h2
+              id={`${id}-title`}
+              className="m-0 mb-6 font-display text-[min(9cqw,4.75rem)] leading-[1.02] font-normal whitespace-nowrap text-[var(--color-warm-white)]"
+            >
+              {pick(data.headline)}
+            </h2>
             {pick(data.body) && (
               <p className="m-0 max-w-[560px] font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]">
                 {pick(data.body)}
@@ -73,14 +74,14 @@ export function SalesPhasesSection({
           </div>
 
           {hasDate && (
-            <div className="relative rounded-sm border border-[rgba(250,245,238,0.18)] bg-[rgba(250,245,238,0.06)] p-6 backdrop-blur-sm sm:p-8">
+            <div className="@container relative rounded-sm border border-[rgba(250,245,238,0.18)] bg-[rgba(250,245,238,0.06)] p-6 backdrop-blur-sm sm:p-8">
               <span aria-hidden="true" className="absolute top-0 left-6 h-[3px] w-16 bg-[var(--project-accent-light)] sm:left-8" />
               {pick(data.dateLabel) && (
                 <div className="mb-3 font-ui text-xs font-bold tracking-[0.14em] text-[var(--project-accent-light)] uppercase">
                   {pick(data.dateLabel)}
                 </div>
               )}
-              <div className="font-display text-[clamp(3rem,8vw,5.5rem)] leading-none text-[var(--color-warm-white)] tabular-nums">
+              <div className="font-display text-[min(15cqw,5.5rem)] leading-none text-[var(--color-warm-white)] tabular-nums">
                 {data.date}
               </div>
               {pick(data.dateCaption) && (
