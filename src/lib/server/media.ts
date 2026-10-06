@@ -42,3 +42,15 @@ export function kindForMimeType(mimeType: string): MediaKind | null {
 export function isAllowedMimeType(mimeType: string): mimeType is (typeof ALLOWED_MIME_TYPES)[number] {
   return (ALLOWED_MIME_TYPES as readonly string[]).includes(mimeType);
 }
+
+// When BLOB_PUBLIC_HOST (e.g. "abc123.public.blob.vercel-storage.com") is
+// set, new uploads are referenced via the site's own /media/* path, which
+// next.config.ts rewrites to that Blob host. That keeps the raw Blob URL out
+// of the HTML and lets src/proxy.ts apply hotlink protection — a request
+// straight to the Blob origin never passes through this app. Unset → the
+// raw Blob URL is stored as before.
+export function publicMediaUrl(blob: { url: string; pathname: string }): string {
+  const host = process.env.BLOB_PUBLIC_HOST;
+  if (!host || new URL(blob.url).hostname !== host) return blob.url;
+  return `/media/${blob.pathname}`;
+}

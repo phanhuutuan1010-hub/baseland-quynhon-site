@@ -1,11 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
-import sharp, { type OutputInfo } from "sharp";
+import type { OutputInfo } from "sharp";
 import { getSessionUser } from "@/lib/server/auth";
 import { prisma } from "@/lib/server/db";
 import { activityLogWrite } from "@/lib/server/activityLog";
-import { MAX_RAW_IMAGE_UPLOAD_BYTES, IMAGE_MAX_DIMENSION, IMAGE_WEBP_QUALITY } from "@/lib/server/media";
+import { MAX_RAW_IMAGE_UPLOAD_BYTES, IMAGE_MAX_DIMENSION, IMAGE_WEBP_QUALITY, publicMediaUrl } from "@/lib/server/media";
+import { watermarkImage } from "@/lib/server/watermark";
 
 // Images are the one kind that goes THROUGH this server (not
 // browser-direct-to-Blob like video/PDF, see ../upload/route.ts) — the
@@ -44,16 +45,32 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   let processed: { data: Buffer; info: OutputInfo };
   try {
-    processed = await sharp(inputBuffer, { animated: true })
-      .rotate() // apply EXIF orientation before resizing, then strip it
-      .resize({ width: IMAGE_MAX_DIMENSION, height: IMAGE_MAX_DIMENSION, fit: "inside", withoutEnlargement: true })
-      .webp({ quality: IMAGE_WEBP_QUALITY })
-      .toBuffer({ resolveWithObject: true });
+    // Only the watermarked copy is ever public — see src/lib/server/watermark.ts.
+    processed = await watermarkImage(inputBuffer, { maxDimension: IMAGE_MAX_DIMENSION, quality: IMAGE_WEBP_QUALITY });
   } catch {
     return NextResponse.json({ error: "Không đọc được file ảnh — file có thể bị hỏng hoặc sai định dạng." }, { status: 400 });
   }
 
   const baseName = file.name.replace(/\.[^.]+$/, "") || "image";
+  const id = randomUUID();
+
+  // Untouched original, kept privately (never referenced by the site) so a
+  // clean master exists for re-processing. BLOB_PRIVATE_READ_WRITE_TOKEN
+  // points at a private-access Blob store; falls back to the main token if
+  // that store itself allows private blobs. Deterministic path keyed by the
+  // Media id, so no schema column is needed to find it. Failure is logged,
+  // not fatal — and never retried as public.
+  try {
+    await put(`originals/${id}-${file.name}`, inputBuffer, {
+      access: "private",
+      contentType: file.type,
+      addRandomSuffix: false,
+      token: process.env.BLOB_PRIVATE_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN,
+    });
+  } catch (err) {
+    console.error("[upload-image] could not archive private original:", err);
+  }
+
   const blob = await put(`${baseName}.webp`, processed.data, {
     access: "public",
     contentType: "image/webp",
@@ -62,12 +79,11 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   // Persist the Media row (+ audit log) in this same request — saves the
   // browser a second round trip to the createMedia Server Action.
-  const id = randomUUID();
   const title = baseName;
   const item = {
     id,
     filename: `${baseName}.webp`,
-    url: blob.url,
+    url: publicMediaUrl(blob),
     mimeType: "image/webp",
     size: processed.info.size,
     kind: "IMAGE" as const,

@@ -105,6 +105,16 @@ function MediaCard({ item, onChange, onRemove }: { item: MediaItem; onChange: (i
           <p className="m-0 font-ui text-[10px] font-bold tracking-[0.04em] text-[var(--color-text-muted)] uppercase">URL</p>
           <p className="m-0 mt-1 truncate font-body text-xs text-[var(--color-charcoal)]">{draft.url}</p>
         </div>
+        {item.kind === "IMAGE" && (
+          <a
+            href={`/api/media/${item.id}/original`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-ui text-xs font-semibold text-[var(--color-brand-green)] underline underline-offset-2"
+          >
+            Xem bản gốc (không watermark) — chỉ Admin
+          </a>
+        )}
         {error && <p className="m-0 font-body text-sm text-[var(--color-error)]">{error}</p>}
         <div className="flex gap-2">
           <button

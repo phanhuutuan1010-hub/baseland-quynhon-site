@@ -57,6 +57,15 @@ export function Footer({ data }: { data: SiteChromeData }) {
           Dev by Tuấn
         </a>
       </p>
+      <p className="mx-auto mt-2 flex max-w-[1440px] flex-wrap items-center gap-1.5 font-body text-[12px] text-[var(--color-sand)] opacity-55">
+        {pick({
+          vi: `© ${new Date().getFullYear()} Base Land Quy Nhơn. Nghiêm cấm sao chép khi chưa được phép.`,
+          en: `© ${new Date().getFullYear()} Base Land Quy Nhon. Reproduction without permission is prohibited.`,
+        })}
+        <Link href="/dieu-khoan" className="text-[var(--color-sand)] underline underline-offset-2 hover:opacity-80">
+          {pick({ vi: "Điều khoản sử dụng", en: "Terms of use" })}
+        </Link>
+      </p>
     </footer>
   );
 }
