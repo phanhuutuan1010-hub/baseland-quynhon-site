@@ -24,6 +24,7 @@ import { ProjectNewsTeaser } from "./ProjectNewsTeaser";
 import { FAQSection } from "./FAQSection";
 import { ProjectVerificationNote } from "./ProjectVerificationNote";
 import { ProjectCTA } from "./ProjectCTA";
+import { SalesPhasesSection } from "./SalesPhasesSection";
 
 /**
  * Project Detail Template — orchestrates every section in the site's fixed
@@ -35,13 +36,9 @@ import { ProjectCTA } from "./ProjectCTA";
  */
 export function ProjectPage({
   project,
-  beforeLocation,
   extras,
 }: {
   project: ProjectDetailData;
-  /** Optional server-rendered slot shown right before the Location section
-   * (e.g. Q'Terra's "Giai đoạn mở bán" block). */
-  beforeLocation?: ReactNode;
   /** Optional overlays mounted at the end (e.g. Q'Terra's lead pop-up). */
   extras?: ReactNode;
 }) {
@@ -57,7 +54,9 @@ export function ProjectPage({
         <ProjectTowerSplit id="towers" data={project.towers} />
       )}
 
-      {beforeLocation}
+      {isSectionVisible(project, "salesPhases") && project.salesPhases && (
+        <SalesPhasesSection id="sales-phases" data={project.salesPhases} fallbackImage={project.hero.image?.src} />
+      )}
 
       {isSectionVisible(project, "location") && project.location && (
         <ProjectLocation id="location" data={project.location} />

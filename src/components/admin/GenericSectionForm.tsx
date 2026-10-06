@@ -10,7 +10,28 @@ import { RepeatableStringList } from "@/components/admin/RepeatableList";
 // Human-friendly label from a camelCase/snake_case field key — not a
 // per-section label map, since this form is intentionally generic (see its
 // doc comment in validation/project.ts for why).
+// Optional Vietnamese labels for field keys that read poorly when
+// auto-prettified; any key not listed falls back to prettifyKey's output.
+const FIELD_LABELS: Record<string, string> = {
+  eyebrow: "Dòng nhỏ trên tiêu đề",
+  headline: "Tiêu đề",
+  body: "Mô tả",
+  dateLabel: "Nhãn ngày",
+  date: "Ngày (VD: 30/10/2026)",
+  dateCaption: "Ghi chú dưới ngày",
+  steps: "Các bước",
+  title: "Tiêu đề",
+  tag: "Nhãn nổi bật (để trống = thẻ thường)",
+  ctaLeadLabel: "Nút tư vấn — chữ",
+  ctaLeadHref: "Nút tư vấn — link",
+  ctaCallLabel: "Nút gọi — chữ (số lấy từ hotline chung)",
+  ctaZaloLabel: "Nút Zalo — chữ",
+  zaloUrl: "Link Zalo (để trống = ẩn nút)",
+  backgroundImage: "Ảnh nền (để trống = dùng ảnh hero)",
+};
+
 function prettifyKey(key: string): string {
+  if (FIELD_LABELS[key]) return FIELD_LABELS[key];
   const spaced = key.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/_/g, " ");
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
@@ -34,6 +55,18 @@ function isLocalizedLeaf(value: unknown): value is { vi: string; en: string } {
     typeof value.vi === "string" &&
     typeof value.en === "string"
   );
+}
+
+// Empty value with the same shape as `sample` — used for "+ Thêm" so a new
+// list item keeps bilingual `{vi,en}` leaves, nested objects and flags
+// instead of collapsing every field to a plain "" string.
+function blankLike(sample: Json): Json {
+  if (isLocalizedLeaf(sample)) return { vi: "", en: "" };
+  if (Array.isArray(sample)) return [];
+  if (isPlainObject(sample)) return Object.fromEntries(Object.entries(sample).map(([k, v]) => [k, blankLike(v)]));
+  if (typeof sample === "boolean") return false;
+  if (typeof sample === "number") return 0;
+  return "";
 }
 
 function isLocalizedStringArray(value: Json[]): value is { vi: string; en: string }[] {
@@ -191,8 +224,7 @@ function FieldEditor({
         <button
           type="button"
           onClick={() => {
-            const template = isPlainObject(value[0]) ? Object.fromEntries(Object.keys(value[0]).map((k) => [k, ""])) : "";
-            onChange([...value, template as Json]);
+            onChange([...value, blankLike(value[0])]);
           }}
           className="self-start rounded-xs border border-dashed border-[var(--color-border)] px-4 py-2 font-ui text-xs font-bold tracking-[0.04em] uppercase hover:bg-[var(--color-sand)]"
         >

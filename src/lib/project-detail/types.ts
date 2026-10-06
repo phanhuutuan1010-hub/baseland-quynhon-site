@@ -36,7 +36,8 @@ export type ProjectSectionKey =
   | "documents"
   | "verification"
   | "faq"
-  | "videoDuo";
+  | "videoDuo"
+  | "salesPhases";
 
 export type ProjectSections = Partial<Record<ProjectSectionKey, boolean>>;
 
@@ -451,6 +452,35 @@ export type ProjectVideoDuo = {
   navLabel?: Localized<string>;
 };
 
+export type ProjectSalesPhaseStep = {
+  title: Localized<string>;
+  body: Localized<string>;
+  /** Small label on the step card (e.g. "Mốc mở bán"). A non-empty tag
+   * also highlights that card. Empty = plain card. */
+  tag: Localized<string>;
+};
+
+/** "Giai đoạn bán hàng" — timeline of sale phases with a large key date.
+ * Renders right before Location. Empty strings hide the matching element
+ * (date card, CTA, Zalo button…). */
+export type ProjectSalesPhases = {
+  eyebrow: Localized<string>;
+  headline: Localized<string>;
+  body: Localized<string>;
+  dateLabel: Localized<string>;
+  /** Shown large, same in both languages (e.g. "30/10/2026"). */
+  date: string;
+  dateCaption: Localized<string>;
+  steps: ProjectSalesPhaseStep[];
+  ctaLeadLabel: Localized<string>;
+  ctaLeadHref: string;
+  ctaCallLabel: Localized<string>;
+  ctaZaloLabel: Localized<string>;
+  zaloUrl: string;
+  /** Faint backdrop photo. Empty src → falls back to the hero image. */
+  backgroundImage: { src: string; alt: Localized<string> };
+};
+
 export type ProjectDetailData = {
   slug: string;
   /** Proper noun — kept invariant across languages (matches how every page
@@ -469,6 +499,7 @@ export type ProjectDetailData = {
   intro?: ProjectIntro;
   stats?: ProjectStats;
   towers?: ProjectTowers;
+  salesPhases?: ProjectSalesPhases;
   location?: ProjectLocation;
   masterplan?: ProjectMasterplan;
   gallery?: ProjectGallery;

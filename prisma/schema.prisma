@@ -202,6 +202,7 @@ enum ProjectSectionType {
   VERIFICATION
   VIDEO_DUO
   NEWS_TEASER
+  SALES_PHASES
 }
 
 // One project detail page. hero/cta/sections/category/statusLabel are kept

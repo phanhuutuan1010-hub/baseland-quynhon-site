@@ -41,6 +41,7 @@ const KEY_TO_SECTION_TYPE: Record<string, ProjectSectionType> = {
   verification: "VERIFICATION",
   videoDuo: "VIDEO_DUO",
   news: "NEWS_TEASER",
+  salesPhases: "SALES_PHASES",
 };
 
 function isNamedTableKey(key: string): key is NamedTableKey {

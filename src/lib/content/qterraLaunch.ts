@@ -1,7 +1,7 @@
 import { CONTACT_PHONE, CONTACT_PHONE_HREF, HOTLINE } from "./nav";
 
 /**
- * Cấu hình khối "Giai đoạn mở bán" + pop-up thu SĐT của trang /projects/qterra.
+ * Cấu hình pop-up thu SĐT của trang /projects/qterra.
  * Mọi chữ hiển thị nằm ở đây để sửa nhanh. Hotline lấy từ HOTLINE dùng chung
  * (src/lib/content/nav.ts) — không viết cứng số ở component.
  */
@@ -13,35 +13,6 @@ export const QTERRA_LAUNCH = {
   hotlineHref: CONTACT_PHONE_HREF, // tel:+84373910109
   hotlineDisplay: CONTACT_PHONE, // 0373 910 109
   ZALO_URL: "https://zalo.me/0373910109", // rỗng = ẩn nút Zalo
-  OPEN_DATE_TEXT: "Dự kiến 30/10/2026",
-  OPEN_DATE: "30/10/2026", // hiển thị lớn trong khối "Giai đoạn mở bán"
-
-  section: {
-    eyebrow: "Q'Terra Quy Nhơn",
-    title: "Giai đoạn mở bán",
-    description:
-      "Thông tin dự kiến, có thể thay đổi theo thông báo chính thức của chủ đầu tư và đơn vị phân phối.",
-    steps: {
-      register: {
-        title: "Đăng ký nguyện vọng",
-        body: "Chọn tầng, loại căn, hướng bạn quan tâm. Điều kiện giữ chỗ (nếu có) gửi bằng văn bản trước khi bạn chuyển tiền.",
-      },
-      launch: {
-        title: "Mở bán · chọn căn",
-        bodySuffix: ". Quy tắc chọn căn được công bố bằng văn bản trước ngày mở bán.",
-      },
-      inventory: {
-        title: "Bán theo giỏ hàng",
-        body: "Các căn còn lại mở bán công khai theo bảng hàng cập nhật.",
-      },
-    },
-    dateLabel: "Mở bán dự kiến",
-    dateCaption: "Ngày chính xác theo thông báo của chủ đầu tư.",
-    stepTag: "Mốc mở bán",
-    ctaZalo: "Chat Zalo",
-    ctaLead: "Nhận tư vấn chọn căn",
-    ctaCall: "Gọi ngay",
-  },
 
   popup: {
     title: "Mở bán dự kiến 30/10/2026. Cần chọn vị trí căn?",
