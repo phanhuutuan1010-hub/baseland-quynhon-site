@@ -15,7 +15,7 @@ export const QTERRA_LAUNCH = {
   ZALO_URL: "https://zalo.me/0373910109", // rỗng = ẩn nút Zalo
 
   popup: {
-    title: "Mở bán dự kiến 05/11/2026. Cần chọn vị trí căn?",
+    title: "Mở bán dự kiến 12/11/2026. Cần chọn vị trí căn?",
     subtitle: "Để lại số, chuyên viên Base Land gửi mặt bằng tầng và 6 câu hỏi nên hỏi trước khi giữ chỗ.",
     phoneLabel: "Số điện thoại",
     phonePlaceholder: "VD: 0901234567",
