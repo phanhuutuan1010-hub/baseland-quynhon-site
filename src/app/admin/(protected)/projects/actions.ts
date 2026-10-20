@@ -42,6 +42,7 @@ const KEY_TO_SECTION_TYPE: Record<string, ProjectSectionType> = {
   videoDuo: "VIDEO_DUO",
   news: "NEWS_TEASER",
   salesPhases: "SALES_PHASES",
+  virtualTour: "VIRTUAL_TOUR",
 };
 
 function isNamedTableKey(key: string): key is NamedTableKey {
@@ -111,6 +112,13 @@ export async function updateProjectOverview(projectId: string, input: unknown): 
 
   const before = await prisma.project.findUnique({ where: { id: projectId } });
   if (!before) return { error: "Không tìm thấy dự án" };
+  // The Overview form only covers part of hero/cta — keep the fields it
+  // doesn't show (hero.navLabel/placeholderLabel, cta.qualifiers,
+  // headlineMaxWidth…) instead of dropping them on every save. The hero
+  // image is the exception: it is form-controlled, so blank = removed.
+  const { image: _prevHeroImage, ...prevHero } = (before.hero ?? {}) as Record<string, unknown>;
+  void _prevHeroImage;
+  const prevCta = (before.cta ?? {}) as Record<string, unknown>;
 
   await prisma.project.update({
     where: { id: projectId },
@@ -121,6 +129,7 @@ export async function updateProjectOverview(projectId: string, input: unknown): 
       theme: d.theme || null,
       verificationRequired: d.verificationRequired,
       hero: {
+        ...(prevHero as object),
         eyebrow: { vi: d.heroEyebrowVi, en: d.heroEyebrowEn },
         addressLine: { vi: d.heroAddressLineVi, en: d.heroAddressLineEn },
         subhead: { vi: d.heroSubheadVi, en: d.heroSubheadEn },
@@ -131,6 +140,7 @@ export async function updateProjectOverview(projectId: string, input: unknown): 
         ...(d.heroImageSrc ? { image: { src: d.heroImageSrc, alt: { vi: d.name, en: d.name } } } : {}),
       },
       cta: {
+        ...(prevCta as object),
         eyebrow: { vi: d.ctaEyebrowVi, en: d.ctaEyebrowEn },
         headline: { vi: d.ctaHeadlineVi, en: d.ctaHeadlineEn },
         body: { vi: d.ctaBodyVi, en: d.ctaBodyEn },

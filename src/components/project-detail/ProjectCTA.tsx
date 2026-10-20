@@ -53,7 +53,7 @@ export function ProjectCTA({ id, data }: { id: string; data: ProjectCtaData }) {
           )}
         </div>
         <div className="min-w-70 flex-1 basis-95 rounded-sm bg-[var(--color-warm-white)] p-7 sm:p-11">
-          <LeadFormFull source={data.leadSource} />
+          <LeadFormFull source={data.leadSource} qualifiers={data.qualifiers} />
         </div>
       </Reveal>
     </section>

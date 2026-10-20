@@ -95,6 +95,7 @@ const KEY_TO_SECTION_TYPE: Record<string, ProjectSectionType> = {
   videoDuo: "VIDEO_DUO",
   news: "NEWS_TEASER",
   salesPhases: "SALES_PHASES",
+  virtualTour: "VIRTUAL_TOUR",
 };
 
 // Real production content — the site's 4 actual project detail pages,

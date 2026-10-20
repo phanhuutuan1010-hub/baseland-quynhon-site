@@ -203,6 +203,7 @@ enum ProjectSectionType {
   VIDEO_DUO
   NEWS_TEASER
   SALES_PHASES
+  VIRTUAL_TOUR
 }
 
 // One project detail page. hero/cta/sections/category/statusLabel are kept
@@ -403,6 +404,11 @@ model Lead {
   email        String?
   message      String?
   source       String
+  // Optional project-specific qualifiers (ProjectCta.qualifiers) — stored
+  // as the option's Vietnamese text, e.g. "Quy Nhơn" / "Second home".
+  region       String?
+  purpose      String?
+  timeframe    String?
   projectId    String?
   status       LeadStatus @default(NEW)
   assignedToId String?

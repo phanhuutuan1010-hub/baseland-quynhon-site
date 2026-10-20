@@ -6,6 +6,7 @@ import { useLang } from "@/lib/i18n";
 import { LEAD_COPY, NEED_CTA_MAP, NEED_OPTIONS } from "@/lib/content/lead";
 import { CONTACT_PHONE_HREF } from "@/lib/content/nav";
 import { useLeadForm } from "@/lib/useLeadForm";
+import type { ProjectLeadQualifier } from "@/lib/project-detail/types";
 
 const kicker = { vi: "Gửi yêu cầu tư vấn", en: "Request Consultation" };
 const title = { vi: "Cho chúng tôi biết bạn cần gì", en: "Tell us what you need" };
@@ -22,10 +23,14 @@ export function LeadFormFull({
   source = "contact",
   prefillNeed,
   contextNote,
+  qualifiers,
 }: {
   source?: string;
   prefillNeed?: string;
   contextNote?: Localized<string>;
+  /** Project-specific select fields; when present they replace the
+   * generic "Bạn đang tìm gì?" select. */
+  qualifiers?: ProjectLeadQualifier[];
 }) {
   const { pick } = useLang();
   const { lead, updateField, errors, status, submit, retry } = useLeadForm(source, {
@@ -132,23 +137,45 @@ export function LeadFormFull({
           />
         </label>
 
-        <label className="flex flex-col gap-2">
-          <span className="font-ui text-xs font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase">
-            {pick(LEAD_COPY.formNeed)}
-          </span>
-          <select
-            value={lead.need}
-            onChange={(e) => updateField("need", e.target.value)}
-            className={inputClass()}
-          >
-            <option value="">{pick(LEAD_COPY.needPlaceholder)}</option>
-            {NEED_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {pick(opt.label)}
-              </option>
-            ))}
-          </select>
-        </label>
+        {qualifiers?.length ? (
+          qualifiers.map((q) => (
+            <label key={q.key} className="flex flex-col gap-2">
+              <span className="font-ui text-xs font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase">
+                {pick(q.label)}
+              </span>
+              <select
+                value={lead.qualifiers[q.key] ?? ""}
+                onChange={(e) => updateField("qualifiers", { ...lead.qualifiers, [q.key]: e.target.value })}
+                className={inputClass()}
+              >
+                <option value="">{pick(LEAD_COPY.needPlaceholder)}</option>
+                {q.options.map((opt) => (
+                  <option key={opt.vi} value={opt.vi}>
+                    {pick(opt)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ))
+        ) : (
+          <label className="flex flex-col gap-2">
+            <span className="font-ui text-xs font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase">
+              {pick(LEAD_COPY.formNeed)}
+            </span>
+            <select
+              value={lead.need}
+              onChange={(e) => updateField("need", e.target.value)}
+              className={inputClass()}
+            >
+              <option value="">{pick(LEAD_COPY.needPlaceholder)}</option>
+              {NEED_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {pick(opt.label)}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
 
         {contextualCta && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xs border border-[rgba(var(--project-primary-rgb),0.3)] bg-[var(--color-warm-white)] px-4 py-3.5">

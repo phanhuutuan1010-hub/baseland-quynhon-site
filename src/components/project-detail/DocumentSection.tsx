@@ -5,9 +5,21 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectDocuments as ProjectDocumentsData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { trackTourLinkClick } from "@/lib/analytics";
 
-export function DocumentSection({ id, data }: { id: string; data: ProjectDocumentsData }) {
-  const { pick } = useLang();
+export function DocumentSection({
+  id,
+  data,
+  tourUrl,
+  projectSlug,
+}: {
+  id: string;
+  data: ProjectDocumentsData;
+  /** Project's 360° tour URL — a link to it is tracked as project_360_open. */
+  tourUrl?: string;
+  projectSlug?: string;
+}) {
+  const { pick, lang } = useLang();
   return (
     <section id={id} className="bg-[var(--color-sand)] px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
       <Reveal className="mx-auto max-w-[1440px]">
@@ -29,11 +41,12 @@ export function DocumentSection({ id, data }: { id: string; data: ProjectDocumen
               {d.fileUrl ? (
                 <a
                   href={d.fileUrl}
+                  onClick={() => trackTourLinkClick(d.fileUrl!, tourUrl, projectSlug ?? "", "documents", lang)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="whitespace-nowrap font-ui text-xs font-bold tracking-[0.08em] text-[var(--project-primary-text)] uppercase no-underline hover:text-[var(--project-primary-dark)]"
                 >
-                  {pick(data.ctaLabel)}
+                  {pick(d.linkLabel ?? data.ctaLabel)}
                 </a>
               ) : (
                 <Link

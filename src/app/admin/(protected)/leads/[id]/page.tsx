@@ -43,6 +43,18 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
           <p className="m-0 font-ui text-[10px] font-bold tracking-[0.04em] text-[var(--color-text-muted)] uppercase">Nguồn</p>
           <p className="m-0 mt-1 font-body text-sm text-[var(--color-charcoal)]">{lead.source}</p>
         </div>
+        {[
+          { label: "Khu vực", value: lead.region },
+          { label: "Mục đích mua", value: lead.purpose },
+          { label: "Thời điểm", value: lead.timeframe },
+        ]
+          .filter((f) => f.value)
+          .map((f) => (
+            <div key={f.label}>
+              <p className="m-0 font-ui text-[10px] font-bold tracking-[0.04em] text-[var(--color-text-muted)] uppercase">{f.label}</p>
+              <p className="m-0 mt-1 font-body text-sm text-[var(--color-charcoal)]">{f.value}</p>
+            </div>
+          ))}
         <div>
           <p className="m-0 font-ui text-[10px] font-bold tracking-[0.04em] text-[var(--color-text-muted)] uppercase">Ngày tạo</p>
           <p className="m-0 mt-1 font-body text-sm text-[var(--color-charcoal)]">{lead.createdAt.toLocaleString("vi-VN")}</p>

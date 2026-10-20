@@ -37,7 +37,8 @@ export type ProjectSectionKey =
   | "verification"
   | "faq"
   | "videoDuo"
-  | "salesPhases";
+  | "salesPhases"
+  | "virtualTour";
 
 export type ProjectSections = Partial<Record<ProjectSectionKey, boolean>>;
 
@@ -249,6 +250,20 @@ export type ProjectResidenceUnit = {
    * ProjectResidences.unitCtaLabel/unitCtaHref when omitted. */
   ctaLabel?: Localized<string>;
   ctaHref?: string;
+  /** Single area figure (e.g. "32 – 38 m²") for projects whose source
+   * gives one area per type instead of an NFA/NSA pair — shown under
+   * `ProjectResidences.areaLabel`. Empty nfa/nsa rows are hidden. */
+  area?: string;
+  /** Share of the unit mix (e.g. "~67% quỹ căn", "142 căn"). */
+  share?: Localized<string>;
+};
+
+/** "Mặt bằng tầng điển hình" summary under the residence table. */
+export type ProjectTypicalFloor = {
+  title: Localized<string>;
+  body: Localized<string>;
+  /** View orientations of the typical floor (e.g. "Hướng biển"). */
+  orientations: Localized<string>[];
 };
 
 export type ProjectResidences = {
@@ -264,6 +279,12 @@ export type ProjectResidences = {
   unitCtaFloorplanHref: string;
   footnote: Localized<string>;
   items: ProjectResidenceUnit[];
+  areaLabel?: Localized<string>;
+  shareLabel?: Localized<string>;
+  /** Present = render the unit-mix table (type · area · share) under the
+   * selector. */
+  tableTitle?: Localized<string>;
+  typicalFloor?: ProjectTypicalFloor;
   /** ProjectNav label override — falls back to `eyebrow`. */
   navLabel?: Localized<string>;
 };
@@ -295,6 +316,17 @@ export type ProjectFloorPlans = {
 
 export type ProjectInvestmentPoint = { num: string; title: Localized<string>; desc: Localized<string> };
 
+export type ProjectPriceFact = { label: Localized<string>; value: Localized<string> };
+
+export type ProjectPaymentStep = { milestone: Localized<string>; desc: Localized<string> };
+
+export type ProjectPaymentPlan = {
+  key: string;
+  name: Localized<string>;
+  summary: Localized<string>;
+  steps: ProjectPaymentStep[];
+};
+
 export type ProjectInvestment = {
   eyebrow: Localized<string>;
   headline: Localized<string>;
@@ -305,6 +337,12 @@ export type ProjectInvestment = {
   pricingBody: Localized<string>;
   pricingCtaLabel: Localized<string>;
   pricingCtaHref: string;
+  /** Indicative price figures (from-price, entry ticket, booking). */
+  priceFacts?: ProjectPriceFact[];
+  paymentTitle?: Localized<string>;
+  paymentPlans?: ProjectPaymentPlan[];
+  /** Small print under the payment plans (e.g. "dự kiến, theo từng đợt"). */
+  paymentNote?: Localized<string>;
   /** ProjectNav label override — falls back to `eyebrow`. */
   navLabel?: Localized<string>;
 };
@@ -351,6 +389,9 @@ export type ProjectDocumentItem = {
    * Absent means the row renders as a listed-but-not-yet-downloadable item
    * (no broken link) rather than an empty href. */
   fileUrl?: string;
+  /** Link text for `fileUrl` (e.g. an external page, not a PDF) — falls
+   * back to the section's ctaLabel. */
+  linkLabel?: Localized<string>;
 };
 
 export type ProjectDocuments = {
@@ -368,6 +409,8 @@ export type ProjectTrustPoint = { label: Localized<string>; desc: Localized<stri
 export type ProjectLegal = {
   body: Localized<string>;
   points: ProjectTrustPoint[];
+  /** Outbound reference links (developer site, 360 tour, legal file…). */
+  links?: { label: Localized<string>; href: string }[];
 };
 
 export type ProjectCta = {
@@ -378,6 +421,19 @@ export type ProjectCta = {
   callNowLabel: Localized<string>;
   /** Identifies this project to the shared lead form / API (e.g. "qterra"). */
   leadSource: string;
+  /** Extra select fields on this project's lead form, stored on the Lead
+   * row (see LEAD_QUALIFIER_KEYS). The submitted value is the option's
+   * `vi` text. Present = replaces the generic "Bạn đang tìm gì?" select. */
+  qualifiers?: ProjectLeadQualifier[];
+};
+
+export const LEAD_QUALIFIER_KEYS = ["region", "purpose", "timeframe"] as const;
+export type LeadQualifierKey = (typeof LEAD_QUALIFIER_KEYS)[number];
+
+export type ProjectLeadQualifier = {
+  key: LeadQualifierKey;
+  label: Localized<string>;
+  options: Localized<string>[];
 };
 
 /**
@@ -481,6 +537,36 @@ export type ProjectSalesPhases = {
   backgroundImage: { src: string; alt: Localized<string> };
 };
 
+/** "Tham quan ảo 360°" — an external 360° tour (developer-hosted). The
+ * page only ever shows the poster until the visitor clicks play: the
+ * iframe is never loaded up front (it is heavy WebGL content). Desktop +
+ * `allowEmbed` → iframe in place with a fullscreen button; mobile or
+ * `allowEmbed: false` → opens `tourUrl` in a new tab. */
+export type ProjectVirtualTour = {
+  eyebrow: Localized<string>;
+  headline: Localized<string>;
+  body: Localized<string>;
+  tourUrl: string;
+  /** Set false if the tour host starts refusing to be framed. */
+  allowEmbed: boolean;
+  /** Empty src → falls back to the hero image. */
+  poster: { src: string; alt: Localized<string> };
+  playLabel: Localized<string>;
+  fullscreenLabel: Localized<string>;
+  newTabLabel: Localized<string>;
+  /** Secondary hero button that scrolls to this section; empty = no button. */
+  heroCtaLabel: Localized<string>;
+  /** CTA under the tour, opens the lead form. */
+  ctaLabel: Localized<string>;
+  /** Banner shown above the lead form the CTA opens; empty = none. */
+  ctaNote: Localized<string>;
+  /** Lead `source` for that CTA (e.g. "qterra-360"); empty → "<slug>-360". */
+  leadSource: string;
+  /** Small print under the tour (e.g. "Tour do chủ đầu tư cung cấp"). */
+  note: Localized<string>;
+  navLabel?: Localized<string>;
+};
+
 export type ProjectDetailData = {
   slug: string;
   /** Proper noun — kept invariant across languages (matches how every page
@@ -515,6 +601,7 @@ export type ProjectDetailData = {
    * quan tâm gì tiếp theo" transition point), not reorderable per project. */
   videoDuo?: ProjectVideoDuo;
   floorPlans?: ProjectFloorPlans;
+  virtualTour?: ProjectVirtualTour;
   investment?: ProjectInvestment;
   news?: ProjectNewsTeaser;
   legal?: ProjectLegal;
@@ -572,6 +659,9 @@ export function getProjectNavItems(project: ProjectDetailData): ProjectNavItem[]
   }
   if (isSectionVisible(project, "floorPlans") && project.floorPlans) {
     items.push({ href: "#floorplans", label: project.floorPlans.navLabel ?? project.floorPlans.eyebrow });
+  }
+  if (isSectionVisible(project, "virtualTour") && project.virtualTour?.tourUrl) {
+    items.push({ href: "#virtual-tour", label: project.virtualTour.navLabel ?? project.virtualTour.eyebrow });
   }
   if (isSectionVisible(project, "education") && project.education) {
     items.push({

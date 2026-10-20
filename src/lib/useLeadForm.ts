@@ -9,9 +9,12 @@ export type LeadFormState = {
   email: string;
   need: string;
   consent: boolean;
+  /** Per-project select fields (see ProjectCta.qualifiers), keyed by
+   * LeadQualifierKey — sent as-is and stored on the Lead row. */
+  qualifiers: Record<string, string>;
 };
 
-const INITIAL: LeadFormState = { name: "", phone: "", email: "", need: "", consent: false };
+const INITIAL: LeadFormState = { name: "", phone: "", email: "", need: "", consent: false, qualifiers: {} };
 
 type Status = "idle" | "loading" | "success" | "error";
 

@@ -5,10 +5,20 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectLegal as ProjectLegalData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { trackTourLinkClick } from "@/lib/analytics";
 
 /** "Legal / Trust" section — Base Land credibility block. */
-export function TrustSection({ data }: { data: ProjectLegalData }) {
-  const { pick } = useLang();
+export function TrustSection({
+  data,
+  tourUrl,
+  projectSlug,
+}: {
+  data: ProjectLegalData;
+  /** Project's 360° tour URL — a link to it is tracked as project_360_open. */
+  tourUrl?: string;
+  projectSlug?: string;
+}) {
+  const { pick, lang } = useLang();
   return (
     <section className="bg-[var(--color-warm-white)] px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-24">
       <Reveal className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-8 md:gap-20">
@@ -31,6 +41,22 @@ export function TrustSection({ data }: { data: ProjectLegalData }) {
               </div>
             ))}
           </div>
+          {!!data.links?.length && (
+            <div className="mt-8 flex flex-wrap gap-3">
+              {data.links.map((l, i) => (
+                <a
+                  key={i}
+                  href={l.href}
+                  onClick={() => trackTourLinkClick(l.href, tourUrl, projectSlug ?? "", "trust", lang)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-xs border border-[var(--project-accent)] bg-transparent px-5 py-3 font-ui text-xs font-bold tracking-[0.08em] text-[var(--color-charcoal)] uppercase no-underline hover:bg-[rgba(var(--project-accent-rgb),0.15)]"
+                >
+                  {pick(l.label)} ↗
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       </Reveal>
     </section>

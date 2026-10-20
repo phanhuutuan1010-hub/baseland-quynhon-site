@@ -51,6 +51,9 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: P
         phone: true,
         status: true,
         source: true,
+        region: true,
+        purpose: true,
+        timeframe: true,
         projectId: true,
         createdAt: true,
         assignedTo: { select: { name: true } },
@@ -129,7 +132,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: P
               <th className="px-4 py-3">Tên</th>
               <th className="px-4 py-3">Dự án</th>
               <th className="px-4 py-3">Trạng thái</th>
-              <th className="px-4 py-3">Nguồn</th>
+              <th className="px-4 py-3">Nguồn / phân loại</th>
               <th className="px-4 py-3">Phụ trách</th>
               <th className="px-4 py-3">Ngày tạo</th>
             </tr>
@@ -156,7 +159,12 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: P
                     {STATUS_LABEL[lead.status]}
                   </span>
                 </td>
-                <td className="px-4 py-3 font-body text-sm text-[var(--color-text-muted)]">{lead.source}</td>
+                <td className="px-4 py-3 font-body text-sm text-[var(--color-text-muted)]">
+                  {lead.source}
+                  {(lead.region || lead.purpose || lead.timeframe) && (
+                    <p className="m-0 mt-0.5 text-xs">{[lead.region, lead.purpose, lead.timeframe].filter(Boolean).join(" · ")}</p>
+                  )}
+                </td>
                 <td className="px-4 py-3 font-body text-sm text-[var(--color-text-muted)]">{lead.assignedTo?.name ?? "—"}</td>
                 <td className="px-4 py-3 font-body text-sm text-[var(--color-text-muted)]">
                   {lead.createdAt.toLocaleDateString("vi-VN")}

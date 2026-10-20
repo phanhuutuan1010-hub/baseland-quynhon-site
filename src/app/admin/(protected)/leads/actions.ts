@@ -88,13 +88,16 @@ export async function exportLeadsCsv(): Promise<string> {
     orderBy: { createdAt: "desc" },
   });
 
-  const header = ["Tên", "Điện thoại", "Email", "Nhu cầu", "Nguồn", "Dự án", "Trạng thái", "Người phụ trách", "Ngày tạo"];
+  const header = ["Tên", "Điện thoại", "Email", "Nhu cầu", "Khu vực", "Mục đích mua", "Thời điểm", "Nguồn", "Dự án", "Trạng thái", "Người phụ trách", "Ngày tạo"];
   const rows = leads.map((l) =>
     [
       l.name,
       l.phone,
       l.email ?? "",
       l.message ?? "",
+      l.region ?? "",
+      l.purpose ?? "",
+      l.timeframe ?? "",
       l.source,
       l.project?.name ?? "",
       l.status,

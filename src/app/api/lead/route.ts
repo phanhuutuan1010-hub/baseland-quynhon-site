@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { prisma } from "@/lib/server/db";
 import { resolveProjectIdFromSource } from "@/lib/server/leadProject";
 import { isRateLimited } from "@/lib/server/rateLimit";
+import { LEAD_QUALIFIER_KEYS, type LeadQualifierKey } from "@/lib/project-detail/types";
 
 export const runtime = "nodejs";
 
@@ -24,11 +25,24 @@ type LeadBody = {
   source?: unknown;
   lang?: unknown;
   requireConsent?: unknown;
+  qualifiers?: unknown;
   website?: unknown; // honeypot — real visitors never fill it
 };
 
 function isNonEmptyString(v: unknown): v is string {
   return typeof v === "string" && v.trim().length > 0;
+}
+
+// Only the known qualifier keys are kept, each capped in length — the
+// values are free text from the visitor's browser, not trusted options.
+function readQualifiers(v: unknown): Partial<Record<LeadQualifierKey, string>> {
+  if (!v || typeof v !== "object") return {};
+  const out: Partial<Record<LeadQualifierKey, string>> = {};
+  for (const key of LEAD_QUALIFIER_KEYS) {
+    const value = (v as Record<string, unknown>)[key];
+    if (isNonEmptyString(value)) out[key] = value.trim().slice(0, 100);
+  }
+  return out;
 }
 
 function digitsOnly(v: string) {
@@ -70,6 +84,7 @@ export async function POST(request: Request) {
   const source = isNonEmptyString(body.source) ? body.source.trim() : "unknown";
   const lang = body.lang === "en" ? "en" : "vi";
   const requireConsent = body.requireConsent === true;
+  const qualifiers = readQualifiers(body.qualifiers);
 
   const errors: Record<string, boolean> = {};
   if (!name) errors.name = true;
@@ -87,7 +102,17 @@ export async function POST(request: Request) {
   const projectId = await resolveProjectIdFromSource(source);
   try {
     await prisma.lead.create({
-      data: { name, phone, email: email || null, message: need || null, source, projectId },
+      data: {
+        name,
+        phone,
+        email: email || null,
+        message: need || null,
+        source,
+        projectId,
+        region: qualifiers.region ?? null,
+        purpose: qualifiers.purpose ?? null,
+        timeframe: qualifiers.timeframe ?? null,
+      },
     });
   } catch (err) {
     console.error("[api/lead] Failed to save lead to database:", err);
@@ -109,6 +134,9 @@ export async function POST(request: Request) {
       <tr><td><strong>Điện thoại</strong></td><td>${escapeHtml(phone)}</td></tr>
       <tr><td><strong>Email</strong></td><td>${escapeHtml(email || "—")}</td></tr>
       <tr><td><strong>Nhu cầu</strong></td><td>${escapeHtml(need || "—")}</td></tr>
+      ${qualifiers.region ? `<tr><td><strong>Khu vực</strong></td><td>${escapeHtml(qualifiers.region)}</td></tr>` : ""}
+      ${qualifiers.purpose ? `<tr><td><strong>Mục đích</strong></td><td>${escapeHtml(qualifiers.purpose)}</td></tr>` : ""}
+      ${qualifiers.timeframe ? `<tr><td><strong>Thời điểm</strong></td><td>${escapeHtml(qualifiers.timeframe)}</td></tr>` : ""}
       <tr><td><strong>Nguồn</strong></td><td>${escapeHtml(source)}</td></tr>
       <tr><td><strong>Ngôn ngữ</strong></td><td>${escapeHtml(lang)}</td></tr>
     </table>

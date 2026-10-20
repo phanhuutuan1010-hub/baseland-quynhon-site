@@ -6,6 +6,7 @@ import { useLang } from "@/lib/i18n";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { useSequenceReveal, stepStyle, stepScaleStyle, lineRevealStyle } from "@/lib/useSequenceReveal";
 import type { ProjectHero as ProjectHeroData } from "@/lib/project-detail/types";
+import type { Localized } from "@/lib/i18n";
 import { Accent } from "@/components/Accent";
 import { stripAccent } from "@/lib/accent";
 
@@ -18,7 +19,18 @@ import { stripAccent } from "@/lib/accent";
  * as gold on Simona purely through the --project-accent-light theme token,
  * no special-casing needed.
  */
-export function ProjectHero({ id, name, data }: { id: string; name: string; data: ProjectHeroData }) {
+export function ProjectHero({
+  id,
+  name,
+  data,
+  tourCta,
+}: {
+  id: string;
+  name: string;
+  data: ProjectHeroData;
+  /** Secondary "360° tour" button, derived from the virtualTour section. */
+  tourCta?: { label: Localized<string>; href: string };
+}) {
   const { pick } = useLang();
   const entered = useSequenceReveal();
 
@@ -75,7 +87,7 @@ export function ProjectHero({ id, name, data }: { id: string; name: string; data
             <Accent text={pick(data.subhead)} onDark />
           </p>
         )}
-        {(pick(data.ctaExploreLabel) || pick(data.ctaConsultLabel)) && (
+        {(pick(data.ctaExploreLabel) || pick(data.ctaConsultLabel) || (tourCta && pick(tourCta.label))) && (
           <div style={stepScaleStyle(entered, 1100)} className="flex flex-wrap gap-4">
             {pick(data.ctaExploreLabel) && (
               <Link
@@ -91,6 +103,15 @@ export function ProjectHero({ id, name, data }: { id: string; name: string; data
                 className="inline-flex items-center rounded-xs border border-[var(--project-primary)] bg-[var(--project-primary)] px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase no-underline hover:bg-[var(--project-primary-dark)]"
               >
                 {pick(data.ctaConsultLabel)}
+              </Link>
+            )}
+            {tourCta && pick(tourCta.label) && (
+              <Link
+                href={tourCta.href}
+                className="inline-flex items-center gap-2.5 rounded-xs border border-[rgba(250,247,242,0.45)] bg-[rgba(38,34,32,0.25)] px-6 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--color-warm-white)] uppercase no-underline backdrop-blur-sm hover:bg-[rgba(38,34,32,0.45)]"
+              >
+                <span aria-hidden className="text-base leading-none">◎</span>
+                {pick(tourCta.label)}
               </Link>
             )}
           </div>

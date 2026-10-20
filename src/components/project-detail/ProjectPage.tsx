@@ -25,6 +25,7 @@ import { FAQSection } from "./FAQSection";
 import { ProjectVerificationNote } from "./ProjectVerificationNote";
 import { ProjectCTA } from "./ProjectCTA";
 import { SalesPhasesSection } from "./SalesPhasesSection";
+import { VirtualTourSection } from "./VirtualTourSection";
 
 /**
  * Project Detail Template — orchestrates every section in the site's fixed
@@ -42,9 +43,15 @@ export function ProjectPage({
   /** Optional overlays mounted at the end (e.g. Q'Terra's lead pop-up). */
   extras?: ReactNode;
 }) {
+  const showTour = isSectionVisible(project, "virtualTour") && !!project.virtualTour?.tourUrl;
   return (
     <div className="relative w-full" data-project-theme={project.theme}>
-      <ProjectHero id={project.slug} name={project.name} data={project.hero} />
+      <ProjectHero
+        id={project.slug}
+        name={project.name}
+        data={project.hero}
+        tourCta={showTour && project.virtualTour ? { label: project.virtualTour.heroCtaLabel, href: "#virtual-tour" } : undefined}
+      />
 
       {isSectionVisible(project, "intro") && project.intro && <ProjectIntro id="statement" data={project.intro} />}
 
@@ -106,12 +113,22 @@ export function ProjectPage({
         <FloorPlanViewer id="floorplans" data={project.floorPlans} />
       )}
 
+      {showTour && project.virtualTour && (
+        <VirtualTourSection
+          id="virtual-tour"
+          data={project.virtualTour}
+          projectSlug={project.slug}
+          fallbackImage={project.hero.image?.src}
+          qualifiers={project.cta.qualifiers}
+        />
+      )}
+
       {isSectionVisible(project, "investment") && project.investment && (
         <InvestmentSection id="investment" data={project.investment} />
       )}
 
       {isSectionVisible(project, "documents") && project.documents && (
-        <DocumentSection id="documents" data={project.documents} />
+        <DocumentSection id="documents" data={project.documents} tourUrl={project.virtualTour?.tourUrl} projectSlug={project.slug} />
       )}
 
       {isSectionVisible(project, "verification") && project.verification && (
@@ -122,7 +139,7 @@ export function ProjectPage({
 
       {isSectionVisible(project, "news") && project.news && <ProjectNewsTeaser id="news" data={project.news} />}
 
-      {isSectionVisible(project, "legal") && project.legal && <TrustSection data={project.legal} />}
+      {isSectionVisible(project, "legal") && project.legal && <TrustSection data={project.legal} tourUrl={project.virtualTour?.tourUrl} projectSlug={project.slug} />}
 
       <ProjectCTA id="lead" data={project.cta} />
 

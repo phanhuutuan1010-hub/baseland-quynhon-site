@@ -7,6 +7,15 @@
  * identifiers like project/video/position/language (see call sites in
  * ProjectVideoDuo).
  */
+const normalizeUrl = (u: string) => u.trim().replace(/\/+$/, "").toLowerCase();
+
+/** Tracks `project_360_open` when an outbound link points at the project's
+ * 360° tour (Trust/Documents link lists) — no-op for any other link. */
+export function trackTourLinkClick(href: string, tourUrl: string | undefined, project: string, source: string, language: string) {
+  if (!tourUrl || normalizeUrl(href) !== normalizeUrl(tourUrl)) return;
+  trackEvent("project_360_open", { project, mode: "new_tab", source, language });
+}
+
 export function trackEvent(name: string, payload: Record<string, string | number | boolean> = {}) {
   if (typeof window === "undefined") return;
   const w = window as unknown as { dataLayer?: Record<string, unknown>[] };

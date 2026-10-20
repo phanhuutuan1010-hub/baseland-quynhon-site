@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { Localized } from "@/lib/i18n";
 import { useLang } from "@/lib/i18n";
 import { LeadFormFull } from "@/components/LeadFormFull";
+import type { ProjectLeadQualifier } from "@/lib/project-detail/types";
 
 /**
  * Lightweight lead-capture dialog — wraps the existing LeadFormFull instead
@@ -20,12 +21,14 @@ export function LeadModal({
   source,
   prefillNeed,
   contextNote,
+  qualifiers,
 }: {
   open: boolean;
   onClose: () => void;
   source: string;
   prefillNeed?: string;
   contextNote?: Localized<string>;
+  qualifiers?: ProjectLeadQualifier[];
 }) {
   const { pick } = useLang();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -70,7 +73,7 @@ export function LeadModal({
         >
           ×
         </button>
-        <LeadFormFull source={source} prefillNeed={prefillNeed} contextNote={contextNote} />
+        <LeadFormFull source={source} prefillNeed={prefillNeed} contextNote={contextNote} qualifiers={qualifiers} />
       </div>
     </div>
   );

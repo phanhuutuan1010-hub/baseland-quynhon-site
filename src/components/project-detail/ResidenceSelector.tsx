@@ -82,18 +82,21 @@ export function ResidenceSelector({ id, data }: { id: string; data: ProjectResid
               {pick(activeUnit.tag)}
             </div>
             <div className="mb-7 flex flex-col gap-4.5">
-              <div className="border-t border-[rgba(var(--project-accent-rgb),0.35)] pt-3.5">
-                <div className="mb-2 font-ui text-xs font-bold tracking-[0.1em] text-[var(--project-accent)] uppercase">
-                  {pick(data.nfaLabel)}
-                </div>
-                <div className="font-display text-2xl text-[var(--color-charcoal)]">{activeUnit.nfa}</div>
-              </div>
-              <div className="border-t border-[rgba(var(--project-accent-rgb),0.35)] pt-3.5">
-                <div className="mb-2 font-ui text-xs font-bold tracking-[0.1em] text-[var(--project-accent)] uppercase">
-                  {pick(data.nsaLabel)}
-                </div>
-                <div className="font-display text-2xl text-[var(--color-charcoal)]">{activeUnit.nsa}</div>
-              </div>
+              {[
+                { label: data.nfaLabel, value: activeUnit.nfa },
+                { label: data.nsaLabel, value: activeUnit.nsa },
+                { label: data.areaLabel, value: activeUnit.area },
+                { label: data.shareLabel, value: activeUnit.share ? pick(activeUnit.share) : undefined },
+              ]
+                .filter((row): row is { label: NonNullable<typeof row.label>; value: string } => !!row.label && !!row.value)
+                .map((row, i) => (
+                  <div key={i} className="border-t border-[rgba(var(--project-accent-rgb),0.35)] pt-3.5">
+                    <div className="mb-2 font-ui text-xs font-bold tracking-[0.1em] text-[var(--project-accent)] uppercase">
+                      {pick(row.label)}
+                    </div>
+                    <div className="font-display text-2xl text-[var(--color-charcoal)]">{row.value}</div>
+                  </div>
+                ))}
             </div>
             <p className="m-0 mb-7 max-w-105 font-body text-[15px] leading-[var(--lh-body)] text-[var(--color-text-muted)]">
               {pick(activeUnit.desc)}
@@ -114,6 +117,63 @@ export function ResidenceSelector({ id, data }: { id: string; data: ProjectResid
             </div>
           </div>
         </div>
+        {data.tableTitle && (
+          <div className="mt-12 md:mt-16">
+            <h3 className="m-0 mb-5 font-display text-[length:var(--fs-h3)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
+              {pick(data.tableTitle)}
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-[rgba(var(--project-accent-rgb),0.5)] font-ui text-xs font-bold tracking-[0.1em] text-[var(--project-accent)] uppercase">
+                    <th className="py-3 pr-4 font-bold">{pick(data.unitTypeAria)}</th>
+                    <th className="py-3 pr-4 font-bold">{pick(data.areaLabel ?? data.nsaLabel)}</th>
+                    {data.shareLabel && <th className="py-3 font-bold">{pick(data.shareLabel)}</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.items.map((u, i) => (
+                    <tr
+                      key={u.key}
+                      onClick={() => setUnitIndex(i)}
+                      className={`cursor-pointer border-b border-[var(--color-border)] font-body text-[15px] text-[var(--color-charcoal)] transition-colors hover:bg-[var(--color-limestone)] ${
+                        i === unitIndex ? "bg-[var(--color-limestone)]" : ""
+                      }`}
+                    >
+                      <td className="py-3.5 pr-4 font-ui text-[13px] font-bold tracking-[0.06em] uppercase">{pick(u.name)}</td>
+                      <td className="py-3.5 pr-4">{u.area || u.nsa}</td>
+                      {data.shareLabel && <td className="py-3.5">{u.share ? pick(u.share) : "—"}</td>}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {data.typicalFloor && (
+          <div className="mt-10 flex flex-wrap gap-6 border border-[var(--color-border)] p-6 md:mt-12 md:gap-12 md:p-9">
+            <div className="min-w-60 flex-1 basis-80">
+              <h3 className="m-0 mb-3 font-display text-[length:var(--fs-h3)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
+                {pick(data.typicalFloor.title)}
+              </h3>
+              <p className="m-0 max-w-120 font-body text-[15px] leading-[var(--lh-body)] text-[var(--color-text-muted)]">
+                {pick(data.typicalFloor.body)}
+              </p>
+            </div>
+            <ul className="m-0 grid min-w-60 flex-1 basis-80 list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
+              {data.typicalFloor.orientations.map((o, i) => (
+                <li
+                  key={i}
+                  className="border-t border-[rgba(var(--project-accent-rgb),0.35)] pt-3 font-ui text-[13px] font-bold tracking-[0.06em] text-[var(--color-charcoal)] uppercase"
+                >
+                  {pick(o)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <p className="m-0 mt-8 max-w-180 font-body text-[13px] leading-[var(--lh-body)] text-[var(--color-deep-earth)] md:mt-10">
           {pick(data.footnote)}
         </p>
