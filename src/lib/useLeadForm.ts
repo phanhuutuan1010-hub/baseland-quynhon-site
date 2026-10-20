@@ -21,7 +21,7 @@ type Status = "idle" | "loading" | "success" | "error";
 export const LEAD_SUBMITTED_KEY = "bl_lead_submitted_at";
 export const LEAD_SUBMITTED_EVENT = "bl:lead-submitted";
 
-/** Records that a lead form was sent (read by QterraLeadPopup to stay hidden). */
+/** Records that a lead form was sent (read by LeadPopupTrigger to stay hidden). */
 export function markLeadSubmitted() {
   try {
     localStorage.setItem(LEAD_SUBMITTED_KEY, String(Date.now()));

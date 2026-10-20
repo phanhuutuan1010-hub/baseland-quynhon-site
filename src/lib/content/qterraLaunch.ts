@@ -1,9 +1,9 @@
 import { CONTACT_PHONE, CONTACT_PHONE_HREF, HOTLINE } from "./nav";
 
 /**
- * Cấu hình pop-up thu SĐT của trang /projects/qterra.
- * Mọi chữ hiển thị nằm ở đây để sửa nhanh. Hotline lấy từ HOTLINE dùng chung
- * (src/lib/content/nav.ts) — không viết cứng số ở component.
+ * Cấu hình thanh liên hệ nhanh (mobile) của trang /projects/qterra.
+ * Nội dung pop-up thu lead KHÔNG còn ở đây — quản lý trong Admin
+ * (Dự án → Nội dung → Popup thu lead).
  */
 export const QTERRA_LAUNCH = {
   slug: "qterra",
@@ -14,37 +14,9 @@ export const QTERRA_LAUNCH = {
   hotlineDisplay: CONTACT_PHONE, // 0373 910 109
   ZALO_URL: "https://zalo.me/0373910109", // rỗng = ẩn nút Zalo
 
-  popup: {
-    title: "Mở bán dự kiến 12/11/2026. Cần chọn vị trí căn?",
-    subtitle: "Để lại số, chuyên viên Base Land gửi mặt bằng tầng và 6 câu hỏi nên hỏi trước khi giữ chỗ.",
-    phoneLabel: "Số điện thoại",
-    phonePlaceholder: "VD: 0901234567",
-    phoneError: "Số điện thoại chưa đúng (10 số, bắt đầu bằng 0 hoặc +84).",
-    nameLabel: "Tên (không bắt buộc)",
-    unitLabel: "Loại căn",
-    unitOptions: ["Studio", "1PN", "2PN"],
-    floorLabel: "Tầng",
-    floorOptions: ["Tầng thấp", "Tầng trung", "Tầng cao"],
-    consentPre: "Tôi đồng ý để Base Land Quy Nhơn liên hệ tư vấn Q'Terra. Xem",
-    consentLink: "Chính sách bảo mật",
-    consentPost: ".",
-    consentError: "Vui lòng đồng ý để chúng tôi liên hệ.",
-    submit: "Gọi lại cho tôi",
-    submitting: "Đang gửi…",
+  bar: {
     call: "Gọi ngay",
     zalo: "Zalo",
     consult: "Nhận tư vấn",
-    close: "Đóng",
-    success: "Đã nhận. Chuyên viên sẽ liên hệ bạn.",
-    error: "Chưa gửi được, có thể do mạng. Thông tin bạn nhập vẫn còn — vui lòng thử lại hoặc gọi hotline.",
-    fallbackName: "Khách để lại SĐT (popup Q'Terra)",
   },
-
-  // Hành vi pop-up
-  source: "qterra-popup",
-  desktopDelayMs: 30_000,
-  desktopScrollRatio: 0.4,
-  mobileScrollRatio: 0.5,
-  dismissDays: 5,
-  submittedDays: 30,
 } as const;

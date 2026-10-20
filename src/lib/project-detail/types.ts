@@ -38,7 +38,8 @@ export type ProjectSectionKey =
   | "faq"
   | "videoDuo"
   | "salesPhases"
-  | "virtualTour";
+  | "virtualTour"
+  | "leadPopup";
 
 export type ProjectSections = Partial<Record<ProjectSectionKey, boolean>>;
 
@@ -567,6 +568,39 @@ export type ProjectVirtualTour = {
   navLabel?: Localized<string>;
 };
 
+/** Lead-capture popup (not a page section — rendered as an overlay). The
+ * dialog code is only loaded once a trigger fires; see LeadPopupTrigger. */
+export type ProjectLeadPopup = {
+  title: Localized<string>;
+  subtitle: Localized<string>;
+  benefits: Localized<string>[];
+  phoneLabel: Localized<string>;
+  phonePlaceholder: Localized<string>;
+  phoneError: Localized<string>;
+  nameLabel: Localized<string>;
+  submitLabel: Localized<string>;
+  submittingLabel: Localized<string>;
+  /** Text before the privacy link, e.g. "Bảo mật thông tin · Không spam ·". */
+  privacyNote: Localized<string>;
+  privacyLinkLabel: Localized<string>;
+  successMessage: Localized<string>;
+  errorMessage: Localized<string>;
+  callLabel: Localized<string>;
+  zaloLabel: Localized<string>;
+  /** Empty = no Zalo button on the success screen. */
+  zaloUrl: string;
+  closeLabel: Localized<string>;
+  /** Triggers: after N seconds, after scrolling N% of the page, or
+   * exit-intent (desktop only). Closing hides it for `dismissDays`. */
+  delaySeconds: number;
+  scrollPercent: number;
+  dismissDays: number;
+  /** Lead `source`; empty → "<slug>-popup". */
+  leadSource: string;
+  /** Saved as the lead's name when the visitor leaves it blank. */
+  fallbackName: string;
+};
+
 export type ProjectDetailData = {
   slug: string;
   /** Proper noun — kept invariant across languages (matches how every page
@@ -602,6 +636,7 @@ export type ProjectDetailData = {
   videoDuo?: ProjectVideoDuo;
   floorPlans?: ProjectFloorPlans;
   virtualTour?: ProjectVirtualTour;
+  leadPopup?: ProjectLeadPopup;
   investment?: ProjectInvestment;
   news?: ProjectNewsTeaser;
   legal?: ProjectLegal;

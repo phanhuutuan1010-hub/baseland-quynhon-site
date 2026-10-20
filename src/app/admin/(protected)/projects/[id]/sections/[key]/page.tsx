@@ -26,6 +26,7 @@ const KEY_TO_SECTION_TYPE: Record<string, ProjectSectionType> = {
   news: "NEWS_TEASER",
   salesPhases: "SALES_PHASES",
   virtualTour: "VIRTUAL_TOUR",
+  leadPopup: "LEAD_POPUP",
 };
 
 function isNamedTableKey(key: string): key is NamedTableKey {

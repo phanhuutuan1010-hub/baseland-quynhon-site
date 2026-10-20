@@ -390,6 +390,29 @@ textarea {
   }
 }
 
+/* Lead pop-up (LeadPopupDialog): backdrop fade + panel rising into place —
+ * a bottom sheet on mobile, a centered modal on desktop. Covered by the
+ * reduced-motion rule above like every other animation. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Key-phrase highlight for `[[phrase]]` content marks (see components/
  * Accent.tsx). Reuses the existing accent tokens — terracotta site-wide,
  * each project's own accent inside [data-project-theme]. Max 1–2 per

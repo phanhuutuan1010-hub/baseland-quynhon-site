@@ -6,6 +6,7 @@ export const PROJECT_SECTION_LABELS: Record<EditableProjectSectionKey, string> =
   towers: "Tháp (Towers)",
   salesPhases: "Giai đoạn bán hàng (Sales Phases)",
   virtualTour: "Tham quan ảo 360° (Virtual Tour)",
+  leadPopup: "Popup thu lead (Lead Popup)",
   location: "Vị trí (Location)",
   masterplan: "Mặt bằng tổng thể (Masterplan)",
   architecture: "Kiến trúc (Architecture)",
@@ -52,4 +53,5 @@ export const PROJECT_SECTION_ORDER: EditableProjectSectionKey[] = [
   "documents",
   "verification",
   "faq",
+  "leadPopup",
 ];

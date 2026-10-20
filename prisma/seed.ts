@@ -96,6 +96,7 @@ const KEY_TO_SECTION_TYPE: Record<string, ProjectSectionType> = {
   news: "NEWS_TEASER",
   salesPhases: "SALES_PHASES",
   virtualTour: "VIRTUAL_TOUR",
+  leadPopup: "LEAD_POPUP",
 };
 
 // Real production content — the site's 4 actual project detail pages,

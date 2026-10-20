@@ -26,6 +26,7 @@ const KEY_TO_SECTION_TYPE: Record<string, string> = {
   news: "NEWS_TEASER",
   salesPhases: "SALES_PHASES",
   virtualTour: "VIRTUAL_TOUR",
+  leadPopup: "LEAD_POPUP",
 };
 
 export default async function ProjectSectionsPage({ params }: { params: Promise<{ id: string }> }) {

@@ -19,6 +19,7 @@ export const projectSectionKeys = [
   "news",
   "salesPhases",
   "virtualTour",
+  "leadPopup",
   "residences",
   "floorPlans",
   "amenities",

@@ -11,7 +11,7 @@ import type { SiteChromeData } from "@/lib/siteChrome";
  * / ct-sticky-mobile treatment, applied site-wide rather than only on Contact. */
 export function StickyCta({ data }: { data: SiteChromeData }) {
   const { pick } = useLang();
-  // Q'Terra renders its own mobile bottom bar (QterraLeadPopup).
+  // Q'Terra renders its own mobile bottom bar (QterraQuickBar).
   const hideMobileBar = usePathname()?.replace(/\/$/, "") === QTERRA_LAUNCH.path;
 
   return (

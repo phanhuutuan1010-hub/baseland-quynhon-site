@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import { getPublishedProjectBySlug, getPublishedProjectSlugs } from "@/lib/server/mappers/project";
 import { ProjectPage } from "@/components/project-detail/ProjectPage";
 import { ProjectNav } from "@/components/project-detail/ProjectNav";
-import { QterraLeadPopup } from "@/components/project-detail/QterraLeadPopup";
+import { QterraQuickBar } from "@/components/project-detail/QterraQuickBar";
+import { LeadPopupTrigger } from "@/components/project-detail/LeadPopupTrigger";
 import { QTERRA_LAUNCH } from "@/lib/content/qterraLaunch";
+import { isSectionVisible } from "@/lib/project-detail/types";
+import { getSiteChromeData } from "@/lib/server/mappers/siteChrome";
 import { toJsonLdString } from "@/lib/jsonLd";
 import { buildMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
@@ -33,11 +36,25 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function ProjectDetailPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
-  const project = await getPublishedProjectBySlug(slug);
+  const [project, chrome] = await Promise.all([getPublishedProjectBySlug(slug), getSiteChromeData()]);
 
   if (!project) {
     notFound();
   }
+
+  const extras = (
+    <>
+      {project.slug === QTERRA_LAUNCH.slug && <QterraQuickBar />}
+      {isSectionVisible(project, "leadPopup") && project.leadPopup && (
+        <LeadPopupTrigger
+          data={project.leadPopup}
+          projectSlug={project.slug}
+          phone={chrome.contactPhone}
+          phoneHref={chrome.contactPhoneHref}
+        />
+      )}
+    </>
+  );
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -56,11 +73,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
           rendered here, not derived from a client-side static-registry
           lookup, since project content is DB-backed and can change per edit. */}
       <ProjectNav project={project} />
-      {project.slug === QTERRA_LAUNCH.slug ? (
-        <ProjectPage project={project} extras={<QterraLeadPopup />} />
-      ) : (
-        <ProjectPage project={project} />
-      )}
+      <ProjectPage project={project} extras={extras} />
     </>
   );
 }
