@@ -52,10 +52,6 @@ export function Footer({ data }: { data: SiteChromeData }) {
       </div>
       <p className="mx-auto mt-5 flex max-w-[1440px] flex-wrap items-center gap-1.5 font-body text-[13px] text-[var(--color-sand)] opacity-55">
         {pick(data.footerCopyright)}
-        {pick(data.footerCopyright) && <span aria-hidden>·</span>}
-        <a href="https://zalo.me/0906051010" target="_blank" rel="noopener noreferrer" className="text-[var(--color-sand)] no-underline hover:opacity-80">
-          Dev by Tuấn
-        </a>
       </p>
     </footer>
   );

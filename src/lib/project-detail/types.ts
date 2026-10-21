@@ -61,6 +61,9 @@ export type ProjectHero = {
   /** "compact" = the shorter conversion-first page flow (see
    * ProjectPage's CompactProjectPage). Omitted = the full editorial flow. */
   layout?: ProjectLayout;
+  /** 4:3 card image (recommended 1600×1200) for the /projects grid and the
+   * Homepage project cards; falls back to `image`. */
+  cardImage?: { src: string; alt: Localized<string> };
   /** Compact layout: small status pill above the name (e.g. "Đang nhận
    * booking"). Empty = no pill. */
   badge?: Localized<string>;

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AdminTextField, AdminTextAreaField } from "@/components/admin/AdminField";
 import { MediaPickerField } from "@/components/admin/MediaPickerField";
+import { CardImageField } from "@/components/admin/CardImageField";
 import { SaveBar } from "@/components/admin/SaveBar";
 import { updateProjectOverview } from "../actions";
 import type { ProjectOverviewValue } from "./types";
@@ -58,6 +59,7 @@ export function OverviewForm({ projectId, initial }: { projectId: string; initia
           </div>
           <AdminTextField label="CTA tư vấn — href" value={value.heroCtaConsultHref} onChange={set("heroCtaConsultHref")} />
           <MediaPickerField label="Ảnh hero (để trống = dùng placeholder)" value={value.heroImageSrc} onChange={set("heroImageSrc")} kindFilter="IMAGE" />
+          <CardImageField value={value.cardImageSrc} onChange={set("cardImageSrc")} />
           <label className="flex flex-col gap-1.5">
             <span className="font-ui text-xs font-semibold tracking-[0.04em] uppercase">Bố cục trang</span>
             <select

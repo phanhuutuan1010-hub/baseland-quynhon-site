@@ -88,6 +88,7 @@ export const projectOverviewSchema = z.object({
   heroCtaConsultLabelEn: z.string().trim(),
   heroCtaConsultHref: z.string().trim().min(1),
   heroImageSrc: z.string().trim().optional().or(z.literal("")),
+  cardImageSrc: z.string().trim().optional().or(z.literal("")),
   heroLayout: z.enum(["full", "compact"]),
   heroBadgeVi: z.string().trim(),
   heroBadgeEn: z.string().trim(),

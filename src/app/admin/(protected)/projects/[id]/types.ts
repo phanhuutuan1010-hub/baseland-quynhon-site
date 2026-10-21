@@ -19,6 +19,7 @@ export type ProjectOverviewValue = {
   heroCtaConsultLabelEn: string;
   heroCtaConsultHref: string;
   heroImageSrc: string;
+  cardImageSrc: string;
   heroLayout: "full" | "compact";
   heroBadgeVi: string;
   heroBadgeEn: string;

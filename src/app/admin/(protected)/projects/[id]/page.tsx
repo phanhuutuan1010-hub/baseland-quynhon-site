@@ -48,6 +48,7 @@ export default async function ProjectOverviewPage({ params }: { params: Promise<
     heroCtaConsultLabelEn: hero.ctaConsultLabel.en,
     heroCtaConsultHref: hero.ctaConsultHref,
     heroImageSrc: hero.image?.src ?? "",
+    cardImageSrc: hero.cardImage?.src ?? "",
     heroLayout: hero.layout === "full" ? "full" : "compact",
     heroBadgeVi: hero.badge?.vi ?? "",
     heroBadgeEn: hero.badge?.en ?? "",

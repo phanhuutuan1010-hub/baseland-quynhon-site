@@ -127,7 +127,14 @@ export async function listProjectsForAdmin() {
 
 export type { ProjectPublishStatus };
 
-export type ProjectCardImage = { src: string; alt: { vi: string; en: string }; focalX?: number; focalY?: number };
+export type ProjectCardImage = {
+  src: string;
+  alt: { vi: string; en: string };
+  focalX?: number;
+  focalY?: number;
+  /** true = the dedicated 4:3 card image; false = hero-image fallback. */
+  isCard?: boolean;
+};
 
 /** Published projects' hero images by slug — the /projects listing cards
  * use them (Admin → Dự án → Tổng quan → Ảnh hero), so there is no
@@ -136,8 +143,10 @@ export const getProjectCardImages = cache(async (): Promise<Record<string, Proje
   const rows = await prisma.project.findMany({ where: { publishStatus: "PUBLISHED" }, select: { slug: true, hero: true } });
   const images: Record<string, ProjectCardImage> = {};
   for (const r of rows) {
-    const img = (r.hero as { image?: ProjectCardImage } | null)?.image;
-    if (img?.src) images[r.slug] = { ...img };
+    // The 4:3 card image (Overview → Ảnh đại diện) wins; else the hero image.
+    const hero = r.hero as { image?: ProjectCardImage; cardImage?: ProjectCardImage } | null;
+    const img = hero?.cardImage?.src ? hero.cardImage : hero?.image;
+    if (img?.src) images[r.slug] = { ...img, isCard: img === hero?.cardImage };
   }
   return attachImageMeta(images);
 });

@@ -113,3 +113,23 @@ export async function listMedia(kind?: MediaKind) {
     },
   });
 }
+
+/** Focal point + size of the Media row behind a URL (null when the URL is
+ * not a Media Library file, e.g. an old /public image). */
+export async function getMediaFocalByUrl(url: string) {
+  await requireRole("ADMIN", "SALES");
+  return prisma.media.findUnique({ where: { url }, select: { id: true, focalX: true, focalY: true, width: true, height: true } });
+}
+
+/** Sets the crop anchor of the Media row behind a URL (clamped to 0–1). */
+export async function setMediaFocalByUrl(url: string, focalX: number, focalY: number): Promise<ActionResult> {
+  const user = await requireRole("ADMIN");
+  const clamp = (v: number) => Math.min(1, Math.max(0, Math.round(v * 1000) / 1000));
+  const media = await prisma.media.findUnique({ where: { url }, select: { id: true } });
+  if (!media) return { error: "Ảnh này không thuộc Thư viện Media — chỉ chỉnh được điểm lấy nét cho ảnh tải lên Media." };
+  await prisma.$transaction([
+    prisma.media.update({ where: { id: media.id }, data: { focalX: clamp(focalX), focalY: clamp(focalY) } }),
+    activityLogWrite({ userId: user.id, action: "media.update", entityType: "Media", entityId: media.id }),
+  ]);
+  return {};
+}

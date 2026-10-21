@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import { getHomepageSections } from "@/lib/server/mappers/homepage";
+import { getProjectCardImages } from "@/lib/server/mappers/project";
 import { getSiteChromeData } from "@/lib/server/mappers/siteChrome";
 import { getPublishedArticles } from "@/lib/server/mappers/news";
 import { HeroSection } from "@/components/home/HeroSection";
@@ -24,7 +25,12 @@ export const metadata: Metadata = buildMetadata({
 // decides what renders), except here the Admin-controlled `enabled`/`order`
 // genuinely comes from the DB instead of a fixed per-project literal.
 export default async function HomePage() {
-  const [sections, chrome, articles] = await Promise.all([getHomepageSections(), getSiteChromeData(), getPublishedArticles()]);
+  const [sections, chrome, articles, cardImages] = await Promise.all([
+    getHomepageSections(),
+    getSiteChromeData(),
+    getPublishedArticles(),
+    getProjectCardImages(),
+  ]);
   const latestArticles = articles.slice(0, 3);
 
   return (
@@ -40,7 +46,7 @@ export default async function HomePage() {
           case "FEATURED_PROJECT":
             return <FeaturedProjectSection key={section.type} content={section.content} />;
           case "PROJECTS_TEASER":
-            return <ProjectsTeaserSection key={section.type} content={section.content} />;
+            return <ProjectsTeaserSection key={section.type} content={section.content} cardImages={cardImages} />;
           case "SERVICES":
             return <ServicesSection key={section.type} content={section.content} />;
           case "WHY_BASE_LAND":

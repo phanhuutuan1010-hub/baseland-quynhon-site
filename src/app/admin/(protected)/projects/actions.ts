@@ -170,9 +170,11 @@ export async function updateProjectOverview(projectId: string, input: unknown): 
   // doesn't show (hero.navLabel/placeholderLabel, cta.qualifiers,
   // headlineMaxWidth…) instead of dropping them on every save. The hero
   // image is the exception: it is form-controlled, so blank = removed.
-  const { image: prevHeroImage, ...prevHero } = (before.hero ?? {}) as Record<string, unknown> & {
+  const { image: prevHeroImage, cardImage: _prevCardImage, ...prevHero } = (before.hero ?? {}) as Record<string, unknown> & {
     image?: { src?: string; alt?: { vi: string; en: string } };
+    cardImage?: unknown;
   };
+  void _prevCardImage;
   const prevCta = (before.cta ?? {}) as Record<string, unknown>;
 
   await prisma.project.update({
@@ -195,6 +197,7 @@ export async function updateProjectOverview(projectId: string, input: unknown): 
         layout: d.heroLayout,
         badge: { vi: d.heroBadgeVi, en: d.heroBadgeEn },
         facts: { vi: d.heroFactsVi, en: d.heroFactsEn },
+        ...(d.cardImageSrc ? { cardImage: { src: d.cardImageSrc, alt: { vi: d.name, en: d.name } } } : {}),
         // Keep a hand-written alt text when the image itself is unchanged.
         ...(d.heroImageSrc
           ? {

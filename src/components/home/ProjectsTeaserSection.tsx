@@ -7,8 +7,17 @@ import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { HomeProjectsTeaserContent } from "@/lib/content/home";
 import { Accent } from "@/components/Accent";
+import type { ProjectCardImage } from "@/lib/server/mappers/project";
+import { focalPosition } from "@/components/project-detail/imageFrame";
 
-export function ProjectsTeaserSection({ content }: { content: HomeProjectsTeaserContent }) {
+export function ProjectsTeaserSection({
+  content,
+  cardImages = {},
+}: {
+  content: HomeProjectsTeaserContent;
+  /** Projects' 4:3 card images by slug (same as the /projects grid). */
+  cardImages?: Record<string, ProjectCardImage>;
+}) {
   const { pick } = useLang();
   const t = pick(content);
 
@@ -26,16 +35,25 @@ export function ProjectsTeaserSection({ content }: { content: HomeProjectsTeaser
           </h2>
         )}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {t.items.map((item, i) => (
+          {t.items.map((item, i) => {
+            // The linked project's card image (Admin → Dự án → Tổng quan →
+            // Ảnh đại diện) wins, so both pages show the same photo.
+            // (only a dedicated card image — the hero fallback never replaces
+            // the photo set here in Admin → Trang chủ).
+            const found = cardImages[item.href?.match(/^\/projects\/([^/#?]+)/)?.[1] ?? ""];
+            const card = found?.isCard ? found : undefined;
+            const src = card?.src || item.imageSrc;
+            return (
             <div key={item.slotId || i}>
-              <div className="relative mb-5 aspect-4/3">
-                {item.imageSrc ? (
+              <div className="relative mb-5 aspect-4/3 overflow-hidden">
+                {src ? (
                   <Image
-                    src={item.imageSrc}
+                    src={src}
                     alt={item.name || "Ảnh dự án"}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="object-cover"
+                    style={{ objectPosition: card ? focalPosition(card) : undefined }}
                   />
                 ) : (
                   <ImagePlaceholder label={item.name ? `${item.name}.jpg` : "Ảnh dự án"} />
@@ -58,7 +76,8 @@ export function ProjectsTeaserSection({ content }: { content: HomeProjectsTeaser
                 </Link>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       </Reveal>
     </section>

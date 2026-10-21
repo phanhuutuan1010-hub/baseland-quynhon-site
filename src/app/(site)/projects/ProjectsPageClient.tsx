@@ -26,13 +26,24 @@ type Filters = {
 
 const DEFAULT_FILTERS: Filters = { area: "all", type: "all", purpose: "all", status: "all" };
 
-/** Card grid spans that mirror the design bundle's getSpan() rhythm: a wide
- * card, a tall card, then a full-width banner card, repeating every 3. */
-function cardSpan(i: number): { colClass: string; aspect: string } {
-  const m = i % 3;
-  if (m === 0) return { colClass: "col-span-12 md:col-span-7", aspect: "aspect-4/3" };
-  if (m === 1) return { colClass: "col-span-12 md:col-span-5", aspect: "aspect-3/4" };
-  return { colClass: "col-span-12", aspect: "aspect-21/8" };
+/** The project shown in the "Nổi bật" block above the grid — not repeated in it. */
+const FEATURED_SLUG = "qterra";
+
+/** The four dropdown filters only come back once the list is long enough
+ * to need them; until then three type chips are enough. */
+const DROPDOWNS_FROM = 9;
+
+const TYPE_CHIPS: { value: "all" | "apartment" | "townhouse"; label: { vi: string; en: string } }[] = [
+  { value: "all", label: { vi: "Tất cả", en: "All" } },
+  { value: "apartment", label: { vi: "Căn hộ", en: "Apartments" } },
+  { value: "townhouse", label: { vi: "Nhà phố & Shophouse", en: "Townhouses & Shophouses" } },
+];
+
+/** Chip "Căn hộ" also covers condotels (both are apartment-type units). */
+function matchesType(type: ProjectType, filter: Filters["type"]) {
+  if (filter === "all") return true;
+  if (filter === "apartment") return type === "apartment" || type === "condotel";
+  return type === filter;
 }
 
 const selectClass =
@@ -54,8 +65,9 @@ export function ProjectsPageClient({
     () =>
       t.projects.filter(
         (p) =>
+          p.slug !== FEATURED_SLUG &&
           (filters.area === "all" || p.area === filters.area) &&
-          (filters.type === "all" || p.type === filters.type) &&
+          matchesType(p.type, filters.type) &&
           (filters.purpose === "all" || p.purpose.includes(filters.purpose)) &&
           (filters.status === "all" || p.status === filters.status),
       ),
@@ -71,11 +83,13 @@ export function ProjectsPageClient({
       : `${filtered.length} ${filtered.length === 1 ? t.filters.resultsSingular : t.filters.resultsPlural}`;
 
   const resetFilters = () => setFilters(DEFAULT_FILTERS);
+  const showDropdowns = t.projects.length >= DROPDOWNS_FROM;
+  const featuredImage = images[FEATURED_SLUG];
 
   return (
     <div className="relative w-full">
       {/* Hero */}
-      <section className="relative h-[clamp(380px,52vh,560px)] w-full overflow-hidden">
+      <section className="relative flex min-h-[clamp(420px,56vh,580px)] w-full overflow-hidden">
         <div className="absolute inset-0">
           {heroImage ? (
             <Image
@@ -88,11 +102,9 @@ export function ProjectsPageClient({
               style={{ objectPosition: focalPosition(heroImage) }}
             />
           ) : (
-            <ImagePlaceholder
-              label={pick({ vi: "Ảnh biển/thành phố Quy Nhơn", en: "Photo of the sea/city of Quy Nhon" })}
-              tone="dark"
-              className="rounded-none border-none"
-            />
+            // No image set yet: a plain dark backdrop — a placeholder label
+            // here sat right on top of the eyebrow/headline.
+            <div className="h-full w-full bg-[var(--color-deep-earth)]" />
           )}
         </div>
         <div
@@ -102,7 +114,8 @@ export function ProjectsPageClient({
               "linear-gradient(180deg, rgba(38,34,32,0.55) 0%, rgba(38,34,32,0.25) 45%, rgba(38,34,32,0.78) 100%)",
           }}
         />
-        <div className="relative z-[2] mx-auto flex h-full max-w-[1440px] flex-col justify-end px-5 pb-10 sm:px-8 sm:pb-14 md:px-12 md:pb-16">
+        {/* pt clears the fixed site nav so the eyebrow never sits under it. */}
+        <div className="relative z-[2] mx-auto flex w-full max-w-[1440px] flex-col justify-end px-5 pt-28 pb-10 sm:px-8 sm:pb-14 md:px-12 md:pt-32 md:pb-16">
           <div className="mb-4 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--color-terracotta-light)] uppercase">
             {t.hero.eyebrow}
           </div>
@@ -118,52 +131,76 @@ export function ProjectsPageClient({
       {/* Filters */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-warm-white)] px-5 py-5 sm:px-8 md:px-12">
         <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3.5">
-            <select
-              value={filters.area}
-              onChange={(e) => setFilters((f) => ({ ...f, area: e.target.value as Filters["area"] }))}
-              className={selectClass}
-            >
-              {t.filters.areaOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filters.type}
-              onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value as Filters["type"] }))}
-              className={selectClass}
-            >
-              {t.filters.typeOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filters.purpose}
-              onChange={(e) => setFilters((f) => ({ ...f, purpose: e.target.value as Filters["purpose"] }))}
-              className={selectClass}
-            >
-              {t.filters.purposeOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filters.status}
-              onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value as Filters["status"] }))}
-              className={selectClass}
-            >
-              {t.filters.statusOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            {hasActiveFilters && (
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div role="group" aria-label={pick({ vi: "Loại hình", en: "Type" })} className="flex flex-wrap gap-2">
+              {TYPE_CHIPS.map((c) => {
+                const active = filters.type === c.value;
+                return (
+                  <button
+                    key={c.value}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setFilters((f) => ({ ...f, type: c.value }))}
+                    className={`cursor-pointer rounded-full border px-4 py-2 font-ui text-xs font-bold tracking-[0.05em] uppercase transition-colors ${
+                      active
+                        ? "border-[var(--color-brand-green)] bg-[var(--color-brand-green)] text-[var(--color-warm-white)]"
+                        : "border-[var(--color-border)] bg-[var(--color-warm-white)] text-[var(--color-charcoal)] hover:border-[var(--color-brand-green)]"
+                    }`}
+                  >
+                    {pick(c.label)}
+                  </button>
+                );
+              })}
+            </div>
+            {showDropdowns && (
+              <>
+                <select
+                  value={filters.area}
+                  onChange={(e) => setFilters((f) => ({ ...f, area: e.target.value as Filters["area"] }))}
+                  className={selectClass}
+                >
+                  {t.filters.areaOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={filters.type}
+                  onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value as Filters["type"] }))}
+                  className={selectClass}
+                >
+                  {t.filters.typeOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={filters.purpose}
+                  onChange={(e) => setFilters((f) => ({ ...f, purpose: e.target.value as Filters["purpose"] }))}
+                  className={selectClass}
+                >
+                  {t.filters.purposeOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={filters.status}
+                  onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value as Filters["status"] }))}
+                  className={selectClass}
+                >
+                  {t.filters.statusOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </>
+            )}
+            {showDropdowns && hasActiveFilters && (
               <button
                 type="button"
                 onClick={resetFilters}
@@ -184,11 +221,13 @@ export function ProjectsPageClient({
         <Reveal className="mx-auto flex max-w-[1440px] flex-wrap items-stretch gap-10 md:gap-20">
           <div className="aspect-4/3 min-w-[280px] flex-1 basis-115 border border-[var(--color-sand)] box-border">
             <Image
-              src="/images/qterra/qterra-facade.jpg"
-              alt="Phối cảnh Q'Terra Quy Nhơn"
-              width={800}
-              height={600}
+              src={featuredImage?.src ?? "/images/qterra/qterra-facade.jpg"}
+              alt={featuredImage ? pick(featuredImage.alt) || t.featured.name : "Phối cảnh Q'Terra Quy Nhơn"}
+              width={1600}
+              height={1200}
+              sizes="(min-width: 768px) 50vw, 100vw"
               className="h-full w-full object-cover"
+              style={{ objectPosition: featuredImage ? focalPosition(featuredImage) : undefined }}
             />
           </div>
           <div className="flex min-w-[280px] flex-1 basis-95 flex-col justify-center">
@@ -242,24 +281,19 @@ export function ProjectsPageClient({
           </h2>
 
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-12 gap-6 sm:gap-8">
-              {filtered.map((p, i) => {
-                const span = cardSpan(i);
+            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 sm:gap-x-8 lg:grid-cols-3">
+              {filtered.map((p) => {
                 return (
-                  <Link
-                    key={p.key}
-                    href={`/projects/${p.slug}`}
-                    className={`group flex flex-col no-underline ${span.colClass}`}
-                  >
-                    <div className={`relative mb-4.5 overflow-hidden ${span.aspect}`}>
-                      {/* Card photo = the project's hero image (Admin → Dự án →
-                          Tổng quan → Ảnh hero); placeholder until one is set. */}
+                  <Link key={p.key} href={`/projects/${p.slug}`} className="group flex flex-col no-underline">
+                    {/* Card photo: the project's 4:3 card image (Admin → Dự án →
+                        Tổng quan → Ảnh đại diện), else its hero image. */}
+                    <div className="relative mb-4.5 aspect-4/3 overflow-hidden">
                       {images[p.slug] ? (
                         <Image
                           src={images[p.slug].src}
                           alt={pick(images[p.slug].alt) || p.name}
                           fill
-                          sizes={span.colClass === "col-span-12" ? "100vw" : "(min-width: 768px) 60vw, 100vw"}
+                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                           className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
                           style={{ objectPosition: focalPosition(images[p.slug]) }}
                         />
@@ -306,37 +340,6 @@ export function ProjectsPageClient({
               </button>
             </div>
           )}
-        </Reveal>
-      </section>
-
-      {/* Where we build */}
-      <section className="bg-[var(--color-sand)] px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
-        <Reveal className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-8 md:gap-22">
-          <div className="min-w-[280px] flex-1 basis-95">
-            <div className="mb-5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--color-terracotta-accessible)] uppercase">
-              {t.location.kicker}
-            </div>
-            <h2 className="m-0 mb-6 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-              {t.location.title}
-            </h2>
-            <p className="m-0 max-w-120 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-text-muted)]">
-              {t.location.body}
-            </p>
-          </div>
-          <div className="flex min-w-70 flex-1 basis-90 flex-col">
-            {t.location.coverageItems.map((c) => (
-              <div
-                key={c.n}
-                className="flex items-baseline gap-5 border-t border-[rgba(193,99,60,0.35)] py-4.5"
-              >
-                <div className="flex-none basis-8 font-display text-xl text-[var(--color-terracotta-accessible)]">{c.n}</div>
-                <div>
-                  <div className="mb-1 font-body text-base font-semibold text-[var(--color-charcoal)]">{c.name}</div>
-                  <div className="font-body text-sm text-[var(--color-text-muted)]">{c.location}</div>
-                </div>
-              </div>
-            ))}
-          </div>
         </Reveal>
       </section>
 
