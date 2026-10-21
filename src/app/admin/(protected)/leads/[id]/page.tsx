@@ -46,7 +46,6 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
         {[
           { label: "Khu vực", value: lead.region },
           { label: "Mục đích mua", value: lead.purpose },
-          { label: "Thời điểm", value: lead.timeframe },
         ]
           .filter((f) => f.value)
           .map((f) => (

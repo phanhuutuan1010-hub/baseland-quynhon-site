@@ -53,7 +53,6 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: P
         source: true,
         region: true,
         purpose: true,
-        timeframe: true,
         projectId: true,
         createdAt: true,
         assignedTo: { select: { name: true } },
@@ -161,8 +160,8 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: P
                 </td>
                 <td className="px-4 py-3 font-body text-sm text-[var(--color-text-muted)]">
                   {lead.source}
-                  {(lead.region || lead.purpose || lead.timeframe) && (
-                    <p className="m-0 mt-0.5 text-xs">{[lead.region, lead.purpose, lead.timeframe].filter(Boolean).join(" · ")}</p>
+                  {(lead.region || lead.purpose) && (
+                    <p className="m-0 mt-0.5 text-xs">{[lead.region, lead.purpose].filter(Boolean).join(" · ")}</p>
                   )}
                 </td>
                 <td className="px-4 py-3 font-body text-sm text-[var(--color-text-muted)]">{lead.assignedTo?.name ?? "—"}</td>

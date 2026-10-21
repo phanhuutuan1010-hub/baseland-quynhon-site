@@ -88,7 +88,7 @@ export function LeadFormFull({
   source?: string;
   prefillNeed?: string;
   contextNote?: Localized<string>;
-  /** Project-specific fields (region/purpose/timeframe); when present they
+  /** Project-specific fields (region/purpose); when present they
    * replace the generic need list. */
   qualifiers?: ProjectLeadQualifier[];
 }) {
