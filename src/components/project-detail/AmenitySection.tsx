@@ -91,11 +91,11 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
               </div>
               <div className="flex flex-1 flex-col p-5">
                 <div className="mb-2 font-ui text-[11px] font-bold tracking-[0.14em] text-[var(--project-accent-dark)] uppercase">{ch.kicker}</div>
-                <h3 className="m-0 mb-2 font-display text-xl leading-[1.25] font-normal text-[var(--color-charcoal)]">{pick(ch.title)}</h3>
+                <h3 className="m-0 mb-2 font-display text-xl leading-[1.3] font-normal text-[var(--color-charcoal)]">{pick(ch.title)}</h3>
                 <p className="m-0 mb-4 font-body text-sm leading-[var(--lh-body)] text-[var(--color-text-muted-accessible)]">
                   {pick(ch.desc)}
                 </p>
-                <p className="m-0 mt-auto font-ui text-[11px] font-semibold tracking-[0.06em] text-[var(--color-charcoal)] uppercase">
+                <p className="m-0 mt-auto font-ui text-[11px] leading-[1.7] font-semibold tracking-[0.06em] text-[var(--color-charcoal)] uppercase">
                   {ch.items.map((item) => pick(item)).join(" · ")}
                 </p>
               </div>

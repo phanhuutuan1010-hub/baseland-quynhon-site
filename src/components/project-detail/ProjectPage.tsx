@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { ProjectDetailData } from "@/lib/project-detail/types";
 import { getCompactAnchorItems, isCompactLayout, isSectionVisible } from "@/lib/project-detail/types";
 import { ProjectHero } from "./ProjectHero";
@@ -171,6 +171,9 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
     <div
       className="relative w-full [&_section[id]]:scroll-mt-[104px] md:[&_section[id]]:scroll-mt-[120px]"
       data-project-theme={project.theme}
+      // Vietnamese stacked diacritics need a little more room between
+      // wrapped headline lines than the site default (1.25).
+      style={{ "--lh-heading": "1.32" } as CSSProperties}
     >
       <ProjectHero
         id={project.slug}

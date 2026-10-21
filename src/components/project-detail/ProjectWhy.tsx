@@ -40,7 +40,7 @@ export function ProjectWhy({ id, data }: { id: string; data: ProjectTowers }) {
                   </span>
                 )}
               </div>
-              <h3 className="m-0 mb-2.5 font-display text-[length:var(--fs-h3)] leading-[1.25] font-normal text-[var(--color-warm-white)]">
+              <h3 className="m-0 mb-2.5 font-display text-[length:var(--fs-h3)] leading-[1.3] font-normal text-[var(--color-warm-white)]">
                 {pick(r.title)}
               </h3>
               <p className="m-0 font-body text-[15px] leading-[var(--lh-body)] text-[var(--color-sand)]">

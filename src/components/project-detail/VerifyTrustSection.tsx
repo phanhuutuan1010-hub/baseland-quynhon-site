@@ -48,7 +48,7 @@ export function VerifyTrustSection({
               <ul className="m-0 grid list-none grid-cols-2 gap-x-6 gap-y-4 p-0">
                 {legal.points.map((p, i) => (
                   <li key={i} className="border-l border-[rgba(var(--project-accent-rgb),0.5)] pl-3.5">
-                    <div className="font-ui text-xs font-bold tracking-[0.08em] text-[var(--color-deep-earth)] uppercase">{pick(p.label)}</div>
+                    <div className="font-ui text-xs leading-[1.5] font-bold tracking-[0.08em] text-[var(--color-deep-earth)] uppercase">{pick(p.label)}</div>
                   </li>
                 ))}
               </ul>
@@ -62,7 +62,7 @@ export function VerifyTrustSection({
             {documents.items.map((d, i) => (
               <div key={i} className="flex items-center justify-between gap-4 border-t border-[rgba(38,34,32,0.15)] py-4">
                 <div className="min-w-0">
-                  <div className="font-ui text-[13px] font-bold tracking-[0.06em] text-[var(--color-charcoal)] uppercase">{pick(d.name)}</div>
+                  <div className="font-ui text-[13px] leading-[1.45] font-bold tracking-[0.06em] text-[var(--color-charcoal)] uppercase">{pick(d.name)}</div>
                   <div className="mt-1 font-body text-[13px] text-[var(--color-text-muted)]">{pick(d.note)}</div>
                 </div>
                 {d.fileUrl ? (

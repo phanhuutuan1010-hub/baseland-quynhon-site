@@ -148,12 +148,14 @@ function PricingBlock({ data, launch }: { data: ProjectInvestmentData; launch?: 
               {plan.steps.map((step, i) => (
                 <li
                   key={i}
-                  className="flex flex-wrap gap-x-8 gap-y-1 border-t border-[rgba(var(--project-accent-rgb),0.3)] py-4"
+                  className="flex items-baseline gap-x-4 border-t border-[rgba(var(--project-accent-rgb),0.3)] py-3.5 sm:gap-x-8 sm:py-4"
                 >
-                  <div className="w-32 flex-none font-display text-lg text-[var(--project-accent-light)]">
+                  {/* Milestone and description share one row on phones too —
+                      stacked, each step read as two loose lines. */}
+                  <div className="w-18 flex-none font-display text-lg leading-[1.3] text-[var(--project-accent-light)] sm:w-32">
                     {pick(step.milestone)}
                   </div>
-                  <div className="min-w-50 flex-1 font-body text-[15px] leading-[var(--lh-body)] text-[var(--color-warm-white)]">
+                  <div className="min-w-0 flex-1 font-body text-[15px] leading-[1.55] text-[var(--color-warm-white)]">
                     {pick(step.desc)}
                   </div>
                 </li>

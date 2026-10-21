@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Fragment } from "react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
@@ -167,12 +168,27 @@ function CompactLocation({ id, data, destinations }: { id: string; data: Project
               className="mb-8"
             />
             {data.journey && (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+              // One row per time group (tier | places) from sm up: three narrow
+              // columns squeezed long place names into each other.
+              <div className="flex flex-col gap-4">
                 {data.journey.map((stop, i) => (
-                  <div key={i} className="border-t border-[rgba(var(--project-accent-rgb),0.45)] pt-3.5">
-                    <div className="mb-2.5 font-display text-xl text-[var(--project-accent-light)]">{pick(stop.tier)}</div>
-                    <p className="m-0 font-body text-[13px] leading-[1.6] text-[var(--color-sand)]">
-                      {stop.landmarks.map((l) => pick(l)).join(" · ")}
+                  <div
+                    key={i}
+                    className="border-t border-[rgba(var(--project-accent-rgb),0.45)] pt-3.5 sm:grid sm:grid-cols-[7.5rem_1fr] sm:items-baseline sm:gap-5"
+                  >
+                    <div className="mb-2 font-display text-xl leading-[1.3] whitespace-nowrap text-[var(--project-accent-light)] sm:mb-0">{pick(stop.tier)}</div>
+                    {/* A place name stays whole unless it is wider than the
+                        line; the separator trails it so no line starts with "·". */}
+                    <p className="m-0 font-body text-[13px] leading-[1.75] text-[var(--color-sand)]">
+                      {stop.landmarks.map((l, j) => (
+                        <Fragment key={j}>
+                          <span className="inline-block max-w-full">
+                            {pick(l)}
+                            {j < stop.landmarks.length - 1 && <span aria-hidden className="pl-1.5 opacity-60">·</span>}
+                          </span>
+                          {j < stop.landmarks.length - 1 && " "}
+                        </Fragment>
+                      ))}
                     </p>
                   </div>
                 ))}
