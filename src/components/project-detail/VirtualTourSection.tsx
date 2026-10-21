@@ -9,6 +9,7 @@ import { LeadModal } from "@/components/LeadModal";
 import { trackEvent } from "@/lib/analytics";
 import type { ProjectLeadQualifier, ProjectVirtualTour } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { focalPosition } from "./imageFrame";
 
 /**
  * "Tham quan ảo 360°" — poster-first: nothing from the tour host loads
@@ -111,6 +112,7 @@ export function VirtualTourSection({
                 fill
                 sizes="(min-width: 1440px) 1344px, 100vw"
                 className={`object-cover transition-[filter] duration-500 ${embedded ? "blur-sm" : ""}`}
+                style={{ objectPosition: data.poster.src ? focalPosition(data.poster) : undefined }}
               />
             ) : (
               <ImagePlaceholder label={pick(data.eyebrow)} tone="dark" className="rounded-none border-none" />

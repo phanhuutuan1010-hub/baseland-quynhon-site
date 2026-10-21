@@ -15,6 +15,7 @@ import type {
   ProjectAdvisor,
 } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { Carousel } from "./Carousel";
 
 const DEFAULT_CTA_LABEL: Localized<string> = {
   vi: "Liên hệ ngay với TVBH",
@@ -95,15 +96,28 @@ export function ProjectVideoDuo({
           )}
         </div>
 
-        <div
-          className={
-            singleItem
-              ? "mx-auto grid max-w-95 grid-cols-1"
-              : compact
-                ? "no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-8 sm:overflow-visible sm:px-0 sm:pb-0 md:gap-9 [&>*]:w-[82%] [&>*]:flex-none [&>*]:snap-start sm:[&>*]:w-auto"
-                : "grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 md:gap-9"
-          }
-        >
+        {compact && !singleItem ? (
+          /* Phones: swipe row with peek + arrows; sm+: the usual 2-up grid. */
+          <Carousel
+            label={pick(data.eyebrow)}
+            className="sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-8 sm:overflow-visible sm:scroll-px-0 sm:px-0 sm:pb-0 md:gap-9 [&>*]:w-[82%] [&>*]:flex-none [&>*]:snap-start sm:[&>*]:w-auto"
+          >
+            {items.map((video, i) => (
+              <VideoStoryCard
+                key={video.key}
+                video={video}
+                index={i}
+                projectSlug={projectSlug}
+                advisor={resolveAdvisor(video, i, data)}
+                /* Subtle editorial offset (mục 2) — the second card sits a
+                   touch lower on desktop, never more than a small nudge. */
+                offsetClassName={!singleItem && i === 1 ? "md:mt-9" : undefined}
+                revealDelayMs={i * 120}
+              />
+            ))}
+          </Carousel>
+        ) : (
+          <div className={singleItem ? "mx-auto grid max-w-95 grid-cols-1" : "grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 md:gap-9"}>
           {items.map((video, i) => (
             <VideoStoryCard
               key={video.key}
@@ -117,7 +131,8 @@ export function ProjectVideoDuo({
               revealDelayMs={i * 120}
             />
           ))}
-        </div>
+          </div>
+        )}
       </Reveal>
     </section>
   );

@@ -4,7 +4,8 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectTowers } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
-import { CompactHeading, cardRowClass, scrollCardClass } from "./shared";
+import { CompactHeading, scrollCardClass } from "./shared";
+import { Carousel } from "./Carousel";
 import { SectionAction } from "./ProjectContact";
 
 /**
@@ -23,9 +24,9 @@ export function ProjectWhy({ id, data }: { id: string; data: ProjectTowers }) {
           <CompactHeading dark eyebrow={pick(data.eyebrow)} headline={<Accent text={pick(data.headline)} onDark />} />
           <SectionAction data={data} show="md-up" />
         </div>
-        <ol className={`m-0 list-none ${cardRowClass(4)}`}>
+        <Carousel dark label={pick(data.eyebrow)} className="md:mx-0 md:grid md:gap-6 md:overflow-visible md:scroll-px-0 md:px-0 md:pb-0 md:grid-cols-2 lg:grid-cols-4">
           {reasons.map((r, i) => (
-            <li
+            <div
               key={i}
               className={`${scrollCardClass} flex flex-col rounded-sm border border-[rgba(250,245,238,0.16)] bg-[rgba(250,245,238,0.05)] p-6 md:p-7`}
             >
@@ -45,9 +46,9 @@ export function ProjectWhy({ id, data }: { id: string; data: ProjectTowers }) {
               <p className="m-0 font-body text-[15px] leading-[var(--lh-body)] text-[var(--color-sand)]">
                 {pick(r.desc)}
               </p>
-            </li>
+            </div>
           ))}
-        </ol>
+        </Carousel>
         <SectionAction data={data} show="md-down" className="mt-8 w-full" />
       </Reveal>
     </section>

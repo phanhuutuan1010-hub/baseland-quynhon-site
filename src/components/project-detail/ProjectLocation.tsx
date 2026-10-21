@@ -7,6 +7,8 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectGallery, ProjectLocation as ProjectLocationData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
 import { CompactHeading } from "./shared";
+import { Carousel } from "./Carousel";
+import { focalPosition, frameRatio } from "./imageFrame";
 import { SectionAction } from "./ProjectContact";
 
 export function ProjectLocation({
@@ -57,14 +59,17 @@ export function ProjectLocation({
             </p>
           </div>
           <div className="min-w-70 flex-1 basis-105">
-            <div className="aspect-4/3 border border-[var(--project-border)] bg-[var(--color-sand)]">
+            <div
+              className="border border-[var(--project-border)] bg-[var(--color-sand)]"
+              style={{ aspectRatio: frameRatio(data.mapImage, "4 / 3") }}
+            >
               {data.mapImage?.src ? (
                 <Image
                   src={data.mapImage.src}
                   alt={pick(data.mapImage.alt)}
                   width={800}
                   height={600}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                 />
               ) : (
                 <ImagePlaceholder
@@ -124,6 +129,7 @@ export function ProjectLocation({
                       width={600}
                       height={800}
                       className="h-full w-full object-cover"
+                      style={{ objectPosition: focalPosition(b.image) }}
                     />
                   ) : (
                     <ImagePlaceholder label={pick(b.name)} />
@@ -174,9 +180,12 @@ function CompactLocation({ id, data, destinations }: { id: string; data: Project
             )}
             <SectionAction data={data} variant="light" show="md-up" className="mt-8" />
           </div>
-          <div className="aspect-4/3 overflow-hidden border border-[rgba(250,245,238,0.16)] bg-[var(--color-sand)]">
+          <div
+            className="overflow-hidden border border-[rgba(250,245,238,0.16)] bg-[var(--color-sand)]"
+            style={{ aspectRatio: frameRatio(data.mapImage, "4 / 3") }}
+          >
             {data.mapImage?.src ? (
-              <Image src={data.mapImage.src} alt={pick(data.mapImage.alt)} width={800} height={600} className="h-full w-full object-cover" />
+              <Image src={data.mapImage.src} alt={pick(data.mapImage.alt)} width={800} height={600} className="h-full w-full object-contain" />
             ) : (
               <ImagePlaceholder label={pick(data.mapPlaceholderLabel ?? { vi: "Bản đồ vị trí", en: "Location map" })} />
             )}
@@ -185,25 +194,24 @@ function CompactLocation({ id, data, destinations }: { id: string; data: Project
 
         {!!destinations?.items.length && (
           <div className="mt-12 md:mt-16">
-            <p className="m-0 mb-5 max-w-180 font-display text-[length:var(--fs-h3)] leading-[1.35] text-[var(--color-warm-white)]">
+            <h3 className="m-0 mb-5 max-w-180 font-display font-normal text-[length:var(--fs-h3)] leading-[1.35] text-[var(--color-warm-white)]">
               <Accent text={pick(destinations.intro)} onDark />
-            </p>
-            <div className="no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-3.5 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:scroll-px-8 sm:px-8 md:mx-0 md:scroll-px-0 md:px-0">
+            </h3>
+            {/* The photos are posters with the place name printed on them,
+                so: real ratio, no crop, no duplicate caption (name → alt). */}
+            <Carousel dark label={pick(destinations.intro).replace(/\[\[|\]\]/g, "")} className="gap-3.5 md:mx-0 md:scroll-px-0 md:px-0">
               {destinations.items.map((d) => (
-                <figure key={d.key} className="m-0 w-[44%] max-w-56 flex-none snap-start sm:w-48">
-                  <div className="mb-2.5 aspect-4/5 overflow-hidden">
+                <div key={d.key} className="w-[42%] max-w-60 flex-none snap-start sm:w-56">
+                  <div className="overflow-hidden bg-[rgba(250,245,238,0.06)]" style={{ aspectRatio: frameRatio(d, "1 / 1") }}>
                     {d.src ? (
-                      <Image src={d.src} alt={pick(d.name)} width={400} height={500} className="h-full w-full object-cover" />
+                      <Image src={d.src} alt={pick(d.name)} width={480} height={480} sizes="(min-width: 640px) 224px, 42vw" className="h-full w-full object-contain" />
                     ) : (
                       <ImagePlaceholder label={pick(d.name)} tone="dark" />
                     )}
                   </div>
-                  <figcaption className="font-ui text-xs font-bold tracking-[0.08em] text-[var(--color-warm-white)] uppercase">
-                    {pick(d.name)}
-                  </figcaption>
-                </figure>
+                </div>
               ))}
-            </div>
+            </Carousel>
           </div>
         )}
         <SectionAction data={data} variant="light" show="md-down" className="mt-8 w-full" />

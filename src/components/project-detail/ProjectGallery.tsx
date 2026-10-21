@@ -6,6 +6,7 @@ import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectGallery as ProjectGalleryData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { frameRatio } from "./imageFrame";
 
 /** Nearby-destinations / gallery grid (Q'Terra: "6 điểm đến lân cận"). */
 export function ProjectGallery({ id, data }: { id: string; data: ProjectGalleryData }) {
@@ -19,9 +20,9 @@ export function ProjectGallery({ id, data }: { id: string; data: ProjectGalleryD
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {data.items.map((d) => (
             <div key={d.key}>
-              <div className="mb-4 aspect-square overflow-hidden">
+              <div className="mb-4 overflow-hidden" style={{ aspectRatio: frameRatio(d, "1 / 1") }}>
                 {d.src ? (
-                  <Image src={d.src} alt={pick(d.name)} width={800} height={800} className="h-full w-full object-cover" />
+                  <Image src={d.src} alt={pick(d.name)} width={800} height={800} className="h-full w-full object-contain" />
                 ) : (
                   <ImagePlaceholder label={pick(d.name)} />
                 )}

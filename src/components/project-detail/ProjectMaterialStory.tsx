@@ -6,6 +6,7 @@ import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectMaterialStory as ProjectMaterialStoryData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { focalPosition } from "./imageFrame";
 
 export function ProjectMaterialStory({ data }: { data: ProjectMaterialStoryData }) {
   const { pick } = useLang();
@@ -38,7 +39,7 @@ export function ProjectMaterialStory({ data }: { data: ProjectMaterialStoryData 
           {data.galleryImages.map((g, i) => (
             <div key={i} className="aspect-square overflow-hidden">
               {g.src ? (
-                <Image src={g.src} alt={pick(g.label)} width={600} height={600} className="h-full w-full object-cover" />
+                <Image src={g.src} alt={pick(g.label)} width={600} height={600} className="h-full w-full object-cover" style={{ objectPosition: focalPosition(g) }} />
               ) : (
                 <ImagePlaceholder label={pick(g.label)} className="rounded-none" />
               )}

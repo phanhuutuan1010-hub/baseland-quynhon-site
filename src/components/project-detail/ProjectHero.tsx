@@ -9,6 +9,7 @@ import type { ProjectHero as ProjectHeroData } from "@/lib/project-detail/types"
 import type { Localized } from "@/lib/i18n";
 import { Accent } from "@/components/Accent";
 import { stripAccent } from "@/lib/accent";
+import { focalPosition } from "./imageFrame";
 
 /**
  * Staged hero reveal per the Q'Terra brief's mục 5 ("image reveal → project
@@ -44,7 +45,7 @@ export function ProjectHero({
     <section id={id} className="relative h-screen min-h-[640px] w-full overflow-hidden">
       <div className="absolute inset-0" style={{ opacity: entered ? 1 : 0, transition: "opacity 600ms var(--ease-editorial)" }}>
         {data.image?.src ? (
-          <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="100vw" priority className="object-cover" />
+          <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="100vw" priority className="object-cover" style={{ objectPosition: focalPosition(data.image) }} />
         ) : (
           <ImagePlaceholder
             label={stripAccent(pick(data.placeholderLabel ?? data.subhead))}

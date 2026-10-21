@@ -163,7 +163,7 @@ export function FloorPlanModal({ data, open, onClose }: { data: ProjectFloorPlan
                 <div className="w-24 flex-none font-ui text-[11px] font-bold tracking-[0.12em] text-[var(--color-deep-earth)] uppercase">
                   {pick(data.groupLabels[g])}
                 </div>
-                <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0">
+                <div className="flex flex-wrap gap-2">
                   {data.items
                     .filter((p) => p.group === g)
                     .map((p) => (

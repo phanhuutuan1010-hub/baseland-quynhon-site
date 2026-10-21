@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import type { ProjectSectionType, ProjectPublishStatus } from "@prisma/client";
 import { prisma } from "@/lib/server/db";
+import { attachImageMeta } from "@/lib/server/imageMeta";
 import type { ProjectDetailData, ProjectSectionKey, ProjectVerification } from "@/lib/project-detail/types";
 
 const SECTION_TYPE_TO_KEY: Record<ProjectSectionType, ProjectSectionKey> = {
@@ -81,7 +82,7 @@ export const getPublishedProjectBySlug = cache(async (slug: string): Promise<Pro
     include: PROJECT_INCLUDE,
   });
   if (!row) return null;
-  return assembleProjectDetailData(row);
+  return attachImageMeta(assembleProjectDetailData(row));
 });
 
 export const getPublishedProjects = cache(async (): Promise<ProjectDetailData[]> => {

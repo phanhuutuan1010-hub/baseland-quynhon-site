@@ -6,7 +6,9 @@ import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectAmenities as ProjectAmenitiesData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
-import { CompactHeading, cardRowClass, scrollCardClass } from "./shared";
+import { CompactHeading, scrollCardClass } from "./shared";
+import { Carousel } from "./Carousel";
+import { focalPosition } from "./imageFrame";
 import { SectionAction } from "./ProjectContact";
 
 export function AmenitySection({ id, data, compact }: { id: string; data: ProjectAmenitiesData; compact?: boolean }) {
@@ -31,7 +33,7 @@ export function AmenitySection({ id, data, compact }: { id: string; data: Projec
             >
               <div className="aspect-16/10 min-w-65 w-full flex-1 basis-95 overflow-hidden">
                 {ch.image?.src ? (
-                  <Image src={ch.image.src} alt={pick(ch.image.alt)} width={960} height={600} className="h-full w-full object-cover" />
+                  <Image src={ch.image.src} alt={pick(ch.image.alt)} width={960} height={600} className="h-full w-full object-cover" style={{ objectPosition: focalPosition(ch.image) }} />
                 ) : (
                   <ImagePlaceholder label={pick(ch.title)} />
                 )}
@@ -77,12 +79,12 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
           <CompactHeading eyebrow={pick(data.eyebrow)} headline={<Accent text={pick(data.headline)} />} />
           <SectionAction data={data} show="md-up" />
         </div>
-        <div className={cardRowClass(4)}>
+        <Carousel label={pick(data.eyebrow)} className="md:mx-0 md:grid md:gap-6 md:overflow-visible md:scroll-px-0 md:px-0 md:pb-0 md:grid-cols-2 lg:grid-cols-4">
           {data.chapters.map((ch) => (
             <article key={ch.slotId} className={`${scrollCardClass} flex flex-col bg-[var(--color-warm-white)]`}>
               <div className="aspect-4/3 overflow-hidden">
                 {ch.image?.src ? (
-                  <Image src={ch.image.src} alt={pick(ch.image.alt)} width={640} height={480} className="h-full w-full object-cover" />
+                  <Image src={ch.image.src} alt={pick(ch.image.alt)} width={640} height={480} className="h-full w-full object-cover" style={{ objectPosition: focalPosition(ch.image) }} />
                 ) : (
                   <ImagePlaceholder label={pick(ch.title)} />
                 )}
@@ -90,7 +92,7 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
               <div className="flex flex-1 flex-col p-5">
                 <div className="mb-2 font-ui text-[11px] font-bold tracking-[0.14em] text-[var(--project-accent-dark)] uppercase">{ch.kicker}</div>
                 <h3 className="m-0 mb-2 font-display text-xl leading-[1.25] font-normal text-[var(--color-charcoal)]">{pick(ch.title)}</h3>
-                <p className="m-0 mb-4 line-clamp-2 font-body text-sm leading-[var(--lh-body)] text-[var(--color-text-muted-accessible)]">
+                <p className="m-0 mb-4 font-body text-sm leading-[var(--lh-body)] text-[var(--color-text-muted-accessible)]">
                   {pick(ch.desc)}
                 </p>
                 <p className="m-0 mt-auto font-ui text-[11px] font-semibold tracking-[0.06em] text-[var(--color-charcoal)] uppercase">
@@ -99,7 +101,7 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
               </div>
             </article>
           ))}
-        </div>
+        </Carousel>
         <SectionAction data={data} show="md-down" className="mt-8 w-full" />
       </Reveal>
     </section>

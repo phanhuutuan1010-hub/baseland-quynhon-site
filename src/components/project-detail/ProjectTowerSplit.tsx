@@ -9,6 +9,7 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { useInView } from "@/lib/useInView";
 import type { ProjectTowers as ProjectTowersData, ProjectTower } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { focalPosition } from "./imageFrame";
 
 /**
  * Split-screen tower comparison (Simona Heights: The Sea / The Harbour).
@@ -55,7 +56,7 @@ function TowerPanel({ tower, curtainDelayMs }: { tower: ProjectTower; curtainDel
       onMouseLeave={() => setHover(false)}
     >
       {tower.image?.src ? (
-        <Image src={tower.image.src} alt={pick(tower.image.alt)} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+        <Image src={tower.image.src} alt={pick(tower.image.alt)} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-105" style={{ objectPosition: focalPosition(tower.image) }} />
       ) : (
         <ImagePlaceholder label={pick(tower.placeholderLabel ?? tower.name)} tone="dark" className="rounded-none border-none" />
       )}

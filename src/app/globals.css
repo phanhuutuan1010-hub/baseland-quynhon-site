@@ -314,14 +314,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2,
-h3 {
-  text-wrap: balance;
-}
+/* In the base layer so utilities (e.g. [text-wrap:balance] on a <p>
+ * headline) can still override them. */
+@layer base {
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
 
-p {
-  text-wrap: pretty;
+  p {
+    text-wrap: pretty;
+  }
 }
 
 /* @layer base (not a bare rule): bare/unlayered CSS beats every Tailwind

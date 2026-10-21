@@ -10,6 +10,7 @@ import type { ProjectFloorPlans, ProjectResidences as ProjectResidencesData } fr
 import { FloorPlanModal } from "./FloorPlanViewer";
 import { chipClass } from "./shared";
 import { Accent } from "@/components/Accent";
+import { frameRatio } from "./imageFrame";
 
 export function ResidenceSelector({
   id,
@@ -51,7 +52,7 @@ export function ResidenceSelector({
         <div
           role="tablist"
           aria-label={pick(data.unitTypeAria)}
-          className="no-scrollbar mb-7 flex gap-2.5 overflow-x-auto pb-1.5 md:mb-10"
+          className="mb-7 flex flex-wrap gap-2.5 md:mb-10"
         >
           {data.items.map((u, i) => (
             <button
@@ -71,7 +72,8 @@ export function ResidenceSelector({
           <div className="min-w-70 flex-1 basis-115">
             <div
               key={activeUnit.key}
-              className="relative aspect-4/3 animate-[fade-slide-in_400ms_var(--ease-editorial)] border border-[var(--color-border)] bg-[var(--color-sand)]"
+              className="relative animate-[fade-slide-in_400ms_var(--ease-editorial)] border border-[var(--color-border)] bg-[var(--color-sand)]"
+              style={{ aspectRatio: frameRatio(activeUnit.floorPlanImage, "4 / 3") }}
             >
               {activeUnit.floorPlanImage?.src ? (
                 <Image
@@ -79,7 +81,7 @@ export function ResidenceSelector({
                   alt={pick(activeUnit.floorPlanImage.alt)}
                   width={800}
                   height={600}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                 />
               ) : (
                 <ImagePlaceholder

@@ -120,7 +120,7 @@ function PricingBlock({ data, launch }: { data: ProjectInvestmentData; launch?: 
               {pick(data.paymentTitle)}
             </h3>
           )}
-          <div role="tablist" className="no-scrollbar mb-6 flex gap-2.5 overflow-x-auto pb-1.5">
+          <div role="tablist" className="mb-6 flex flex-wrap gap-2.5">
             {plans.map((p, i) => (
               <button
                 key={p.key}

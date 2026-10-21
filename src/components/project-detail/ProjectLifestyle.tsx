@@ -7,6 +7,7 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { HScroller } from "@/components/HScroller";
 import type { ProjectLifestyle as ProjectLifestyleData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { focalPosition } from "./imageFrame";
 
 export function ProjectLifestyle({ id, data }: { id: string; data: ProjectLifestyleData }) {
   const { pick } = useLang();
@@ -35,6 +36,7 @@ export function ProjectLifestyle({ id, data }: { id: string; data: ProjectLifest
                       width={480}
                       height={640}
                       className="h-full w-full object-cover"
+                      style={{ objectPosition: focalPosition(c.image) }}
                     />
                   ) : (
                     <ImagePlaceholder label={`${c.time} · ${c.label}`} />

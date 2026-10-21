@@ -7,6 +7,7 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { useInView } from "@/lib/useInView";
 import type { ProjectPhotoStatement as ProjectPhotoStatementData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { focalPosition } from "./imageFrame";
 
 const TONE_BG: Record<NonNullable<ProjectPhotoStatementData["tone"]>, string> = {
   charcoal: "var(--color-charcoal)",
@@ -76,7 +77,7 @@ function FullBleedPhotoStatement({
         }}
       >
         {data.image?.src ? (
-          <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="100vw" className="object-cover" />
+          <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="100vw" className="object-cover" style={{ objectPosition: focalPosition(data.image) }} />
         ) : (
           <ImagePlaceholder
             label={pick(data.placeholderLabel ?? data.headline)}
@@ -124,7 +125,7 @@ function CompactPhotoStatement({ id, data }: { id?: string; data: ProjectPhotoSt
       <Reveal className="mx-auto grid max-w-[1440px] grid-cols-1 items-center gap-8 md:grid-cols-[1.35fr_1fr] md:gap-14">
         <div className="relative aspect-16/10 overflow-hidden" style={{ background: TONE_BG[data.tone ?? "charcoal"] }}>
           {data.image?.src ? (
-            <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" />
+            <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" style={{ objectPosition: focalPosition(data.image) }} />
           ) : (
             <ImagePlaceholder label={pick(data.placeholderLabel ?? data.headline)} tone="dark" className="rounded-none border-none" />
           )}
