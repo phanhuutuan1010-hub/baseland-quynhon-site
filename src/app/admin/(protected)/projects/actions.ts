@@ -117,8 +117,9 @@ export async function updateProjectOverview(projectId: string, input: unknown): 
   // doesn't show (hero.navLabel/placeholderLabel, cta.qualifiers,
   // headlineMaxWidth…) instead of dropping them on every save. The hero
   // image is the exception: it is form-controlled, so blank = removed.
-  const { image: _prevHeroImage, ...prevHero } = (before.hero ?? {}) as Record<string, unknown>;
-  void _prevHeroImage;
+  const { image: prevHeroImage, ...prevHero } = (before.hero ?? {}) as Record<string, unknown> & {
+    image?: { src?: string; alt?: { vi: string; en: string } };
+  };
   const prevCta = (before.cta ?? {}) as Record<string, unknown>;
 
   await prisma.project.update({
@@ -138,7 +139,18 @@ export async function updateProjectOverview(projectId: string, input: unknown): 
         ctaExploreHref: d.heroCtaExploreHref,
         ctaConsultLabel: { vi: d.heroCtaConsultLabelVi, en: d.heroCtaConsultLabelEn },
         ctaConsultHref: d.heroCtaConsultHref,
-        ...(d.heroImageSrc ? { image: { src: d.heroImageSrc, alt: { vi: d.name, en: d.name } } } : {}),
+        layout: d.heroLayout,
+        badge: { vi: d.heroBadgeVi, en: d.heroBadgeEn },
+        facts: { vi: d.heroFactsVi, en: d.heroFactsEn },
+        // Keep a hand-written alt text when the image itself is unchanged.
+        ...(d.heroImageSrc
+          ? {
+              image: {
+                src: d.heroImageSrc,
+                alt: prevHeroImage?.src === d.heroImageSrc && prevHeroImage.alt ? prevHeroImage.alt : { vi: d.name, en: d.name },
+              },
+            }
+          : {}),
       },
       cta: {
         ...(prevCta as object),

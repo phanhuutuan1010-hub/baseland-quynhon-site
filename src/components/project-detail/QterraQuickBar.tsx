@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { QTERRA_LAUNCH } from "@/lib/content/qterraLaunch";
 import { trackEvent } from "@/lib/analytics";
+import { useLang } from "@/lib/i18n";
+import { cleanTelHref, useProjectContact } from "./ProjectContact";
 
 const c = QTERRA_LAUNCH;
 
@@ -13,6 +15,8 @@ const c = QTERRA_LAUNCH;
  * lead pop-up itself lives in LeadPopupTrigger (DB-driven).
  */
 export function QterraQuickBar() {
+  const { phoneHref } = useProjectContact();
+  const { pick } = useLang();
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const el = (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-track]");
@@ -23,7 +27,7 @@ export function QterraQuickBar() {
   }, []);
 
   const barLinks = [
-    { key: "call", href: c.hotlineHref, label: c.bar.call, track: "click_call", primary: false },
+    { key: "call", href: cleanTelHref(phoneHref), label: c.bar.call, track: "click_call", primary: false },
     ...(c.ZALO_URL ? [{ key: "zalo", href: c.ZALO_URL, label: c.bar.zalo, track: "click_zalo", primary: false }] : []),
     { key: "lead", href: "#lead", label: c.bar.consult, track: "", primary: true },
   ];
@@ -46,7 +50,7 @@ export function QterraQuickBar() {
             i > 0 ? "border-l border-[rgba(250,245,238,0.2)]" : ""
           } ${l.primary ? "bg-[var(--color-brand-green)]" : ""}`}
         >
-          {l.label}
+          {pick(l.label)}
         </a>
       ))}
     </nav>

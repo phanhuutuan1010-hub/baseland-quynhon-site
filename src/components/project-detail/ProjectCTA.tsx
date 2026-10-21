@@ -3,12 +3,14 @@
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { LeadFormFull } from "@/components/LeadFormFull";
-import { CONTACT_EMAIL, CONTACT_EMAIL_HREF, CONTACT_PHONE, CONTACT_PHONE_HREF } from "@/lib/content/nav";
+import { CONTACT_EMAIL, CONTACT_EMAIL_HREF } from "@/lib/content/nav";
+import { cleanTelHref, useProjectContact } from "./ProjectContact";
 import type { ProjectCta as ProjectCtaData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
 
 export function ProjectCTA({ id, data }: { id: string; data: ProjectCtaData }) {
   const { pick } = useLang();
+  const { phone, phoneHref } = useProjectContact();
   return (
     <section
       id={id}
@@ -36,8 +38,8 @@ export function ProjectCTA({ id, data }: { id: string; data: ProjectCtaData }) {
             </p>
           )}
           <div className="mb-9 flex flex-col gap-3.5 font-body text-[17px]">
-            <a href={CONTACT_PHONE_HREF} className="text-[var(--color-warm-white)] no-underline">
-              {CONTACT_PHONE}
+            <a href={cleanTelHref(phoneHref)} className="text-[var(--color-warm-white)] no-underline">
+              {phone}
             </a>
             <a href={CONTACT_EMAIL_HREF} className="text-[var(--color-warm-white)] no-underline">
               {CONTACT_EMAIL}
@@ -45,7 +47,8 @@ export function ProjectCTA({ id, data }: { id: string; data: ProjectCtaData }) {
           </div>
           {pick(data.callNowLabel) && (
             <a
-              href={CONTACT_PHONE_HREF}
+              href={cleanTelHref(phoneHref)}
+              data-track="click_call"
               className="inline-flex items-center rounded-xs border border-[var(--project-accent-light)] bg-transparent px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--color-warm-white)] uppercase no-underline hover:bg-[rgba(var(--project-accent-rgb),0.15)]"
             >
               {pick(data.callNowLabel)}

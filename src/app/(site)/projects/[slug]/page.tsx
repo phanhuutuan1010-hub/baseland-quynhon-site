@@ -5,6 +5,7 @@ import { ProjectPage } from "@/components/project-detail/ProjectPage";
 import { ProjectNav } from "@/components/project-detail/ProjectNav";
 import { QterraQuickBar } from "@/components/project-detail/QterraQuickBar";
 import { LeadPopupTrigger } from "@/components/project-detail/LeadPopupTrigger";
+import { ProjectContactProvider } from "@/components/project-detail/ProjectContact";
 import { QTERRA_LAUNCH } from "@/lib/content/qterraLaunch";
 import { isSectionVisible } from "@/lib/project-detail/types";
 import { getSiteChromeData } from "@/lib/server/mappers/siteChrome";
@@ -67,13 +68,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
   };
 
   return (
-    <>
+    <ProjectContactProvider phone={chrome.contactPhone} phoneHref={chrome.contactPhoneHref}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLdString(breadcrumbSchema) }} />
       {/* Replaces the shared site Nav for this route (see SiteChrome) — now
           rendered here, not derived from a client-side static-registry
           lookup, since project content is DB-backed and can change per edit. */}
       <ProjectNav project={project} />
       <ProjectPage project={project} extras={extras} />
-    </>
+    </ProjectContactProvider>
   );
 }

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useLang } from "@/lib/i18n";
-import { CONTACT_PHONE, CONTACT_PHONE_HREF } from "@/lib/content/nav";
+import { cleanTelHref, useProjectContact } from "./ProjectContact";
 import type { ProjectSalesPhases } from "@/lib/project-detail/types";
 
 const btnOutline =
@@ -23,7 +23,7 @@ function fitOneLine(text: string, maxRem: number, upperEm: number, mixedEm: numb
  * "Giai đoạn bán hàng" — admin-editable per project (Admin → Dự án → Sections
  * → Giai đoạn bán hàng). Dark, image-backed timeline with a large key date.
  * No reveal animation (fixed layout → no CLS). Any empty text hides its
- * element; the call button uses the site-wide hotline (nav.ts).
+ * element; the call button uses the site-wide hotline (Admin → Cài đặt).
  */
 export function SalesPhasesSection({
   id,
@@ -35,6 +35,7 @@ export function SalesPhasesSection({
   fallbackImage?: string;
 }) {
   const { pick } = useLang();
+  const { phone, phoneHref } = useProjectContact();
   const bgImage = data.backgroundImage?.src || fallbackImage;
   const steps = (data.steps ?? []).filter((step) => pick(step.title) || pick(step.body));
   const hasDate = !!data.date?.trim();
@@ -167,8 +168,8 @@ export function SalesPhasesSection({
               </a>
             )}
             {pick(data.ctaCallLabel) && (
-              <a href={CONTACT_PHONE_HREF} data-track="click_call" className={btnOutline}>
-                {pick(data.ctaCallLabel)} · {CONTACT_PHONE}
+              <a href={cleanTelHref(phoneHref)} data-track="click_call" className={btnOutline}>
+                {pick(data.ctaCallLabel)} · {phone}
               </a>
             )}
             {data.zaloUrl && pick(data.ctaZaloLabel) && (

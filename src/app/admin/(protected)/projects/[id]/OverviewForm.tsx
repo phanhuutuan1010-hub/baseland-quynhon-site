@@ -58,6 +58,30 @@ export function OverviewForm({ projectId, initial }: { projectId: string; initia
           </div>
           <AdminTextField label="CTA tư vấn — href" value={value.heroCtaConsultHref} onChange={set("heroCtaConsultHref")} />
           <MediaPickerField label="Ảnh hero (để trống = dùng placeholder)" value={value.heroImageSrc} onChange={set("heroImageSrc")} kindFilter="IMAGE" />
+          <label className="flex flex-col gap-1.5">
+            <span className="font-ui text-xs font-semibold tracking-[0.04em] uppercase">Bố cục trang</span>
+            <select
+              value={value.heroLayout}
+              onChange={(e) => set("heroLayout")(e.target.value as ProjectOverviewValue["heroLayout"])}
+              className="rounded-xs border border-[var(--color-border)] bg-white px-3 py-2.5 font-body text-sm"
+            >
+              <option value="full">Đầy đủ (mặc định)</option>
+              <option value="compact">Rút gọn — hero số liệu, thanh mục lục, các mục gộp</option>
+            </select>
+            <span className="font-body text-xs text-[var(--color-text-muted)]">
+              Rút gọn: Thư viện ảnh → trong Vị trí · Mặt bằng → popup ở Căn hộ · Giai đoạn bán hàng (ngày) → trong Đầu tư · Pháp lý → trong
+              Tài liệu. Intro, Số liệu, Tầm nhìn, Chất liệu, Phong cách sống, Minh bạch dữ liệu không hiển thị. Mục &quot;Vì sao&quot; lấy từ
+              Tháp → Lý do (reasons).
+            </span>
+          </label>
+          <div className="grid grid-cols-2 gap-4">
+            <AdminTextField label="Badge — chỉ bố cục rút gọn (VI)" value={value.heroBadgeVi} onChange={set("heroBadgeVi")} />
+            <AdminTextField label="Badge (EN)" value={value.heroBadgeEn} onChange={set("heroBadgeEn")} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <AdminTextField label="Dòng số liệu, ngăn bằng · (VI)" value={value.heroFactsVi} onChange={set("heroFactsVi")} />
+            <AdminTextField label="Dòng số liệu (EN)" value={value.heroFactsEn} onChange={set("heroFactsEn")} />
+          </div>
         </section>
 
         <section className="flex flex-col gap-4 border-t border-[var(--color-border)] pt-6">

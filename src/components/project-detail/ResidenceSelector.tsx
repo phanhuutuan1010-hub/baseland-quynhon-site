@@ -2,21 +2,41 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
-import type { ProjectResidences as ProjectResidencesData } from "@/lib/project-detail/types";
+import type { ProjectFloorPlans, ProjectResidences as ProjectResidencesData } from "@/lib/project-detail/types";
+import { FloorPlanModal } from "./FloorPlanViewer";
 import { chipClass } from "./shared";
 import { Accent } from "@/components/Accent";
 
-export function ResidenceSelector({ id, data }: { id: string; data: ProjectResidencesData }) {
+export function ResidenceSelector({
+  id,
+  data,
+  compact,
+  floorPlans,
+}: {
+  id: string;
+  data: ProjectResidencesData;
+  /** Compact layout: no unit-mix table, a one-line typical-floor summary,
+   * and the floor-plan button opens `floorPlans` in a dialog. */
+  compact?: boolean;
+  floorPlans?: ProjectFloorPlans;
+}) {
   const { pick } = useLang();
   const [unitIndex, setUnitIndex] = useState(0);
+  const [plansOpen, setPlansOpen] = useState(false);
+  const closePlans = useCallback(() => setPlansOpen(false), []);
   const activeUnit = data.items[unitIndex];
+  const floorplanBtnClass =
+    "inline-flex cursor-pointer items-center rounded-xs border border-[var(--project-accent)] bg-transparent px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--color-charcoal)] uppercase no-underline hover:bg-[rgba(var(--project-accent-rgb),0.15)]";
 
   return (
-    <section id={id} className="bg-[var(--color-warm-white)] px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
+    <section
+      id={id}
+      className={`bg-[var(--color-warm-white)] px-5 sm:px-8 md:px-12 ${compact ? "py-14 sm:py-16 md:py-20" : "py-16 sm:py-20 md:py-28"}`}
+    >
       <Reveal className="mx-auto max-w-[1440px]">
         <div className="mb-5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent)] uppercase">
           {pick(data.eyebrow)}
@@ -108,16 +128,21 @@ export function ResidenceSelector({ id, data }: { id: string; data: ProjectResid
               >
                 {pick(activeUnit.ctaLabel ?? data.unitCtaLabel)}
               </Link>
-              <Link
-                href={data.unitCtaFloorplanHref}
-                className="inline-flex items-center rounded-xs border border-[var(--project-accent)] bg-transparent px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--color-charcoal)] uppercase no-underline hover:bg-[rgba(var(--project-accent-rgb),0.15)]"
-              >
-                {pick(data.unitCtaFloorplanLabel)}
-              </Link>
+              {compact ? (
+                !!floorPlans?.items.length && (
+                  <button type="button" onClick={() => setPlansOpen(true)} className={floorplanBtnClass}>
+                    {pick(data.unitCtaFloorplanLabel)}
+                  </button>
+                )
+              ) : (
+                <Link href={data.unitCtaFloorplanHref} className={floorplanBtnClass}>
+                  {pick(data.unitCtaFloorplanLabel)}
+                </Link>
+              )}
             </div>
           </div>
         </div>
-        {data.tableTitle && (
+        {!compact && data.tableTitle && (
           <div className="mt-12 md:mt-16">
             <h3 className="m-0 mb-5 font-display text-[length:var(--fs-h3)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
               {pick(data.tableTitle)}
@@ -151,7 +176,15 @@ export function ResidenceSelector({ id, data }: { id: string; data: ProjectResid
           </div>
         )}
 
-        {data.typicalFloor && (
+        {compact && data.typicalFloor && (
+          <p className="m-0 mt-8 border-t border-[var(--color-border)] pt-5 font-body text-[15px] leading-[var(--lh-body)] text-[var(--color-charcoal)]">
+            <strong className="font-ui text-xs font-bold tracking-[0.08em] uppercase">{pick(data.typicalFloor.title)}:</strong>{" "}
+            {pick(data.typicalFloor.body)}{" "}
+            <span className="text-[var(--color-text-muted)]">{data.typicalFloor.orientations.map((o) => pick(o)).join(" · ")}</span>
+          </p>
+        )}
+
+        {!compact && data.typicalFloor && (
           <div className="mt-10 flex flex-wrap gap-6 border border-[var(--color-border)] p-6 md:mt-12 md:gap-12 md:p-9">
             <div className="min-w-60 flex-1 basis-80">
               <h3 className="m-0 mb-3 font-display text-[length:var(--fs-h3)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
@@ -178,6 +211,7 @@ export function ResidenceSelector({ id, data }: { id: string; data: ProjectResid
           {pick(data.footnote)}
         </p>
       </Reveal>
+      {compact && floorPlans && <FloorPlanModal data={floorPlans} open={plansOpen} onClose={closePlans} />}
     </section>
   );
 }

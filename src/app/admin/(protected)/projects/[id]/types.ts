@@ -19,6 +19,11 @@ export type ProjectOverviewValue = {
   heroCtaConsultLabelEn: string;
   heroCtaConsultHref: string;
   heroImageSrc: string;
+  heroLayout: "full" | "compact";
+  heroBadgeVi: string;
+  heroBadgeEn: string;
+  heroFactsVi: string;
+  heroFactsEn: string;
   ctaEyebrowVi: string;
   ctaEyebrowEn: string;
   ctaHeadlineVi: string;

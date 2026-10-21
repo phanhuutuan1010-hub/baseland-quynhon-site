@@ -4,11 +4,26 @@ import Image from "next/image";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
-import type { ProjectLocation as ProjectLocationData } from "@/lib/project-detail/types";
+import type { ProjectGallery, ProjectLocation as ProjectLocationData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { CompactHeading } from "./shared";
+import { SectionAction } from "./ProjectContact";
 
-export function ProjectLocation({ id, data }: { id: string; data: ProjectLocationData }) {
+export function ProjectLocation({
+  id,
+  data,
+  compact,
+  destinations,
+}: {
+  id: string;
+  data: ProjectLocationData;
+  /** Compact layout: smaller map, time groups in one row, nearby
+   * destinations (Gallery section) as a sideways carousel. */
+  compact?: boolean;
+  destinations?: ProjectGallery;
+}) {
   const { pick } = useLang();
+  if (compact) return <CompactLocation id={id} data={data} destinations={destinations} />;
   const hasJourney = !!data.journey;
 
   return (
@@ -126,6 +141,72 @@ export function ProjectLocation({ id, data }: { id: string; data: ProjectLocatio
             ))}
           </div>
         )}
+      </Reveal>
+    </section>
+  );
+}
+
+function CompactLocation({ id, data, destinations }: { id: string; data: ProjectLocationData; destinations?: ProjectGallery }) {
+  const { pick } = useLang();
+  return (
+    <section id={id} className="bg-[var(--project-dark-alt)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
+      <Reveal className="mx-auto max-w-[1440px]">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_1.1fr] md:items-center md:gap-14">
+          <div>
+            <CompactHeading
+              dark
+              eyebrow={pick(data.eyebrow)}
+              headline={<Accent text={pick(data.headline)} onDark />}
+              body={<Accent text={pick(data.body)} onDark />}
+              className="mb-8"
+            />
+            {data.journey && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+                {data.journey.map((stop, i) => (
+                  <div key={i} className="border-t border-[rgba(var(--project-accent-rgb),0.45)] pt-3.5">
+                    <div className="mb-2.5 font-display text-xl text-[var(--project-accent-light)]">{pick(stop.tier)}</div>
+                    <p className="m-0 font-body text-[13px] leading-[1.6] text-[var(--color-sand)]">
+                      {stop.landmarks.map((l) => pick(l)).join(" · ")}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+            <SectionAction data={data} variant="light" show="md-up" className="mt-8" />
+          </div>
+          <div className="aspect-4/3 overflow-hidden border border-[rgba(250,245,238,0.16)] bg-[var(--color-sand)]">
+            {data.mapImage?.src ? (
+              <Image src={data.mapImage.src} alt={pick(data.mapImage.alt)} width={800} height={600} className="h-full w-full object-cover" />
+            ) : (
+              <ImagePlaceholder label={pick(data.mapPlaceholderLabel ?? { vi: "Bản đồ vị trí", en: "Location map" })} />
+            )}
+          </div>
+        </div>
+
+        {!!destinations?.items.length && (
+          <div className="mt-12 md:mt-16">
+            <p className="m-0 mb-5 max-w-180 font-display text-[length:var(--fs-h3)] leading-[1.35] text-[var(--color-warm-white)]">
+              <Accent text={pick(destinations.intro)} onDark />
+            </p>
+            <div className="no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-3.5 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:scroll-px-8 sm:px-8 md:mx-0 md:scroll-px-0 md:px-0">
+              {destinations.items.map((d) => (
+                <figure key={d.key} className="m-0 w-[44%] max-w-56 flex-none snap-start sm:w-48">
+                  <div className="mb-2.5 aspect-4/5 overflow-hidden">
+                    {d.src ? (
+                      <Image src={d.src} alt={pick(d.name)} width={400} height={500} className="h-full w-full object-cover" />
+                    ) : (
+                      <ImagePlaceholder label={pick(d.name)} tone="dark" />
+                    )}
+                  </div>
+                  <figcaption className="font-ui text-xs font-bold tracking-[0.08em] text-[var(--color-warm-white)] uppercase">
+                    {pick(d.name)}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        )}
+        <SectionAction data={data} variant="light" show="md-down" className="mt-8 w-full" />
       </Reveal>
     </section>
   );

@@ -4,8 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useLang } from "@/lib/i18n";
-import { CONTACT_EMAIL, CONTACT_EMAIL_HREF, CONTACT_PHONE, CONTACT_PHONE_HREF } from "@/lib/content/nav";
-import { getProjectNavItems, type ProjectDetailData } from "@/lib/project-detail/types";
+import { CONTACT_EMAIL, CONTACT_EMAIL_HREF } from "@/lib/content/nav";
+import { cleanTelHref, useProjectContact } from "./ProjectContact";
+import { getProjectNavItems, isCompactLayout, type ProjectDetailData } from "@/lib/project-detail/types";
 
 /**
  * Per-project anchor navigation (Q'Terra: Q'Terra / Vị trí / Kiến trúc /
@@ -20,6 +21,10 @@ export function ProjectNav({ project }: { project: ProjectDetailData }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { lang, setLang, pick } = useLang();
   const navItems = getProjectNavItems(project);
+  const { phone, phoneHref } = useProjectContact();
+  // Compact layout has its own sticky anchor bar under the header, so the
+  // desktop header keeps only language + CTA (the mobile menu keeps all).
+  const compact = isCompactLayout(project);
 
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 40);
@@ -56,8 +61,8 @@ export function ProjectNav({ project }: { project: ProjectDetailData }) {
           </span>
         </Link>
 
-        <div className="hidden min-w-0 items-center gap-3 2xl:flex">
-          {navItems.map((item) => (
+        <div className={`hidden min-w-0 items-center gap-3 ${compact ? "md:flex" : "2xl:flex"}`}>
+          {!compact && navItems.map((item) => (
             <a
               key={item.href}
               href={item.href}
@@ -85,7 +90,7 @@ export function ProjectNav({ project }: { project: ProjectDetailData }) {
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
           aria-label={pick({ vi: "Mở menu", en: "Open menu" })}
-          className="flex flex-col gap-[5px] border-none bg-transparent p-2 2xl:hidden"
+          className={`flex flex-col gap-[5px] border-none bg-transparent p-2 ${compact ? "md:hidden" : "2xl:hidden"}`}
         >
           <span className="block h-[2px] w-6" style={{ background: solid ? "var(--color-charcoal)" : "var(--color-warm-white)" }} />
           <span className="block h-[2px] w-6" style={{ background: solid ? "var(--color-charcoal)" : "var(--color-warm-white)" }} />
@@ -121,8 +126,8 @@ export function ProjectNav({ project }: { project: ProjectDetailData }) {
             ))}
           </div>
           <div className="mt-12 flex flex-col gap-2.5 font-body text-[15px] text-[var(--color-sand)]">
-            <a href={CONTACT_PHONE_HREF} className="text-[var(--color-sand)] no-underline">
-              {CONTACT_PHONE}
+            <a href={cleanTelHref(phoneHref)} className="text-[var(--color-sand)] no-underline">
+              {phone}
             </a>
             <a href={CONTACT_EMAIL_HREF} className="text-[var(--color-sand)] no-underline">
               {CONTACT_EMAIL}

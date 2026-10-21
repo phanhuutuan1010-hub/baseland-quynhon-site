@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 /** Counts up to `target` once it scrolls into view — used by ProjectStats
  * for animated key numbers (e.g. "864 residences"). Respects
@@ -55,4 +55,60 @@ export function chipClass(active: boolean) {
       ? "border-[var(--color-charcoal)] bg-[var(--color-charcoal)] text-[var(--color-warm-white)]"
       : "border-[rgba(38,34,32,0.25)] bg-transparent text-[var(--color-charcoal)]"
   }`;
+}
+
+/** Mobile: a sideways-scrolling row of cards (bleeds to the screen edge);
+ * md+: a regular grid with `cols` columns. Children get `scrollCardClass`. */
+export function cardRowClass(cols: 3 | 4) {
+  return `no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:scroll-px-8 sm:px-8 md:mx-0 md:grid md:gap-6 md:overflow-visible md:px-0 md:pb-0 ${
+    cols === 4 ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"
+  }`;
+}
+
+export const scrollCardClass = "w-[78%] max-w-80 flex-none snap-start md:w-auto md:max-w-none";
+
+/** Eyebrow + headline (+ optional one-line body) used by the compact
+ * layout's sections. */
+export function CompactHeading({
+  eyebrow,
+  headline,
+  body,
+  dark,
+  className = "",
+}: {
+  eyebrow?: ReactNode;
+  headline: ReactNode;
+  body?: ReactNode;
+  dark?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={`max-w-180 ${className}`}>
+      {eyebrow && (
+        <div
+          className={`mb-4 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] uppercase ${
+            dark ? "text-[var(--project-accent-light)]" : "text-[var(--project-accent-dark)]"
+          }`}
+        >
+          {eyebrow}
+        </div>
+      )}
+      <h2
+        className={`m-0 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal ${
+          dark ? "text-[var(--color-warm-white)]" : "text-[var(--color-charcoal)]"
+        }`}
+      >
+        {headline}
+      </h2>
+      {body && (
+        <p
+          className={`m-0 mt-4 max-w-150 font-body text-[length:var(--fs-body)] leading-[var(--lh-body)] ${
+            dark ? "text-[var(--color-sand)]" : "text-[var(--color-text-muted)]"
+          }`}
+        >
+          {body}
+        </p>
+      )}
+    </div>
+  );
 }

@@ -27,8 +27,11 @@ export function VirtualTourSection({
   projectSlug,
   fallbackImage,
   qualifiers,
+  compact,
 }: {
   id: string;
+  /** Compact layout: shorter frame (21:9 on desktop) and less padding. */
+  compact?: boolean;
   data: ProjectVirtualTour;
   projectSlug: string;
   fallbackImage?: string;
@@ -71,15 +74,18 @@ export function VirtualTourSection({
   }
 
   return (
-    <section id={id} className="bg-[var(--color-warm-white)] px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
+    <section
+      id={id}
+      className={`bg-[var(--color-warm-white)] px-5 sm:px-8 md:px-12 ${compact ? "py-14 sm:py-16 md:py-20" : "py-16 sm:py-20 md:py-28"}`}
+    >
       <Reveal className="mx-auto max-w-[1440px]">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-6 md:mb-12">
+        <div className={`flex flex-wrap items-end justify-between gap-6 ${compact ? "mb-6 md:mb-8" : "mb-8 md:mb-12"}`}>
           <div className="max-w-180">
             <div className="mb-5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent)] uppercase">
               {pick(data.eyebrow)}
             </div>
             {pick(data.headline) && (
-              <h2 className="m-0 mb-4 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
+              <h2 className={`m-0 mb-4 font-display ${compact ? "text-[length:var(--fs-h2)]" : "text-[length:var(--fs-h1)]"} leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]`}>
                 <Accent text={pick(data.headline)} />
               </h2>
             )}
@@ -93,7 +99,9 @@ export function VirtualTourSection({
 
         <div
           ref={frameRef}
-          className="relative aspect-4/3 w-full overflow-hidden border border-[var(--color-border)] bg-[var(--color-charcoal)] md:aspect-16/9"
+          className={`relative w-full overflow-hidden border border-[var(--color-border)] bg-[var(--color-charcoal)] ${
+            compact ? "aspect-16/10 md:aspect-[21/9]" : "aspect-4/3 md:aspect-16/9"
+          }`}
         >
           {(!embedded || !frameLoaded) &&
             (posterSrc ? (

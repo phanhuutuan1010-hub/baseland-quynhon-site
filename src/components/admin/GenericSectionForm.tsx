@@ -78,6 +78,11 @@ const FIELD_LABELS: Record<string, string> = {
   scrollPercent: "Hoặc khi cuộn tới (% trang)",
   dismissDays: "Đóng thì ẩn (ngày)",
   fallbackName: "Tên lưu khi khách bỏ trống",
+  reasons: "Lý do (mục \"Vì sao\" — bố cục rút gọn)",
+  kicker: "Nhãn nhỏ",
+  actionLabel: "Nút CTA của mục — chữ (bố cục rút gọn, để trống = ẩn)",
+  actionHref: "Nút CTA của mục — link (#lead, hoặc call = gọi hotline)",
+  navLabel: "Nhãn trên thanh mục lục",
 };
 
 function prettifyKey(key: string): string {

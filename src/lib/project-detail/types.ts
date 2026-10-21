@@ -58,6 +58,24 @@ export type ProjectHero = {
   /** Short label for ProjectNav's first item (e.g. "Q'Terra", not the
    * stylized all-caps hero title). Falls back to `project.name`. */
   navLabel?: string;
+  /** "compact" = the shorter conversion-first page flow (see
+   * ProjectPage's CompactProjectPage). Omitted = the full editorial flow. */
+  layout?: ProjectLayout;
+  /** Compact layout: small status pill above the name (e.g. "Đang nhận
+   * booking"). Empty = no pill. */
+  badge?: Localized<string>;
+  /** Compact layout: one line of key figures separated by " · ", shown
+   * instead of `subhead` (e.g. "39 tầng · 864 căn · 50m tới biển"). */
+  facts?: Localized<string>;
+};
+
+export type ProjectLayout = "full" | "compact";
+
+/** Section-level call to action used by the compact layout. `href` is an
+ * anchor/URL, or "call" for the site hotline (Admin → Cài đặt). */
+export type ProjectSectionAction = {
+  actionLabel?: Localized<string>;
+  actionHref?: string;
 };
 
 export type ProjectIntro = {
@@ -93,7 +111,7 @@ export type ProjectLocationJourneyStop = {
   landmarks: Localized<string>[];
 };
 
-export type ProjectLocation = {
+export type ProjectLocation = ProjectSectionAction & {
   eyebrow: Localized<string>;
   headline: Localized<string>;
   body: Localized<string>;
@@ -149,12 +167,17 @@ export type ProjectTower = {
 /** "The Sea / The Harbour" style split-screen tower comparison — each
  * tower keeps its own visual identity and never collapses into a single
  * shared card (see ProjectTowerSplit). */
-export type ProjectTowers = {
+export type ProjectTowers = ProjectSectionAction & {
   eyebrow: Localized<string>;
   headline: Localized<string>;
   towers: [ProjectTower, ProjectTower];
   navLabel?: Localized<string>;
+  /** Compact layout: the section renders as "Vì sao …" reason cards
+   * instead of the split-screen towers. */
+  reasons?: ProjectReason[];
 };
+
+export type ProjectReason = { kicker: Localized<string>; title: Localized<string>; desc: Localized<string> };
 
 export type ProjectNewsTeaser = {
   eyebrow: Localized<string>;
@@ -229,7 +252,7 @@ export type ProjectAmenityChapter = {
   image?: { src: string; alt: Localized<string> };
 };
 
-export type ProjectAmenities = {
+export type ProjectAmenities = ProjectSectionAction & {
   eyebrow: Localized<string>;
   headline: Localized<string>;
   chapters: ProjectAmenityChapter[];
@@ -395,7 +418,7 @@ export type ProjectDocumentItem = {
   linkLabel?: Localized<string>;
 };
 
-export type ProjectDocuments = {
+export type ProjectDocuments = ProjectSectionAction & {
   eyebrow: Localized<string>;
   headline: Localized<string>;
   ctaLabel: Localized<string>;
@@ -653,6 +676,10 @@ export type ProjectDetailData = {
  * forces it off (`sections.investment === false`) — the override always
  * wins, even over present data. Sections with no toggle key (hero, cta)
  * are always shown; they're required fields on ProjectDetailData. */
+export function isCompactLayout(project: ProjectDetailData): boolean {
+  return project.hero.layout === "compact";
+}
+
 export function isSectionVisible(project: ProjectDetailData, key: ProjectSectionKey): boolean {
   if (project.sections[key] === false) return false;
   return project[key] != null;
@@ -670,6 +697,7 @@ export type ProjectNavItem = { href: string; label: Localized<string> };
  * shorter nav — no per-project nav config needed.
  */
 export function getProjectNavItems(project: ProjectDetailData): ProjectNavItem[] {
+  if (isCompactLayout(project)) return [...getCompactAnchorItems(project), { href: "#lead", label: project.cta.eyebrow }];
   const items: ProjectNavItem[] = [
     { href: `#${project.slug}`, label: { vi: project.hero.navLabel ?? project.name, en: project.hero.navLabel ?? project.name } },
   ];
@@ -715,5 +743,28 @@ export function getProjectNavItems(project: ProjectDetailData): ProjectNavItem[]
   }
 
   items.push({ href: "#lead", label: project.cta.eyebrow });
+  return items;
+}
+
+/** Compact layout's sticky anchor bar (Tổng quan · Vị trí · Căn hộ ·
+ * Tiện ích · Giá) — labels come from each section's `navLabel`. */
+export function getCompactAnchorItems(project: ProjectDetailData): ProjectNavItem[] {
+  const items: ProjectNavItem[] = [];
+  const towers = project.towers;
+  if (isSectionVisible(project, "towers") && towers?.reasons?.length) {
+    items.push({ href: "#overview", label: towers.navLabel ?? towers.eyebrow });
+  }
+  if (isSectionVisible(project, "location") && project.location) {
+    items.push({ href: "#location", label: project.location.navLabel ?? project.location.eyebrow });
+  }
+  if (isSectionVisible(project, "residences") && project.residences) {
+    items.push({ href: "#residences", label: project.residences.navLabel ?? project.residences.eyebrow });
+  }
+  if (isSectionVisible(project, "amenities") && project.amenities) {
+    items.push({ href: "#amenities", label: project.amenities.navLabel ?? project.amenities.eyebrow });
+  }
+  if (isSectionVisible(project, "investment") && project.investment) {
+    items.push({ href: "#investment", label: project.investment.navLabel ?? project.investment.eyebrow });
+  }
   return items;
 }

@@ -15,8 +15,8 @@ export const QTERRA_LAUNCH = {
   ZALO_URL: "https://zalo.me/0373910109", // rỗng = ẩn nút Zalo
 
   bar: {
-    call: "Gọi ngay",
-    zalo: "Zalo",
-    consult: "Nhận tư vấn",
+    call: { vi: "Gọi ngay", en: "Call now" },
+    zalo: { vi: "Zalo", en: "Zalo" },
+    consult: { vi: "Nhận tư vấn", en: "Get advice" },
   },
 } as const;

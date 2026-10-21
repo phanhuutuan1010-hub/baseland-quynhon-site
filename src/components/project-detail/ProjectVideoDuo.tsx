@@ -8,7 +8,7 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { LeadModal } from "@/components/LeadModal";
 import { useViewportPlayback } from "@/lib/useViewportPlayback";
 import { trackEvent } from "@/lib/analytics";
-import { CONTACT_PHONE, CONTACT_PHONE_HREF } from "@/lib/content/nav";
+import { cleanTelHref, useProjectContact } from "./ProjectContact";
 import type {
   ProjectVideoDuo as ProjectVideoDuoData,
   ProjectVideoItem,
@@ -55,10 +55,14 @@ export function ProjectVideoDuo({
   id,
   data,
   projectSlug,
+  compact,
 }: {
   id: string;
   data: ProjectVideoDuoData;
   projectSlug: string;
+  /** Compact layout: less padding; on phones the two cards sit in a
+   * sideways-swipe row instead of stacking. */
+  compact?: boolean;
 }) {
   const { pick } = useLang();
   const items = [...data.items]
@@ -74,14 +78,14 @@ export function ProjectVideoDuo({
   return (
     <section
       id={id}
-      className="bg-[var(--project-background)] px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28"
+      className={`bg-[var(--project-background)] px-5 sm:px-8 md:px-12 ${compact ? "py-14 sm:py-16 md:py-20" : "py-16 sm:py-20 md:py-28"}`}
     >
       <Reveal className="mx-auto max-w-[1440px]">
-        <div className="mb-10 max-w-170 md:mb-14">
+        <div className={`max-w-170 ${compact ? "mb-8 md:mb-12" : "mb-10 md:mb-14"}`}>
           <div className="mb-5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent)] uppercase">
             {pick(data.eyebrow)}
           </div>
-          <h2 className="m-0 mb-5 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
+          <h2 className={`m-0 mb-5 font-display ${compact ? "text-[length:var(--fs-h2)]" : "text-[length:var(--fs-h1)]"} leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]`}>
             <Accent text={pick(data.headline)} />
           </h2>
           {data.body && (
@@ -95,7 +99,9 @@ export function ProjectVideoDuo({
           className={
             singleItem
               ? "mx-auto grid max-w-95 grid-cols-1"
-              : "grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 md:gap-9"
+              : compact
+                ? "no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-8 sm:overflow-visible sm:px-0 sm:pb-0 md:gap-9 [&>*]:w-[82%] [&>*]:flex-none [&>*]:snap-start sm:[&>*]:w-auto"
+                : "grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 md:gap-9"
           }
         >
           {items.map((video, i) => (
@@ -133,6 +139,7 @@ function VideoStoryCard({
   revealDelayMs: number;
 }) {
   const { pick, lang } = useLang();
+  const hotline = useProjectContact();
   const { ref: viewportRef, inView } = useViewportPlayback<HTMLDivElement>(0.5);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
@@ -190,8 +197,9 @@ function VideoStoryCard({
 
   const contentTypeLabel = pick(CONTENT_TYPE_LABEL[video.contentType]);
   const ctaLabel = pick(video.ctaLabel ?? DEFAULT_CTA_LABEL);
-  const callPhone = advisor?.phone ?? CONTACT_PHONE;
-  const callHref = advisor?.phoneHref ?? CONTACT_PHONE_HREF;
+  // The advisor (TVBH) keeps their own number; no advisor → site hotline.
+  const callPhone = advisor?.phone || hotline.phone;
+  const callHref = cleanTelHref(advisor?.phone ? advisor.phoneHref || `tel:${advisor.phone}` : hotline.phoneHref);
   const leadSource = `project-video/${projectSlug}/${video.topicSlug}`;
 
   function handleCtaClick() {

@@ -4,11 +4,25 @@ import Link from "next/link";
 import { useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
-import type { ProjectInvestment as ProjectInvestmentData, ProjectPaymentPlan } from "@/lib/project-detail/types";
+import type { ProjectInvestment as ProjectInvestmentData, ProjectPaymentPlan, ProjectSalesPhases } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
+import { CompactHeading } from "./shared";
 
-export function InvestmentSection({ id, data }: { id: string; data: ProjectInvestmentData }) {
+export function InvestmentSection({
+  id,
+  data,
+  compact,
+  salesPhases,
+}: {
+  id: string;
+  data: ProjectInvestmentData;
+  /** Compact layout: launch date (from the Sales Phases section) + price
+   * figures + payment-plan tabs + one CTA; the value points are dropped. */
+  compact?: boolean;
+  salesPhases?: ProjectSalesPhases;
+}) {
   const { pick } = useLang();
+  if (compact) return <CompactInvestment id={id} data={data} salesPhases={salesPhases} />;
   return (
     <section id={id} className="bg-[var(--color-deep-earth)] px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
       <Reveal className="mx-auto max-w-[1440px]">
@@ -66,7 +80,7 @@ export function InvestmentSection({ id, data }: { id: string; data: ProjectInves
 
 /** Indicative price figures + payment-plan tabs. Shown only when the
  * project has `priceFacts`/`paymentPlans` data. */
-function PricingBlock({ data }: { data: ProjectInvestmentData }) {
+function PricingBlock({ data, launch }: { data: ProjectInvestmentData; launch?: { label: string; date: string } }) {
   const { pick } = useLang();
   const plans = data.paymentPlans ?? [];
   const [planIndex, setPlanIndex] = useState(0);
@@ -74,14 +88,24 @@ function PricingBlock({ data }: { data: ProjectInvestmentData }) {
 
   return (
     <div className="mb-10 md:mb-14">
-      {!!data.priceFacts?.length && (
-        <div className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-3 md:mb-12">
-          {data.priceFacts.map((f, i) => (
+      {!!(data.priceFacts?.length || launch) && (
+        <div
+          className={`mb-10 grid gap-6 md:mb-12 ${launch ? "grid-cols-2 gap-x-5 md:grid-cols-4" : "grid-cols-1 sm:grid-cols-3"}`}
+        >
+          {launch && (
+            <div className="border-t-2 border-[var(--project-accent-light)] pt-5">
+              <div className="mb-2 font-ui text-xs font-bold tracking-[0.14em] text-[var(--project-accent-light)] uppercase">{launch.label}</div>
+              <div className="font-display text-[clamp(1.5rem,3.5vw,2.5rem)] leading-[1.1] text-[var(--color-warm-white)] tabular-nums">
+                {launch.date}
+              </div>
+            </div>
+          )}
+          {(data.priceFacts ?? []).map((f, i) => (
             <div key={i} className="border-t border-[rgba(var(--project-accent-rgb),0.45)] pt-5">
               <div className="mb-2 font-ui text-xs font-bold tracking-[0.14em] text-[var(--project-accent-light)] uppercase">
                 {pick(f.label)}
               </div>
-              <div className="font-display text-[clamp(1.75rem,3.5vw,2.5rem)] leading-[1.1] text-[var(--color-warm-white)]">
+              <div className="font-display text-[clamp(1.5rem,3.5vw,2.5rem)] leading-[1.1] text-[var(--color-warm-white)]">
                 {pick(f.value)}
               </div>
             </div>
@@ -145,5 +169,29 @@ function PricingBlock({ data }: { data: ProjectInvestmentData }) {
         </p>
       )}
     </div>
+  );
+}
+
+function CompactInvestment({ id, data, salesPhases }: { id: string; data: ProjectInvestmentData; salesPhases?: ProjectSalesPhases }) {
+  const { pick } = useLang();
+  const launch = salesPhases?.date?.trim()
+    ? { label: pick(salesPhases.dateLabel) || pick({ vi: "Mở bán dự kiến", en: "Expected launch" }), date: salesPhases.date }
+    : undefined;
+  return (
+    <section id={id} className="bg-[var(--color-deep-earth)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
+      <Reveal className="mx-auto max-w-[1440px]">
+        <CompactHeading dark eyebrow={pick(data.eyebrow)} headline={<Accent text={pick(data.headline)} onDark />} className="mb-10 md:mb-12" />
+        <PricingBlock data={data} launch={launch} />
+        <div className="flex flex-col gap-4 border-t border-[rgba(233,220,199,0.28)] pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="m-0 max-w-130 font-body text-sm leading-[var(--lh-body)] text-[var(--color-sand)] opacity-85">{pick(data.pricingBody)}</p>
+          <Link
+            href={data.pricingCtaHref}
+            className="inline-flex min-h-12 flex-none items-center justify-center rounded-xs border border-[var(--project-primary)] bg-[var(--project-primary)] px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase no-underline hover:bg-[var(--project-primary-dark)]"
+          >
+            {pick(data.pricingCtaLabel)}
+          </Link>
+        </div>
+      </Reveal>
+    </section>
   );
 }

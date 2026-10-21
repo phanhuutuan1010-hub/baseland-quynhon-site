@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { ProjectDetailData } from "@/lib/project-detail/types";
-import { isSectionVisible } from "@/lib/project-detail/types";
+import { getCompactAnchorItems, isCompactLayout, isSectionVisible } from "@/lib/project-detail/types";
 import { ProjectHero } from "./ProjectHero";
 import { ProjectIntro } from "./ProjectIntro";
 import { ProjectStats } from "./ProjectStats";
@@ -26,6 +26,9 @@ import { ProjectVerificationNote } from "./ProjectVerificationNote";
 import { ProjectCTA } from "./ProjectCTA";
 import { SalesPhasesSection } from "./SalesPhasesSection";
 import { VirtualTourSection } from "./VirtualTourSection";
+import { ProjectAnchorNav } from "./ProjectAnchorNav";
+import { ProjectWhy } from "./ProjectWhy";
+import { VerifyTrustSection } from "./VerifyTrustSection";
 
 /**
  * Project Detail Template — orchestrates every section in the site's fixed
@@ -43,6 +46,7 @@ export function ProjectPage({
   /** Optional overlays mounted at the end (e.g. Q'Terra's lead pop-up). */
   extras?: ReactNode;
 }) {
+  if (isCompactLayout(project)) return <CompactProjectPage project={project} extras={extras} />;
   const showTour = isSectionVisible(project, "virtualTour") && !!project.virtualTour?.tourUrl;
   return (
     <div className="relative w-full" data-project-theme={project.theme}>
@@ -140,6 +144,86 @@ export function ProjectPage({
       {isSectionVisible(project, "news") && project.news && <ProjectNewsTeaser id="news" data={project.news} />}
 
       {isSectionVisible(project, "legal") && project.legal && <TrustSection data={project.legal} tourUrl={project.virtualTour?.tourUrl} projectSlug={project.slug} />}
+
+      <ProjectCTA id="lead" data={project.cta} />
+
+      {extras}
+    </div>
+  );
+}
+
+/**
+ * Compact layout (hero.layout = "compact", Admin → Dự án → Tổng quan):
+ * a shorter, conversion-first order. Sections it merges are hidden in
+ * Admin but their content is still read here:
+ *   gallery → carousel inside Location · floorPlans → dialog from
+ *   Residences · salesPhases (date) → Price block · legal → Verify & trust.
+ * intro/stats/views/materialStory/lifestyle/verification are simply not
+ * part of this layout.
+ */
+function CompactProjectPage({ project, extras }: { project: ProjectDetailData; extras?: ReactNode }) {
+  const show = (key: Parameters<typeof isSectionVisible>[1]) => isSectionVisible(project, key);
+  const showTour = show("virtualTour") && !!project.virtualTour?.tourUrl;
+  const showWhy = show("towers") && !!project.towers?.reasons?.length;
+  const anchors = getCompactAnchorItems(project);
+
+  return (
+    <div
+      className="relative w-full [&_section[id]]:scroll-mt-[104px] md:[&_section[id]]:scroll-mt-[120px]"
+      data-project-theme={project.theme}
+    >
+      <ProjectHero
+        id={project.slug}
+        name={project.name}
+        data={project.hero}
+        tourCta={showTour && project.virtualTour ? { label: project.virtualTour.heroCtaLabel, href: "#virtual-tour" } : undefined}
+      />
+      <ProjectAnchorNav items={anchors} />
+
+      {showWhy && project.towers && <ProjectWhy id="overview" data={project.towers} />}
+
+      {show("location") && project.location && (
+        <ProjectLocation id="location" data={project.location} compact destinations={project.gallery} />
+      )}
+
+      {show("architecture") && project.architecture && (
+        <ProjectPhotoStatement id="architecture" data={project.architecture} variant="compact" />
+      )}
+
+      {show("residences") && project.residences && (
+        <ResidenceSelector id="residences" data={project.residences} compact floorPlans={project.floorPlans} />
+      )}
+
+      {showTour && project.virtualTour && (
+        <VirtualTourSection
+          id="virtual-tour"
+          compact
+          data={project.virtualTour}
+          projectSlug={project.slug}
+          fallbackImage={project.hero.image?.src}
+          qualifiers={project.cta.qualifiers}
+        />
+      )}
+
+      {show("amenities") && project.amenities && <AmenitySection id="amenities" data={project.amenities} compact />}
+
+      {show("videoDuo") && project.videoDuo && (
+        <ProjectVideoDuo id="video-stories" data={project.videoDuo} projectSlug={project.slug} compact />
+      )}
+
+      {show("investment") && project.investment && (
+        <InvestmentSection id="investment" data={project.investment} compact salesPhases={project.salesPhases} />
+      )}
+
+      {((show("documents") && project.documents) || project.legal) && (
+        <VerifyTrustSection
+          id="documents"
+          documents={show("documents") ? project.documents : undefined}
+          legal={project.legal}
+          tourUrl={project.virtualTour?.tourUrl}
+          projectSlug={project.slug}
+        />
+      )}
 
       <ProjectCTA id="lead" data={project.cta} />
 

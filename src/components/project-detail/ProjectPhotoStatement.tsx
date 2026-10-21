@@ -29,7 +29,18 @@ const TONE_BG: Record<NonNullable<ProjectPhotoStatementData["tone"]>, string> = 
  * transform/opacity only, and both skip straight to the resting state
  * under prefers-reduced-motion (useInView starts `true` there).
  */
-export function ProjectPhotoStatement({
+export function ProjectPhotoStatement(props: {
+  id?: string;
+  data: ProjectPhotoStatementData;
+  /** "compact": one framed photo beside the headline + two sentences
+   * (compact layout) instead of a full-bleed screen. */
+  variant: "architecture" | "views" | "compact";
+}) {
+  if (props.variant === "compact") return <CompactPhotoStatement id={props.id} data={props.data} />;
+  return <FullBleedPhotoStatement {...props} variant={props.variant} />;
+}
+
+function FullBleedPhotoStatement({
   id,
   data,
   variant,
@@ -102,6 +113,36 @@ export function ProjectPhotoStatement({
           </p>
         </Reveal>
       )}
+    </section>
+  );
+}
+
+function CompactPhotoStatement({ id, data }: { id?: string; data: ProjectPhotoStatementData }) {
+  const { pick } = useLang();
+  return (
+    <section id={id} className="bg-[var(--color-warm-white)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
+      <Reveal className="mx-auto grid max-w-[1440px] grid-cols-1 items-center gap-8 md:grid-cols-[1.35fr_1fr] md:gap-14">
+        <div className="relative aspect-16/10 overflow-hidden" style={{ background: TONE_BG[data.tone ?? "charcoal"] }}>
+          {data.image?.src ? (
+            <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" />
+          ) : (
+            <ImagePlaceholder label={pick(data.placeholderLabel ?? data.headline)} tone="dark" className="rounded-none border-none" />
+          )}
+        </div>
+        <div>
+          {data.eyebrow && (
+            <div className="mb-4 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent-dark)] uppercase">
+              {pick(data.eyebrow)}
+            </div>
+          )}
+          <h2 className="m-0 mb-4 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
+            <Accent text={pick(data.headline)} />
+          </h2>
+          <p className="m-0 max-w-120 font-body text-[length:var(--fs-body)] leading-[var(--lh-body)] text-[var(--color-text-muted)]">
+            <Accent text={pick(data.body)} />
+          </p>
+        </div>
+      </Reveal>
     </section>
   );
 }
