@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/server/auth";
 import { prisma } from "@/lib/server/db";
 import { projectSectionKeys, NAMED_TABLE_KEYS, type EditableProjectSectionKey, type NamedTableKey } from "@/lib/server/validation/project";
 import { PROJECT_SECTION_LABELS } from "@/lib/server/validation/projectLabels";
-import { PROJECT_SECTION_DEFAULTS, PROJECT_SECTION_ITEM_TEMPLATES } from "@/lib/server/validation/projectSectionDefaults";
+import { PROJECT_SECTION_DEFAULTS, PROJECT_SECTION_ITEM_TEMPLATES, leadPopupTemplate } from "@/lib/server/validation/projectSectionDefaults";
 import { SectionEditClient } from "./SectionEditClient";
 import type { ProjectSectionType } from "@prisma/client";
 
@@ -73,8 +73,10 @@ export default async function ProjectSectionEditPage({ params }: { params: Promi
   // PROJECT_SECTION_DEFAULTS is missing that key entirely — and this form
   // only edits keys already present in the object, never invents new ones
   // — so without the merge, that field would silently never be editable.
+  // A project without a pop-up yet starts from the template with its name.
+  const defaults = key === "leadPopup" && existingContent == null ? leadPopupTemplate(project.name) : PROJECT_SECTION_DEFAULTS[key];
   const initial = {
-    ...(PROJECT_SECTION_DEFAULTS[key] as Record<string, unknown>),
+    ...(defaults as Record<string, unknown>),
     ...((existingContent ?? {}) as Record<string, unknown>),
   };
 

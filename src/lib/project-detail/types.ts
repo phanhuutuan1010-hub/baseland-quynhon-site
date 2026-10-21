@@ -627,6 +627,8 @@ export type ProjectLeadPopup = {
   fallbackName: string;
 };
 
+export type ProjectRelatedArticle = { slug: string; title: Localized<string>; date: string; image: string };
+
 export type ProjectDetailData = {
   slug: string;
   /** Proper noun — kept invariant across languages (matches how every page
@@ -670,6 +672,9 @@ export type ProjectDetailData = {
   verification?: ProjectVerification;
   faq?: ProjectFAQ;
   cta: ProjectCta;
+  /** Published news linked to this project that have a photo (newest
+   * first, max 3) — filled by the server mapper, shown by the News section. */
+  relatedArticles?: ProjectRelatedArticle[];
   /** Optional admin-set SEO overrides — read only by generateMetadata(),
    * never rendered on the page itself. */
   seo?: { title?: string; description?: string; ogImageUrl?: string };
@@ -722,7 +727,7 @@ export function getProjectNavItems(project: ProjectDetailData): ProjectNavItem[]
   if (isSectionVisible(project, "residences") && project.residences) {
     items.push({ href: "#residences", label: project.residences.navLabel ?? project.residences.eyebrow });
   }
-  if (isSectionVisible(project, "videoDuo") && project.videoDuo && project.videoDuo.items.some((v) => v.enabled)) {
+  if (isSectionVisible(project, "videoDuo") && project.videoDuo && project.videoDuo.items.some((v) => v.enabled && v.videoUrl)) {
     items.push({ href: "#video-stories", label: project.videoDuo.navLabel ?? project.videoDuo.eyebrow });
   }
   if (isSectionVisible(project, "floorPlans") && project.floorPlans) {

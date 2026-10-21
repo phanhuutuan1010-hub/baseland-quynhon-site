@@ -35,6 +35,11 @@ export const PROJECT_INCLUDE = {
   amenities: true,
   gallery: true,
   documents: true,
+  // News linked to the project in Admin (Tin tức → Dự án liên quan).
+  relatedNews: {
+    where: { news: { status: "PUBLISHED" } },
+    include: { news: { select: { slug: true, titleVi: true, titleEn: true, featuredImageUrl: true, publishedAt: true, createdAt: true } } },
+  },
 } as const;
 
 type ProjectRow = NonNullable<Awaited<ReturnType<typeof prisma.project.findFirst<{ include: typeof PROJECT_INCLUDE }>>>>;
@@ -64,6 +69,18 @@ function assembleProjectDetailData(row: ProjectRow): ProjectDetailData {
   if (row.amenities) data.amenities = row.amenities.content as ProjectDetailData["amenities"];
   if (row.gallery) data.gallery = row.gallery.content as ProjectDetailData["gallery"];
   if (row.documents) data.documents = row.documents.content as ProjectDetailData["documents"];
+  // Only articles with a photo — the teaser never shows a grey box.
+  data.relatedArticles = row.relatedNews
+    .map((r) => r.news)
+    .filter((n) => !!n.featuredImageUrl)
+    .sort((a, b) => +(b.publishedAt ?? b.createdAt) - +(a.publishedAt ?? a.createdAt))
+    .slice(0, 3)
+    .map((n) => ({
+      slug: n.slug,
+      title: { vi: n.titleVi, en: n.titleEn },
+      date: (n.publishedAt ?? n.createdAt).toISOString().slice(0, 10),
+      image: n.featuredImageUrl!,
+    }));
 
   // "chỉ VERIFIED mới public nếu bật kiểm tra" (mục 5/9) — off by default,
   // matching the site's existing convention of showing hedge-labeled

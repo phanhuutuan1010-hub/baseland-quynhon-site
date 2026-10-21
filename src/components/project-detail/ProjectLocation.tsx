@@ -158,7 +158,7 @@ function CompactLocation({ id, data, destinations }: { id: string; data: Project
   return (
     <section id={id} className="bg-[var(--project-dark-alt)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
       <Reveal className="mx-auto max-w-[1440px]">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_1.1fr] md:items-center md:gap-14">
+        <div className={`grid grid-cols-1 gap-8 md:items-center md:gap-14 ${data.mapImage?.src ? "md:grid-cols-[1fr_1.1fr]" : ""}`}>
           <div>
             <CompactHeading
               dark
@@ -210,19 +210,17 @@ function CompactLocation({ id, data, destinations }: { id: string; data: Project
             )}
             <SectionAction data={data} variant="light" show="md-up" className="mt-8" />
           </div>
-          <div
-            className="overflow-hidden border border-[rgba(250,245,238,0.16)] bg-[var(--color-sand)]"
-            style={{ aspectRatio: frameRatio(data.mapImage, "4 / 3") }}
-          >
-            {data.mapImage?.src ? (
+          {data.mapImage?.src && (
+            <div
+              className="overflow-hidden border border-[rgba(250,245,238,0.16)] bg-[var(--color-sand)]"
+              style={{ aspectRatio: frameRatio(data.mapImage, "4 / 3") }}
+            >
               <Image src={data.mapImage.src} alt={pick(data.mapImage.alt)} width={800} height={600} className="h-full w-full object-contain" />
-            ) : (
-              <ImagePlaceholder label={pick(data.mapPlaceholderLabel ?? { vi: "Bản đồ vị trí", en: "Location map" })} />
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        {!!destinations?.items.length && (
+        {!!destinations?.items.some((d) => d.src) && (
           <div className="mt-12 md:mt-16">
             <h3 className="m-0 mb-5 max-w-180 font-display font-normal text-[length:var(--fs-h3)] leading-[1.35] text-[var(--color-warm-white)]">
               <Accent text={pick(destinations.intro)} onDark />
@@ -230,7 +228,7 @@ function CompactLocation({ id, data, destinations }: { id: string; data: Project
             {/* The photos are posters with the place name printed on them,
                 so: real ratio, no crop, no duplicate caption (name → alt). */}
             <Carousel dark label={pick(destinations.intro).replace(/\[\[|\]\]/g, "")} className="gap-3.5 md:mx-0 md:scroll-px-0 md:px-0">
-              {destinations.items.map((d) => (
+              {destinations.items.filter((d) => d.src).map((d) => (
                 <div key={d.key} className="w-[42%] max-w-60 flex-none snap-start sm:w-56">
                   <div className="overflow-hidden bg-[rgba(250,245,238,0.06)]" style={{ aspectRatio: frameRatio(d, "1 / 1") }}>
                     {d.src ? (

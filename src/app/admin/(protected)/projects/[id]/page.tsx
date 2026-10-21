@@ -62,6 +62,15 @@ export default async function ProjectOverviewPage({ params }: { params: Promise<
     ctaCallNowLabelVi: cta.callNowLabel.vi,
     ctaCallNowLabelEn: cta.callNowLabel.en,
     ctaLeadSource: cta.leadSource,
+    qualifiers: (["region", "purpose"] as const).map((key) => {
+      const q = cta.qualifiers?.find((x) => x.key === key);
+      return {
+        key,
+        labelVi: q?.label.vi ?? (key === "region" ? "Khu vực" : "Nhu cầu"),
+        labelEn: q?.label.en ?? (key === "region" ? "Region" : "Interest"),
+        optionsText: (q?.options ?? []).map((o) => (o.en && o.en !== o.vi ? `${o.vi} | ${o.en}` : o.vi)).join("\n"),
+      };
+    }),
     seoTitle: project.seoTitle ?? "",
     seoDescription: project.seoDescription ?? "",
     seoOgImageUrl: project.seoOgImageUrl ?? "",

@@ -141,7 +141,7 @@ export function ProjectPage({
 
       {isSectionVisible(project, "faq") && project.faq && <FAQSection id="faq" data={project.faq} />}
 
-      {isSectionVisible(project, "news") && project.news && <ProjectNewsTeaser id="news" data={project.news} />}
+      {isSectionVisible(project, "news") && project.news && <ProjectNewsTeaser id="news" data={project.news} articles={project.relatedArticles ?? []} />}
 
       {isSectionVisible(project, "legal") && project.legal && <TrustSection data={project.legal} tourUrl={project.virtualTour?.tourUrl} projectSlug={project.slug} />}
 
@@ -181,7 +181,8 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
   const showArchitecture = show("architecture") && !!architecture && !!pickAny(architecture.headline);
   const showResidences = show("residences") && !!residences?.items.length;
   const showAmenities = show("amenities") && !!amenities?.chapters.length;
-  const showVideo = show("videoDuo") && !!videoDuo?.items.some((v) => v.enabled);
+  // Only real videos — no "đang sản xuất" placeholder cards.
+  const showVideo = show("videoDuo") && !!videoDuo?.items.some((v) => v.enabled && v.videoUrl);
   const showDocuments = show("documents") && !!documents?.items.length;
   const showLegal = !!legal?.points.length || !!pickAny(legal?.body);
 
@@ -251,7 +252,7 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
         <ProjectVerificationNote id="verification" data={project.verification} />
       )}
       {show("faq") && project.faq && !!project.faq.items.length && <FAQSection id="faq" data={project.faq} />}
-      {show("news") && project.news && !!project.news.articleSlugs.length && <ProjectNewsTeaser id="news" data={project.news} />}
+      {show("news") && project.news && !!project.relatedArticles?.length && <ProjectNewsTeaser id="news" data={project.news} articles={project.relatedArticles ?? []} />}
 
       <ProjectCTA id="lead" data={project.cta} />
 

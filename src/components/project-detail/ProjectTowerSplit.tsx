@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
-import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { useInView } from "@/lib/useInView";
 import type { ProjectTowers as ProjectTowersData, ProjectTower } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
@@ -51,16 +50,18 @@ function TowerPanel({ tower, curtainDelayMs }: { tower: ProjectTower; curtainDel
   return (
     <div
       ref={curtainRef}
-      className="group relative aspect-3/4 flex-1 overflow-hidden md:aspect-auto md:min-h-[640px]"
+      // Without a photo the panel only needs room for its text (no tall empty box).
+      className={`group relative flex-1 overflow-hidden ${
+        tower.image?.src ? "aspect-3/4 md:aspect-auto md:min-h-[640px]" : "min-h-[360px] md:min-h-[440px]"
+      }`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
       {tower.image?.src ? (
         <Image src={tower.image.src} alt={pick(tower.image.alt)} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-105" style={{ objectPosition: focalPosition(tower.image) }} />
       ) : (
-        // Label pinned to the top: the tower name/details sit at the bottom
-        // and would run into a centred placeholder label on phones.
-        <ImagePlaceholder label={pick(tower.placeholderLabel ?? tower.name)} tone="dark" className="items-start! rounded-none border-none pt-10" />
+        // No photo yet: a plain tinted panel — never a grey placeholder box.
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(160deg,rgba(var(--project-accent-rgb),0.28)_0%,transparent_60%)]" />
       )}
       {/* Curtain reveal (Simona brief mục 23): a solid panel draws away
           upward to uncover the tower photo, instead of a plain fade. */}

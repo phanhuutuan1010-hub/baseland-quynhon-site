@@ -185,3 +185,29 @@ export const PROJECT_SECTION_ITEM_TEMPLATES: Partial<Record<EditableProjectSecti
   gallery: { items: { key: "", name: L, src: "", desc: L } },
   documents: { items: { name: L, note: L, fileUrl: "", linkLabel: L } },
 };
+
+/** Ready-to-use lead pop-up content for a project (the Q'Terra pop-up made
+ * generic, with the project name filled in) — used when a project has no
+ * pop-up yet. Everything stays editable in Admin. */
+export function leadPopupTemplate(name: string): Record<string, unknown> {
+  return {
+    ...PROJECT_SECTION_DEFAULTS.leadPopup,
+    title: { vi: `Ưu tiên nhận thông tin ${name}`, en: `Get first access to ${name}` },
+    subtitle: { vi: `${name} · tư vấn bởi Base Land Quy Nhơn`, en: `${name} · advice from Base Land Quy Nhon` },
+    benefits: [
+      { vi: "Bảng giá & chính sách thanh toán mới nhất", en: "Latest price list & payment plans" },
+      { vi: "Mặt bằng & thông tin sản phẩm", en: "Floor plans & product details" },
+      { vi: "Tư vấn chọn sản phẩm & tài chính miễn phí", en: "Free advice on choosing a unit & financing" },
+    ],
+    submitLabel: { vi: "Nhận bảng giá & tư vấn", en: "Get prices & advice" },
+    successMessage: {
+      vi: "Đã nhận thông tin. Chuyên viên Base Land Quy Nhơn sẽ liên hệ sớm nhất.",
+      en: "Thank you — a Base Land Quy Nhon advisor will contact you as soon as possible.",
+    },
+    errorMessage: {
+      vi: "Chưa gửi được, có thể do mạng. Thông tin bạn nhập vẫn còn — vui lòng thử lại hoặc gọi hotline.",
+      en: "We couldn't send that, possibly a connection issue. Your details are still here — please try again or call our hotline.",
+    },
+    fallbackName: `Khách để lại SĐT (popup ${name})`,
+  };
+}

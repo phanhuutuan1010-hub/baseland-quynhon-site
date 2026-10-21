@@ -6,7 +6,7 @@ import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectAmenities as ProjectAmenitiesData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
-import { CompactHeading, scrollCardClass } from "./shared";
+import { CompactHeading } from "./shared";
 import { Carousel } from "./Carousel";
 import { focalPosition } from "./imageFrame";
 import { SectionAction } from "./ProjectContact";
@@ -79,16 +79,15 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
           <CompactHeading eyebrow={pick(data.eyebrow)} headline={<Accent text={pick(data.headline)} />} />
           <SectionAction data={data} show="md-up" />
         </div>
-        <Carousel label={pick(data.eyebrow)} className="md:mx-0 md:grid md:gap-6 md:overflow-visible md:scroll-px-0 md:px-0 md:pb-0 md:grid-cols-2 lg:grid-cols-4">
+        <Carousel label={pick(data.eyebrow)} className={amenityGrid(data.chapters.length).row}>
           {data.chapters.map((ch) => (
-            <article key={ch.slotId} className={`${scrollCardClass} flex flex-col bg-[var(--color-warm-white)]`}>
-              <div className="aspect-4/3 overflow-hidden">
-                {ch.image?.src ? (
+            <article key={ch.slotId} className={`${amenityGrid(data.chapters.length).card} flex flex-col bg-[var(--color-warm-white)]`}>
+              {/* No photo yet → text card only (no grey box). */}
+              {ch.image?.src && (
+                <div className="aspect-4/3 overflow-hidden">
                   <Image src={ch.image.src} alt={pick(ch.image.alt)} width={640} height={480} className="h-full w-full object-cover" style={{ objectPosition: focalPosition(ch.image) }} />
-                ) : (
-                  <ImagePlaceholder label={pick(ch.title)} />
-                )}
-              </div>
+                </div>
+              )}
               <div className="flex flex-1 flex-col p-5">
                 <div className="mb-2 font-ui text-[11px] font-bold tracking-[0.14em] text-[var(--project-accent-dark)] uppercase">{ch.kicker}</div>
                 <h3 className="m-0 mb-2 font-display text-xl leading-[1.3] font-normal text-[var(--color-charcoal)]">{pick(ch.title)}</h3>
@@ -106,4 +105,22 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
       </Reveal>
     </section>
   );
+}
+
+const AT_MD = "md:mx-0 md:grid md:gap-6 md:overflow-visible md:scroll-px-0 md:px-0 md:pb-0";
+const AT_LG = "lg:mx-0 lg:grid lg:gap-6 lg:overflow-visible lg:scroll-px-0 lg:px-0 lg:pb-0";
+const LG_COLS: Record<number, string> = { 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 4: "lg:grid-cols-4" };
+
+/** Amenity cards never leave one card alone on the last row: the grid
+ * uses a column count that divides the cards evenly enough (4 → 2/4,
+ * 3 → 3, 5 → 3+2, 6 → 2/3, 7 → 4+3); where no even split exists at a
+ * width, that width keeps the carousel instead. */
+function amenityGrid(n: number): { row: string; card: string } {
+  const lg = [4, 3, 2].find((c) => c <= n && n % c !== 1) ?? Math.max(1, Math.min(n, 4));
+  const lgCols = LG_COLS[lg] ?? "lg:grid-cols-1";
+  if (n % 2 === 0 || n === 3) {
+    const md = n === 3 ? "md:grid-cols-3" : "md:grid-cols-2";
+    return { row: `${AT_MD} ${md} ${lgCols}`, card: "w-[78%] max-w-80 flex-none snap-start md:w-auto md:max-w-none" };
+  }
+  return { row: `${AT_LG} ${lgCols}`, card: "w-[78%] max-w-80 flex-none snap-start lg:w-auto lg:max-w-none" };
 }

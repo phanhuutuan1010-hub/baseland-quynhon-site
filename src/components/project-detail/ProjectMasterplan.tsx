@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
-import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { useInView } from "@/lib/useInView";
 import type { ProjectMasterplan as ProjectMasterplanData } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
@@ -38,30 +37,27 @@ export function ProjectMasterplan({ id, data }: { id: string; data: ProjectMaste
           </p>
         </div>
 
-        <div
-          ref={imageRef}
-          className="mb-10 w-full overflow-hidden border border-[var(--project-border)] md:mb-14"
-          style={{
-            aspectRatio: frameRatio(data.image, "16 / 9"),
-            opacity: inView ? 1 : 0,
-            transform: inView ? "scale(1)" : "scale(1.03)",
-            transition: "opacity 700ms var(--ease-editorial), transform 900ms var(--ease-editorial)",
-          }}
-        >
-          {data.image?.src ? (
-            <Image
-              src={data.image.src}
-              alt={pick(data.image.alt)}
-              width={1600}
-              height={900}
-              className="h-full w-full object-contain"
-            />
-          ) : (
-            <ImagePlaceholder
-              label={pick(data.placeholderLabel ?? { vi: "Mặt bằng tổng thể dự án", en: "Project master plan" })}
-            />
-          )}
-        </div>
+        {/* No masterplan image yet → zones only (no grey box). */}
+        {data.image?.src && (
+          <div
+            ref={imageRef}
+            className="mb-10 w-full overflow-hidden border border-[var(--project-border)] md:mb-14"
+            style={{
+              aspectRatio: frameRatio(data.image, "16 / 9"),
+              opacity: inView ? 1 : 0,
+              transform: inView ? "scale(1)" : "scale(1.03)",
+              transition: "opacity 700ms var(--ease-editorial), transform 900ms var(--ease-editorial)",
+            }}
+          >
+              <Image
+                src={data.image.src}
+                alt={pick(data.image.alt)}
+                width={1600}
+                height={900}
+                className="h-full w-full object-contain"
+              />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {data.zones.map((zone, i) => (

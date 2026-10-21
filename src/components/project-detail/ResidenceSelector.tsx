@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useCallback, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
-import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import type { ProjectFloorPlans, ProjectResidences as ProjectResidencesData } from "@/lib/project-detail/types";
 import { FloorPlanModal } from "./FloorPlanViewer";
 import { chipClass } from "./shared";
@@ -69,13 +68,14 @@ export function ResidenceSelector({
         </div>
 
         <div className="flex flex-wrap items-start gap-8 md:gap-16">
-          <div className="min-w-70 flex-1 basis-115">
-            <div
-              key={activeUnit.key}
-              className="relative animate-[fade-slide-in_400ms_var(--ease-editorial)] border border-[var(--color-border)] bg-[var(--color-sand)]"
-              style={{ aspectRatio: frameRatio(activeUnit.floorPlanImage, "4 / 3") }}
-            >
-              {activeUnit.floorPlanImage?.src ? (
+          {/* No floor-plan image for this unit → details only (no grey box). */}
+          {activeUnit.floorPlanImage?.src && (
+            <div className="min-w-70 flex-1 basis-115">
+              <div
+                key={activeUnit.key}
+                className="relative animate-[fade-slide-in_400ms_var(--ease-editorial)] border border-[var(--color-border)] bg-[var(--color-sand)]"
+                style={{ aspectRatio: frameRatio(activeUnit.floorPlanImage, "4 / 3") }}
+              >
                 <Image
                   src={activeUnit.floorPlanImage.src}
                   alt={pick(activeUnit.floorPlanImage.alt)}
@@ -83,16 +83,9 @@ export function ResidenceSelector({
                   height={600}
                   className="h-full w-full object-contain"
                 />
-              ) : (
-                <ImagePlaceholder
-                  label={pick({
-                    vi: `Mặt bằng ${pick(activeUnit.name)}`,
-                    en: `${pick(activeUnit.name)} floor plan`,
-                  })}
-                />
-              )}
+              </div>
             </div>
-          </div>
+          )}
           <div
             key={`${activeUnit.key}-info`}
             className="min-w-65 flex-1 basis-80 animate-[fade-slide-in_400ms_var(--ease-editorial)]"

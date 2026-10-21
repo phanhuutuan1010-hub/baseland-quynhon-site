@@ -122,14 +122,15 @@ function CompactPhotoStatement({ id, data }: { id?: string; data: ProjectPhotoSt
   const { pick } = useLang();
   return (
     <section id={id} className="bg-[var(--color-warm-white)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
-      <Reveal className="mx-auto grid max-w-[1440px] grid-cols-1 items-center gap-8 md:grid-cols-[1.35fr_1fr] md:gap-14">
-        <div className="relative aspect-16/10 overflow-hidden" style={{ background: TONE_BG[data.tone ?? "charcoal"] }}>
-          {data.image?.src ? (
+      <Reveal
+        className={`mx-auto grid max-w-[1440px] grid-cols-1 items-center gap-8 md:gap-14 ${data.image?.src ? "md:grid-cols-[1.35fr_1fr]" : ""}`}
+      >
+        {/* No photo yet → text only (no grey placeholder). */}
+        {data.image?.src && (
+          <div className="relative aspect-16/10 overflow-hidden" style={{ background: TONE_BG[data.tone ?? "charcoal"] }}>
             <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" style={{ objectPosition: focalPosition(data.image) }} />
-          ) : (
-            <ImagePlaceholder label={pick(data.placeholderLabel ?? data.headline)} tone="dark" className="rounded-none border-none" />
-          )}
-        </div>
+          </div>
+        )}
         <div>
           {data.eyebrow && (
             <div className="mb-4 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent-dark)] uppercase">

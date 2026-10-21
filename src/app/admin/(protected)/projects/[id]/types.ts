@@ -33,6 +33,8 @@ export type ProjectOverviewValue = {
   ctaCallNowLabelVi: string;
   ctaCallNowLabelEn: string;
   ctaLeadSource: string;
+  /** Lead-form chip groups (cta.qualifiers): options one per line, "VI | EN". */
+  qualifiers: { key: "region" | "purpose"; labelVi: string; labelEn: string; optionsText: string }[];
   seoTitle: string;
   seoDescription: string;
   seoOgImageUrl: string;

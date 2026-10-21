@@ -21,7 +21,7 @@ import {
   type NamedTableKey,
 } from "@/lib/server/validation/project";
 import type { Prisma, ProjectSectionType, ProjectPublishStatus } from "@prisma/client";
-import { PROJECT_SECTION_DEFAULTS } from "@/lib/server/validation/projectSectionDefaults";
+import { PROJECT_SECTION_DEFAULTS, leadPopupTemplate } from "@/lib/server/validation/projectSectionDefaults";
 
 type ActionResult = { error?: string };
 
@@ -121,7 +121,8 @@ export async function createProject(input: unknown): Promise<ActionResult & { id
     },
   });
 
-  const content = (key: EditableProjectSectionKey) => PROJECT_SECTION_DEFAULTS[key] as Prisma.InputJsonValue;
+  const content = (key: EditableProjectSectionKey) =>
+    (key === "leadPopup" ? leadPopupTemplate(d.name) : PROJECT_SECTION_DEFAULTS[key]) as Prisma.InputJsonValue;
   await prisma.$transaction([
     prisma.projectSection.createMany({
       data: STANDARD_GENERIC_SECTIONS.map((key) => ({ projectId: project.id, type: KEY_TO_SECTION_TYPE[key], content: content(key) })),
@@ -136,6 +137,25 @@ export async function createProject(input: unknown): Promise<ActionResult & { id
   await logActivity({ userId: user.id, action: "project.create", entityType: "Project", entityId: project.id });
   revalidatePath("/admin/projects");
   return { id: project.id };
+}
+
+/** Overview form's chip groups → cta.qualifiers. One option per line,
+ * "VI | EN" (EN optional); a group with no options is left out. */
+function parseQualifiers(groups: { key: "region" | "purpose"; labelVi: string; labelEn: string; optionsText: string }[]) {
+  return groups
+    .map((g) => ({
+      key: g.key,
+      label: { vi: g.labelVi, en: g.labelEn || g.labelVi },
+      options: g.optionsText
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const [vi, en] = line.split("|").map((x) => x.trim());
+          return { vi, en: en || vi };
+        }),
+    }))
+    .filter((g) => g.options.length > 0);
 }
 
 export async function updateProjectOverview(projectId: string, input: unknown): Promise<ActionResult> {
@@ -192,6 +212,7 @@ export async function updateProjectOverview(projectId: string, input: unknown): 
         body: { vi: d.ctaBodyVi, en: d.ctaBodyEn },
         callNowLabel: { vi: d.ctaCallNowLabelVi, en: d.ctaCallNowLabelEn },
         leadSource: d.ctaLeadSource,
+        ...(d.qualifiers ? { qualifiers: parseQualifiers(d.qualifiers) } : {}),
       },
       seoTitle: d.seoTitle || null,
       seoDescription: d.seoDescription || null,

@@ -102,6 +102,9 @@ export const projectOverviewSchema = z.object({
   ctaCallNowLabelVi: z.string().trim(),
   ctaCallNowLabelEn: z.string().trim(),
   ctaLeadSource: z.string().trim().min(1),
+  qualifiers: z
+    .array(z.object({ key: z.enum(["region", "purpose"]), labelVi: z.string().trim(), labelEn: z.string().trim(), optionsText: z.string() }))
+    .optional(),
   seoTitle: z.string().trim().optional().or(z.literal("")),
   seoDescription: z.string().trim().optional().or(z.literal("")),
   seoOgImageUrl: z.string().trim().optional().or(z.literal("")),

@@ -98,6 +98,23 @@ export function OverviewForm({ projectId, initial }: { projectId: string; initia
             <AdminTextAreaField label="Nội dung (VI)" value={value.ctaBodyVi} onChange={set("ctaBodyVi")} rows={2} />
             <AdminTextAreaField label="Nội dung (EN)" value={value.ctaBodyEn} onChange={set("ctaBodyEn")} rows={2} />
           </div>
+          <div className="flex flex-col gap-3 rounded-xs border border-[var(--color-border)] p-4">
+            <p className="m-0 font-ui text-xs font-bold tracking-[0.04em] uppercase">Form tư vấn — nhóm chip chọn 1 (không bắt buộc)</p>
+            <p className="m-0 font-body text-xs text-[var(--color-text-muted)]">
+              Mỗi dòng một lựa chọn, dạng <code>Tiếng Việt | English</code> (bỏ phần English nếu giống nhau). Để trống = ẩn nhóm đó.
+            </p>
+            {value.qualifiers.map((q, i) => {
+              const setQ = (patch: Partial<typeof q>) =>
+                setValue((prev) => ({ ...prev, qualifiers: prev.qualifiers.map((x, j) => (j === i ? { ...x, ...patch } : x)) }));
+              return (
+                <div key={q.key} className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_2fr]">
+                  <AdminTextField label={`Nhãn nhóm (VI) — ${q.key === "region" ? "khu vực" : "nhu cầu"}`} value={q.labelVi} onChange={(v) => setQ({ labelVi: v })} />
+                  <AdminTextField label="Nhãn nhóm (EN)" value={q.labelEn} onChange={(v) => setQ({ labelEn: v })} />
+                  <AdminTextAreaField label="Lựa chọn" value={q.optionsText} onChange={(v) => setQ({ optionsText: v })} rows={4} />
+                </div>
+              );
+            })}
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <AdminTextField label="Nhãn 'Gọi ngay' (VI)" value={value.ctaCallNowLabelVi} onChange={set("ctaCallNowLabelVi")} />
             <AdminTextField label="Nhãn 'Gọi ngay' (EN)" value={value.ctaCallNowLabelEn} onChange={set("ctaCallNowLabelEn")} />

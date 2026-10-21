@@ -67,7 +67,8 @@ export function ProjectVideoDuo({
 }) {
   const { pick } = useLang();
   const items = [...data.items]
-    .filter((v) => v.enabled)
+    // A card without a real video would only show a placeholder — skip it.
+    .filter((v) => v.enabled && v.videoUrl)
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
   // Empty state (mục 9): no enabled videos → hide the section entirely,
