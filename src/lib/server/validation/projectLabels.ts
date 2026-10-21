@@ -27,31 +27,33 @@ export const PROJECT_SECTION_LABELS: Record<EditableProjectSectionKey, string> =
   documents: "Tài liệu (Documents)",
 };
 
-// Order shown in the admin's section list — NOT the public render order
-// (that's fixed by ProjectPage.tsx and not admin-controlled, see the plan's
-// scope decision on why project sections aren't freely reorderable).
+// Order shown in the admin's section list = the standard layout's page
+// order (fixed in ProjectPage.tsx, not admin-controlled).
 export const PROJECT_SECTION_ORDER: EditableProjectSectionKey[] = [
-  "intro",
-  "stats",
+  // Standard (Q'Terra) layout, in page order
   "towers",
-  "salesPhases",
   "location",
-  "masterplan",
+  "gallery",
   "architecture",
-  "materialStory",
-  "lifestyle",
   "education",
-  "amenities",
-  "views",
+  "masterplan",
   "residences",
-  "videoDuo",
   "floorPlans",
   "virtualTour",
+  "amenities",
+  "videoDuo",
   "investment",
-  "news",
-  "legal",
+  "salesPhases",
   "documents",
+  "legal",
   "verification",
   "faq",
+  "news",
   "leadPopup",
+  // Used by the hero (stats → key-figure line) or only by the older full layout
+  "stats",
+  "intro",
+  "materialStory",
+  "lifestyle",
+  "views",
 ];

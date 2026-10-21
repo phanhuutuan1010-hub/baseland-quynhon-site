@@ -65,17 +65,17 @@ export function OverviewForm({ projectId, initial }: { projectId: string; initia
               onChange={(e) => set("heroLayout")(e.target.value as ProjectOverviewValue["heroLayout"])}
               className="rounded-xs border border-[var(--color-border)] bg-white px-3 py-2.5 font-body text-sm"
             >
-              <option value="full">Đầy đủ (mặc định)</option>
-              <option value="compact">Rút gọn — hero số liệu, thanh mục lục, các mục gộp</option>
+              <option value="compact">Chuẩn Q&apos;Terra (mặc định cho mọi dự án)</option>
+              <option value="full">Cũ — bố cục đầy đủ</option>
             </select>
             <span className="font-body text-xs text-[var(--color-text-muted)]">
-              Rút gọn: Thư viện ảnh → trong Vị trí · Mặt bằng → popup ở Căn hộ · Giai đoạn bán hàng (ngày) → trong Đầu tư · Pháp lý → trong
-              Tài liệu. Intro, Số liệu, Tầm nhìn, Chất liệu, Phong cách sống, Minh bạch dữ liệu không hiển thị. Mục &quot;Vì sao&quot; lấy từ
-              Tháp → Lý do (reasons).
+              Chuẩn: Hero → Vì sao → Vị trí → Kiến trúc → Chọn căn → 360° → Tiện ích → Video → Giá → Kiểm chứng → Form. Mục nào chưa có
+              dữ liệu thì tự ẩn. Vì sao = Tháp → Lý do (reasons), nếu trống thì hiện 2 tháp. Thư viện ảnh → trong Vị trí · Mặt bằng → popup
+              ở Căn hộ · Giai đoạn bán hàng (ngày) → trong Giá · Pháp lý → trong Kiểm chứng. Dòng số liệu trống → lấy từ Số liệu (Stats).
             </span>
           </label>
           <div className="grid grid-cols-2 gap-4">
-            <AdminTextField label="Badge — chỉ bố cục rút gọn (VI)" value={value.heroBadgeVi} onChange={set("heroBadgeVi")} />
+            <AdminTextField label="Badge trên tên dự án (VI)" value={value.heroBadgeVi} onChange={set("heroBadgeVi")} />
             <AdminTextField label="Badge (EN)" value={value.heroBadgeEn} onChange={set("heroBadgeEn")} />
           </div>
           <div className="grid grid-cols-2 gap-4">

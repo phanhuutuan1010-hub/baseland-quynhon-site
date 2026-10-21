@@ -679,8 +679,10 @@ export type ProjectDetailData = {
  * forces it off (`sections.investment === false`) — the override always
  * wins, even over present data. Sections with no toggle key (hero, cta)
  * are always shown; they're required fields on ProjectDetailData. */
+/** The standard (Q'Terra) layout is the default for every project; only
+ * an explicit hero.layout = "full" keeps the older editorial flow. */
 export function isCompactLayout(project: ProjectDetailData): boolean {
-  return project.hero.layout === "compact";
+  return project.hero.layout !== "full";
 }
 
 export function isSectionVisible(project: ProjectDetailData, key: ProjectSectionKey): boolean {
@@ -754,20 +756,28 @@ export function getProjectNavItems(project: ProjectDetailData): ProjectNavItem[]
 export function getCompactAnchorItems(project: ProjectDetailData): ProjectNavItem[] {
   const items: ProjectNavItem[] = [];
   const towers = project.towers;
-  if (isSectionVisible(project, "towers") && towers?.reasons?.length) {
-    items.push({ href: "#overview", label: towers.navLabel ?? towers.eyebrow });
+  if (isSectionVisible(project, "towers") && (towers?.reasons?.length || towers?.towers?.length === 2)) {
+    items.push({ href: "#overview", label: navLabelOf(towers) });
   }
   if (isSectionVisible(project, "location") && project.location) {
-    items.push({ href: "#location", label: project.location.navLabel ?? project.location.eyebrow });
+    items.push({ href: "#location", label: navLabelOf(project.location) });
   }
-  if (isSectionVisible(project, "residences") && project.residences) {
-    items.push({ href: "#residences", label: project.residences.navLabel ?? project.residences.eyebrow });
+  if (isSectionVisible(project, "residences") && project.residences?.items.length) {
+    items.push({ href: "#residences", label: navLabelOf(project.residences) });
+  } else if (isSectionVisible(project, "masterplan") && project.masterplan) {
+    items.push({ href: "#masterplan", label: navLabelOf(project.masterplan) });
   }
-  if (isSectionVisible(project, "amenities") && project.amenities) {
-    items.push({ href: "#amenities", label: project.amenities.navLabel ?? project.amenities.eyebrow });
+  if (isSectionVisible(project, "amenities") && project.amenities?.chapters.length) {
+    items.push({ href: "#amenities", label: navLabelOf(project.amenities) });
   }
-  if (isSectionVisible(project, "investment") && project.investment) {
-    items.push({ href: "#investment", label: project.investment.navLabel ?? project.investment.eyebrow });
-  }
+  // The price block is always rendered (at least its "Nhận bảng giá" CTA).
+  const investment = isSectionVisible(project, "investment") ? project.investment : undefined;
+  items.push({ href: "#investment", label: investment ? navLabelOf(investment) : { vi: "Giá", en: "Pricing" } });
   return items;
+}
+
+/** A section's anchor label: its navLabel when filled, else its eyebrow. */
+function navLabelOf(section: { navLabel?: Localized<string>; eyebrow: Localized<string> }): Localized<string> {
+  const nav = section.navLabel;
+  return nav && (nav.vi.trim() || nav.en.trim()) ? nav : section.eyebrow;
 }

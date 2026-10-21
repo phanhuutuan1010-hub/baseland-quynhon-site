@@ -20,7 +20,8 @@ import {
   type EditableProjectSectionKey,
   type NamedTableKey,
 } from "@/lib/server/validation/project";
-import type { ProjectSectionType, ProjectPublishStatus } from "@prisma/client";
+import type { Prisma, ProjectSectionType, ProjectPublishStatus } from "@prisma/client";
+import { PROJECT_SECTION_DEFAULTS } from "@/lib/server/validation/projectSectionDefaults";
 
 type ActionResult = { error?: string };
 
@@ -64,6 +65,21 @@ function revalidateProjectPaths(projectId: string, slug: string | undefined) {
   revalidatePath(`/admin/projects/${projectId}`, "layout");
 }
 
+/** Sections every new project gets (empty, hidden) — the standard
+ * Q'Terra layout's slots, in page order. */
+const STANDARD_GENERIC_SECTIONS: EditableProjectSectionKey[] = [
+  "stats",
+  "towers",
+  "location",
+  "architecture",
+  "virtualTour",
+  "videoDuo",
+  "investment",
+  "legal",
+  "leadPopup",
+];
+const STANDARD_TABLE_SECTIONS: EditableProjectSectionKey[] = ["residences", "floorPlans", "amenities", "gallery", "documents"];
+
 export async function createProject(input: unknown): Promise<ActionResult & { id?: string }> {
   const user = await requireRole("ADMIN");
   const parsed = createProjectSchema.safeParse(input);
@@ -79,14 +95,17 @@ export async function createProject(input: unknown): Promise<ActionResult & { id
       name: d.name,
       category: { vi: d.categoryVi, en: d.categoryEn },
       statusLabel: { vi: d.statusLabelVi, en: d.statusLabelEn },
-      sections: {},
+      // Standard layout: every template section exists from the start,
+      // switched off until it is filled in (see STANDARD_SECTIONS below).
+      sections: Object.fromEntries([...STANDARD_GENERIC_SECTIONS, ...STANDARD_TABLE_SECTIONS].map((k) => [k, false])),
       hero: {
+        layout: "compact",
         eyebrow: { vi: d.name, en: d.name },
         addressLine: { vi: "", en: "" },
         subhead: { vi: "", en: "" },
         ctaExploreLabel: { vi: "Khám phá dự án", en: "Explore project" },
         ctaExploreHref: "#lead",
-        ctaConsultLabel: { vi: "Nhận tư vấn", en: "Get in Touch" },
+        ctaConsultLabel: { vi: "Nhận bảng giá", en: "Get the price list" },
         ctaConsultHref: "#lead",
       },
       cta: {
@@ -99,6 +118,18 @@ export async function createProject(input: unknown): Promise<ActionResult & { id
       publishStatus: "DRAFT",
     },
   });
+
+  const content = (key: EditableProjectSectionKey) => PROJECT_SECTION_DEFAULTS[key] as Prisma.InputJsonValue;
+  await prisma.$transaction([
+    prisma.projectSection.createMany({
+      data: STANDARD_GENERIC_SECTIONS.map((key) => ({ projectId: project.id, type: KEY_TO_SECTION_TYPE[key], content: content(key) })),
+    }),
+    prisma.projectResidences.create({ data: { projectId: project.id, content: content("residences") } }),
+    prisma.projectFloorPlans.create({ data: { projectId: project.id, content: content("floorPlans") } }),
+    prisma.projectAmenities.create({ data: { projectId: project.id, content: content("amenities") } }),
+    prisma.projectGallery.create({ data: { projectId: project.id, content: content("gallery") } }),
+    prisma.projectDocuments.create({ data: { projectId: project.id, content: content("documents") } }),
+  ]);
 
   await logActivity({ userId: user.id, action: "project.create", entityType: "Project", entityId: project.id });
   revalidatePath("/admin/projects");

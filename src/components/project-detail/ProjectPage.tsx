@@ -153,19 +153,37 @@ export function ProjectPage({
 }
 
 /**
- * Compact layout (hero.layout = "compact", Admin → Dự án → Tổng quan):
- * a shorter, conversion-first order. Sections it merges are hidden in
- * Admin but their content is still read here:
- *   gallery → carousel inside Location · floorPlans → dialog from
- *   Residences · salesPhases (date) → Price block · legal → Verify & trust.
- * intro/stats/views/materialStory/lifestyle/verification are simply not
- * part of this layout.
+ * Standard project layout (the Q'Terra template) — every project uses it
+ * unless Admin sets hero.layout = "full" (the older editorial flow above).
+ * Order: Hero → Vì sao → Vị trí → Kiến trúc → Chọn căn → 360° → Tiện ích →
+ * Video → Giá & lộ trình → Kiểm chứng & Base Land → Form.
+ *
+ * Per-project differences come only from the theme and project modules,
+ * placed in the matching slot:
+ *   Vì sao   — towers.reasons cards, else the two-tower split (Simona's
+ *              The Sea / The Harbour, The Sailing's The Maestro / The Sailing)
+ *   Chọn căn — masterplan (Phú Gia) shown first, then the residence selector
+ *   Kiến trúc — education photo statement follows it (Phú Gia)
+ *   Kiểm chứng — verification (verified/pending facts), FAQ, news follow it
+ * A slot with no real data is skipped — nothing is filled in. Merged
+ * sections (gallery → Vị trí, floorPlans → Chọn căn dialog, salesPhases
+ * date → Giá, legal → Kiểm chứng) are read even when hidden as standalone.
  */
 function CompactProjectPage({ project, extras }: { project: ProjectDetailData; extras?: ReactNode }) {
   const show = (key: Parameters<typeof isSectionVisible>[1]) => isSectionVisible(project, key);
+  const { towers, location, architecture, residences, amenities, videoDuo, documents, legal } = project;
   const showTour = show("virtualTour") && !!project.virtualTour?.tourUrl;
-  const showWhy = show("towers") && !!project.towers?.reasons?.length;
   const anchors = getCompactAnchorItems(project);
+
+  const hasReasons = !!towers?.reasons?.length;
+  const hasTowerPair = towers?.towers?.length === 2;
+  const showLocation = show("location") && !!location && !!(pickAny(location.headline) || location.journey?.length || location.benefits?.length);
+  const showArchitecture = show("architecture") && !!architecture && !!pickAny(architecture.headline);
+  const showResidences = show("residences") && !!residences?.items.length;
+  const showAmenities = show("amenities") && !!amenities?.chapters.length;
+  const showVideo = show("videoDuo") && !!videoDuo?.items.some((v) => v.enabled);
+  const showDocuments = show("documents") && !!documents?.items.length;
+  const showLegal = !!legal?.points.length || !!pickAny(legal?.body);
 
   return (
     <div
@@ -178,23 +196,24 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
       <ProjectHero
         id={project.slug}
         name={project.name}
-        data={project.hero}
+        data={{ ...project.hero, layout: "compact", facts: heroFacts(project) }}
         tourCta={showTour && project.virtualTour ? { label: project.virtualTour.heroCtaLabel, href: "#virtual-tour" } : undefined}
       />
       <ProjectAnchorNav items={anchors} />
 
-      {showWhy && project.towers && <ProjectWhy id="overview" data={project.towers} />}
+      {show("towers") && towers && hasReasons && <ProjectWhy id="overview" data={towers} />}
+      {show("towers") && towers && !hasReasons && hasTowerPair && <ProjectTowerSplit id="overview" data={towers} />}
 
-      {show("location") && project.location && (
-        <ProjectLocation id="location" data={project.location} compact destinations={project.gallery} />
+      {showLocation && location && <ProjectLocation id="location" data={location} compact destinations={project.gallery} />}
+
+      {showArchitecture && architecture && <ProjectPhotoStatement id="architecture" data={architecture} variant="compact" />}
+      {show("education") && project.education && (
+        <ProjectPhotoStatement id="education" data={project.education} variant="compact" />
       )}
 
-      {show("architecture") && project.architecture && (
-        <ProjectPhotoStatement id="architecture" data={project.architecture} variant="compact" />
-      )}
-
-      {show("residences") && project.residences && (
-        <ResidenceSelector id="residences" data={project.residences} compact floorPlans={project.floorPlans} />
+      {show("masterplan") && project.masterplan && <ProjectMasterplan id="masterplan" data={project.masterplan} />}
+      {showResidences && residences && (
+        <ResidenceSelector id="residences" data={residences} compact floorPlans={project.floorPlans} />
       )}
 
       {showTour && project.virtualTour && (
@@ -208,29 +227,54 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
         />
       )}
 
-      {show("amenities") && project.amenities && <AmenitySection id="amenities" data={project.amenities} compact />}
+      {showAmenities && amenities && <AmenitySection id="amenities" data={amenities} compact />}
 
-      {show("videoDuo") && project.videoDuo && (
-        <ProjectVideoDuo id="video-stories" data={project.videoDuo} projectSlug={project.slug} compact />
-      )}
+      {showVideo && videoDuo && <ProjectVideoDuo id="video-stories" data={videoDuo} projectSlug={project.slug} compact />}
 
-      {show("investment") && project.investment && (
-        <InvestmentSection id="investment" data={project.investment} compact salesPhases={project.salesPhases} />
-      )}
+      <InvestmentSection
+        id="investment"
+        data={show("investment") ? project.investment : undefined}
+        compact
+        salesPhases={project.salesPhases}
+      />
 
-      {((show("documents") && project.documents) || project.legal) && (
+      {(showDocuments || showLegal) && (
         <VerifyTrustSection
           id="documents"
-          documents={show("documents") ? project.documents : undefined}
-          legal={project.legal}
+          documents={showDocuments ? documents : undefined}
+          legal={showLegal ? legal : undefined}
           tourUrl={project.virtualTour?.tourUrl}
           projectSlug={project.slug}
         />
       )}
+      {show("verification") && project.verification && !!project.verification.items.length && (
+        <ProjectVerificationNote id="verification" data={project.verification} />
+      )}
+      {show("faq") && project.faq && !!project.faq.items.length && <FAQSection id="faq" data={project.faq} />}
+      {show("news") && project.news && !!project.news.articleSlugs.length && <ProjectNewsTeaser id="news" data={project.news} />}
 
       <ProjectCTA id="lead" data={project.cta} />
 
       {extras}
     </div>
   );
+}
+
+function pickAny(v?: { vi: string; en: string }) {
+  return !!(v?.vi.trim() || v?.en.trim());
+}
+
+/** Hero key-figure line: hero.facts when set, else the project's own Stats
+ * items ("39 Tầng"), so no project needs a separately written line. */
+function heroFacts(project: ProjectDetailData) {
+  if (pickAny(project.hero.facts)) return project.hero.facts;
+  // First four figures, like Q'Terra's line; "·" inside a figure would
+  // split it, so it becomes "/" (values) or "," (labels).
+  const items = (isSectionVisible(project, "stats") ? (project.stats?.items ?? []) : []).slice(0, 4);
+  if (!items.length) return undefined;
+  const line = (lang: "vi" | "en") =>
+    items
+      .map((it) => `${it.value.replace(/\s*·\s*/g, "/")} ${it.label[lang].replace(/\s*·\s*/g, ", ")}`.trim())
+      .join(" · ");
+  return { vi: line("vi"), en: line("en") };
 }

@@ -194,6 +194,20 @@ function CompactLocation({ id, data, destinations }: { id: string; data: Project
                 ))}
               </div>
             )}
+            {/* Projects without time groups list their nearby places instead. */}
+            {!data.journey?.length && !!data.benefits.length && (
+              <ul className="m-0 flex list-none flex-col p-0">
+                {data.benefits.map((b, i) => (
+                  <li
+                    key={i}
+                    className="flex items-baseline justify-between gap-4 border-t border-[rgba(var(--project-accent-rgb),0.45)] py-3 font-body text-[15px] leading-[1.5] text-[var(--color-sand)]"
+                  >
+                    <span>{pick(b.name)}</span>
+                    <span className="flex-none font-display text-[var(--project-accent-light)]">{pick(b.distance)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
             <SectionAction data={data} variant="light" show="md-up" className="mt-8" />
           </div>
           <div

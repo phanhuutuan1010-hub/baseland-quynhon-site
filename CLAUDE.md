@@ -1,5 +1,14 @@
 @AGENTS.md
 
+## Trang dự án
+
+Trang dự án luôn theo layout chuẩn Q'Terra; khác biệt chỉ qua theme và module đặc thù.
+
+- Thứ tự cố định trong `CompactProjectPage` (`components/project-detail/ProjectPage.tsx`): Hero → Vì sao → Vị trí → Kiến trúc → Chọn căn → 360° → Tiện ích → Video → Giá & lộ trình → Kiểm chứng & Base Land → Form, kèm thanh mục lục, sticky Tư vấn nhanh, form rút gọn, popup lead.
+- Theme qua `Project.theme` (`data-project-theme`); module đặc thù đặt đúng ô tương ứng (2 tháp trong "Vì sao", Masterplan trước "Chọn căn", Education sau "Kiến trúc", Verification/FAQ/News sau "Kiểm chứng").
+- Mục chưa có dữ liệu thì tự ẩn — không điền giả. Giá/phương thức thanh toán chỉ hiện khi dự án có `priceFacts`/`paymentPlans`; còn lại chỉ nút "Nhận bảng giá mới nhất". Tour 360° chỉ hiện khi có link.
+- `hero.layout = "full"` (Admin → Tổng quan) là lối thoát về bố cục cũ, không dùng cho dự án mới.
+
 ## Quy tắc layout bắt buộc
 
 - **Heading:** `text-wrap: balance` (đã đặt chung cho h1–h3 trong `globals.css`; tiêu đề viết bằng thẻ khác thì thêm `[text-wrap:balance]`). Không để 1 từ/cụm ngắn rớt dòng lẻ.

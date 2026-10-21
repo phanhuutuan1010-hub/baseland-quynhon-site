@@ -8,14 +8,17 @@ export function SectionEditClient({
   projectId,
   sectionKey,
   initial,
+  itemTemplates,
 }: {
   projectId: string;
   sectionKey: EditableProjectSectionKey;
   initial: Record<string, unknown>;
+  itemTemplates: Record<string, unknown>;
 }) {
   return (
     <GenericSectionForm
       initial={initial}
+      itemTemplates={itemTemplates}
       onSave={(content) => updateProjectSectionContent(projectId, sectionKey, content)}
     />
   );

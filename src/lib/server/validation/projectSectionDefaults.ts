@@ -13,7 +13,7 @@ const emptyImage = { src: "", alt: L };
 export const PROJECT_SECTION_DEFAULTS: Record<EditableProjectSectionKey, object> = {
   intro: { eyebrow: L, headline: L, body: L },
   stats: { items: [] },
-  towers: { eyebrow: L, headline: L, towers: [] },
+  towers: { eyebrow: L, headline: L, navLabel: L, reasons: [], towers: [], actionLabel: L, actionHref: "#lead" },
   // Prefilled with a ready-to-edit 3-step template (not blank) so a new
   // project gets a usable section after filling in the date.
   salesPhases: {
@@ -99,14 +99,27 @@ export const PROJECT_SECTION_DEFAULTS: Record<EditableProjectSectionKey, object>
     leadSource: "",
     fallbackName: "Khách để lại SĐT (popup)",
   },
-  location: { eyebrow: L, headline: L, body: L, mapImage: emptyImage, benefits: [] },
+  location: { eyebrow: L, headline: L, body: L, navLabel: L, mapImage: emptyImage, journey: [], benefits: [], actionLabel: L, actionHref: "call" },
   masterplan: { eyebrow: L, headline: L, body: L, image: emptyImage, zones: [], ctaLabel: L, ctaHref: "#lead" },
   architecture: { headline: L, body: L, image: emptyImage },
   materialStory: { kicker: L, headline: L, body: L, swatches: [], galleryImages: [] },
   lifestyle: { eyebrow: L, headline: L, chapters: [] },
   education: { headline: L, body: L, image: emptyImage },
   views: { headline: L, body: L, image: emptyImage },
-  investment: { eyebrow: L, headline: L, points: [], pricingTitle: L, pricingBody: L, pricingCtaLabel: L, pricingCtaHref: "#lead" },
+  investment: {
+    eyebrow: L,
+    headline: L,
+    navLabel: L,
+    points: [],
+    pricingTitle: L,
+    pricingBody: L,
+    pricingCtaLabel: { vi: "Nhận bảng giá mới nhất", en: "Get the latest price list" },
+    pricingCtaHref: "#lead",
+    priceFacts: [],
+    paymentTitle: L,
+    paymentPlans: [],
+    paymentNote: L,
+  },
   legal: { body: L, points: [] },
   faq: { eyebrow: L, headline: L, groupLabels: {}, items: [] },
   verification: { eyebrow: L, headline: L, body: L, items: [] },
@@ -124,10 +137,51 @@ export const PROJECT_SECTION_DEFAULTS: Record<EditableProjectSectionKey, object>
     unitCtaFloorplanLabel: L,
     unitCtaFloorplanHref: "#lead",
     footnote: L,
+    navLabel: L,
+    areaLabel: L,
+    shareLabel: L,
     items: [],
   },
   floorPlans: { eyebrow: L, headline: L, zoomBtn: L, closeAria: L, footnote: L, ctaLabel: L, ctaHref: "#lead", groupLabels: {}, items: [] },
-  amenities: { eyebrow: L, headline: L, chapters: [] },
+  amenities: { eyebrow: L, headline: L, navLabel: L, chapters: [], actionLabel: L, actionHref: "#lead" },
   gallery: { intro: L, items: [] },
-  documents: { eyebrow: L, headline: L, ctaLabel: L, ctaHref: "#lead", items: [] },
+  documents: { eyebrow: L, headline: L, ctaLabel: L, ctaHref: "#lead", items: [], actionLabel: L, actionHref: "call" },
+};
+
+/** Shape of one new item for list fields that may start empty (keyed by
+ * field name, per section) — lets the generic form offer "+ Thêm" with the
+ * same item structure Q'Terra uses, for every project. */
+export const PROJECT_SECTION_ITEM_TEMPLATES: Partial<Record<EditableProjectSectionKey, Record<string, unknown>>> = {
+  intro: {},
+  stats: { items: { value: "", label: L, note: L } },
+  towers: {
+    reasons: { kicker: L, title: L, desc: L },
+    towers: { key: "", name: L, subtitle: L, description: L, characteristics: [], image: emptyImage },
+    characteristics: L,
+  },
+  location: {
+    journey: { tier: L, landmarks: [] },
+    landmarks: L,
+    benefits: { name: L, distance: L, image: emptyImage },
+  },
+  masterplan: { zones: { key: "", name: L, desc: L, tag: L } },
+  investment: {
+    points: { num: "", title: L, desc: L },
+    priceFacts: { label: L, value: L },
+    paymentPlans: { key: "", name: L, summary: L, steps: [] },
+    steps: { milestone: L, desc: L },
+  },
+  legal: { points: { label: L, desc: L }, links: { label: L, href: "" } },
+  verification: { items: { label: L, note: L, source: "", verified: false, lastUpdated: "" } },
+  faq: { items: { q: L, a: L, group: "" } },
+  salesPhases: { steps: { title: L, body: L, tag: L } },
+  leadPopup: { benefits: L },
+  residences: {
+    items: { key: "", name: L, tag: L, nfa: "", nsa: "", area: "", share: L, desc: L, floorPlanImage: emptyImage },
+    orientations: L,
+  },
+  floorPlans: { items: { key: "", group: "", name: L, src: "", alt: L, caption: L } },
+  amenities: { chapters: { slotId: "", kicker: "", title: L, desc: L, items: [], direction: "row", image: emptyImage }, items: L },
+  gallery: { items: { key: "", name: L, src: "", desc: L } },
+  documents: { items: { name: L, note: L, fileUrl: "", linkLabel: L } },
 };

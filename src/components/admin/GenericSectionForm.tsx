@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { AdminTextField, AdminTextAreaField } from "@/components/admin/AdminField";
 import { MediaPickerField } from "@/components/admin/MediaPickerField";
 import { LangToggle } from "@/components/admin/LangToggle";
@@ -78,9 +78,9 @@ const FIELD_LABELS: Record<string, string> = {
   scrollPercent: "Hoặc khi cuộn tới (% trang)",
   dismissDays: "Đóng thì ẩn (ngày)",
   fallbackName: "Tên lưu khi khách bỏ trống",
-  reasons: "Lý do (mục \"Vì sao\" — bố cục rút gọn)",
+  reasons: "Lý do (mục \"Vì sao\")",
   kicker: "Nhãn nhỏ",
-  actionLabel: "Nút CTA của mục — chữ (bố cục rút gọn, để trống = ẩn)",
+  actionLabel: "Nút CTA của mục — chữ (để trống = ẩn)",
   actionHref: "Nút CTA của mục — link (#lead, hoặc call = gọi hotline)",
   navLabel: "Nhãn trên thanh mục lục",
 };
@@ -127,6 +127,11 @@ function blankLike(sample: Json): Json {
 function isLocalizedStringArray(value: Json[]): value is { vi: string; en: string }[] {
   return value.length > 0 && value.every((item) => isLocalizedLeaf(item));
 }
+
+/** Per-section item shapes keyed by field name (e.g. `reasons`,
+ * `priceFacts`) — lets an EMPTY list still offer "+ Thêm" with the right
+ * shape, so every project can fill the same fields as Q'Terra. */
+const ItemTemplates = createContext<Record<string, Json>>({});
 
 function FieldEditor({
   path,
@@ -177,7 +182,31 @@ function FieldEditor({
   }
 
   if (Array.isArray(value)) {
-    if (value.length === 0 || value.every((v) => typeof v === "string")) {
+    return <ArrayEditor path={path} value={value} lang={lang} onChange={onChange} />;
+  }
+
+  if (isPlainObject(value)) {
+    return <ObjectEditor path={path} value={value} lang={lang} onChange={onChange} />;
+  }
+
+  return null;
+}
+
+function ArrayEditor({
+  path,
+  value,
+  lang,
+  onChange,
+}: {
+  path: string;
+  value: Json[];
+  lang: "vi" | "en";
+  onChange: (next: Json) => void;
+}) {
+  const template = useContext(ItemTemplates)[path];
+  const sample = value[0] ?? template;
+  {
+    if (sample === undefined || value.every((v) => typeof v === "string") && typeof sample === "string") {
       return (
         <div>
           <p className="mb-2 font-ui text-xs font-semibold tracking-[0.04em] text-[var(--color-text-muted)] uppercase">
@@ -188,18 +217,19 @@ function FieldEditor({
       );
     }
 
-    if (isLocalizedStringArray(value)) {
+    if (isLocalizedStringArray(value) || (value.length === 0 && isLocalizedLeaf(sample))) {
+      const items = value as { vi: string; en: string }[];
       return (
         <div className="flex flex-col gap-2">
           <p className="m-0 font-ui text-xs font-semibold tracking-[0.04em] text-[var(--color-text-muted)] uppercase">
             {prettifyKey(path)}
           </p>
-          {value.map((item, index) => (
+          {items.map((item, index) => (
             <div key={index} className="flex items-center gap-2">
               <input
                 value={item[lang]}
                 onChange={(e) => {
-                  const next = [...value];
+                  const next = [...items];
                   next[index] = { ...item, [lang]: e.target.value };
                   onChange(next);
                 }}
@@ -279,7 +309,7 @@ function FieldEditor({
         <button
           type="button"
           onClick={() => {
-            onChange([...value, blankLike(value[0])]);
+            onChange([...value, blankLike(sample)]);
           }}
           className="self-start rounded-xs border border-dashed border-[var(--color-border)] px-4 py-2 font-ui text-xs font-bold tracking-[0.04em] uppercase hover:bg-[var(--color-sand)]"
         >
@@ -288,8 +318,20 @@ function FieldEditor({
       </div>
     );
   }
+}
 
-  if (isPlainObject(value)) {
+function ObjectEditor({
+  path,
+  value,
+  lang,
+  onChange,
+}: {
+  path: string;
+  value: Record<string, Json>;
+  lang: "vi" | "en";
+  onChange: (next: Json) => void;
+}) {
+  {
     // Nested non-localized object (e.g. an image { src, alt }, or a
     // groupLabels map keyed by arbitrary group ids) — recurse the same way,
     // grouped visually so it reads as one field rather than a flat list.
@@ -306,35 +348,37 @@ function FieldEditor({
       </div>
     );
   }
-
-  return null;
 }
 
 export function GenericSectionForm({
   initial,
   onSave,
+  itemTemplates = {},
 }: {
   initial: Record<string, unknown>;
   onSave: (content: Record<string, unknown>) => Promise<{ error?: string } | void>;
+  itemTemplates?: Record<string, unknown>;
 }) {
   const [content, setContent] = useState(initial as Record<string, Json>);
   const [lang, setLang] = useState<"vi" | "en">("vi");
 
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-col gap-5 p-6">
-        <LangToggle value={lang} onChange={setLang} />
-        {Object.entries(content).map(([key, value]) => (
-          <FieldEditor
-            key={key}
-            path={key}
-            value={value}
-            lang={lang}
-            onChange={(next) => setContent({ ...content, [key]: next })}
-          />
-        ))}
+    <ItemTemplates.Provider value={itemTemplates as Record<string, Json>}>
+      <div className="flex flex-col">
+        <div className="flex flex-col gap-5 p-6">
+          <LangToggle value={lang} onChange={setLang} />
+          {Object.entries(content).map(([key, value]) => (
+            <FieldEditor
+              key={key}
+              path={key}
+              value={value}
+              lang={lang}
+              onChange={(next) => setContent({ ...content, [key]: next })}
+            />
+          ))}
+        </div>
+        <SaveBar onSave={() => onSave(content)} />
       </div>
-      <SaveBar onSave={() => onSave(content)} />
-    </div>
+    </ItemTemplates.Provider>
   );
 }

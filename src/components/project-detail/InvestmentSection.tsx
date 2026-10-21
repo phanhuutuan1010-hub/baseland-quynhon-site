@@ -15,14 +15,17 @@ export function InvestmentSection({
   salesPhases,
 }: {
   id: string;
-  data: ProjectInvestmentData;
-  /** Compact layout: launch date (from the Sales Phases section) + price
-   * figures + payment-plan tabs + one CTA; the value points are dropped. */
+  /** Optional only in the standard layout, which always shows the price
+   * block (at least the "Nhận bảng giá mới nhất" button). */
+  data?: ProjectInvestmentData;
+  /** Standard layout: launch date (from the Sales Phases section) + price
+   * figures + payment-plan tabs + one CTA. */
   compact?: boolean;
   salesPhases?: ProjectSalesPhases;
 }) {
   const { pick } = useLang();
   if (compact) return <CompactInvestment id={id} data={data} salesPhases={salesPhases} />;
+  if (!data) return null;
   return (
     <section id={id} className="bg-[var(--color-deep-earth)] px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
       <Reveal className="mx-auto max-w-[1440px]">
@@ -174,23 +177,53 @@ function PricingBlock({ data, launch }: { data: ProjectInvestmentData; launch?: 
   );
 }
 
-function CompactInvestment({ id, data, salesPhases }: { id: string; data: ProjectInvestmentData; salesPhases?: ProjectSalesPhases }) {
+const LATEST_PRICE_CTA = { vi: "Nhận bảng giá mới nhất", en: "Get the latest price list" };
+
+/**
+ * Standard layout's "Giá & lộ trình". Indicative prices and payment plans
+ * appear only when the project has them (today: Q'Terra). Any other
+ * project shows its own value points (if any) and the "Nhận bảng giá mới
+ * nhất" button — never invented figures.
+ */
+function CompactInvestment({ id, data, salesPhases }: { id: string; data?: ProjectInvestmentData; salesPhases?: ProjectSalesPhases }) {
   const { pick } = useLang();
+  const hasPricing = !!(data?.priceFacts?.length || data?.paymentPlans?.length);
   const launch = salesPhases?.date?.trim()
     ? { label: pick(salesPhases.dateLabel) || pick({ vi: "Mở bán dự kiến", en: "Expected launch" }), date: salesPhases.date }
     : undefined;
+  const eyebrow = data && pick(data.eyebrow) ? pick(data.eyebrow) : pick({ vi: "Giá & lộ trình", en: "Price & timeline" });
+  const headline = data && pick(data.headline) ? pick(data.headline) : pick({ vi: "Bảng giá & chính sách bán hàng", en: "Pricing & sales policy" });
+  const points = !hasPricing ? (data?.points ?? []) : [];
+
   return (
     <section id={id} className="bg-[var(--color-deep-earth)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
       <Reveal className="mx-auto max-w-[1440px]">
-        <CompactHeading dark eyebrow={pick(data.eyebrow)} headline={<Accent text={pick(data.headline)} onDark />} className="mb-10 md:mb-12" />
-        <PricingBlock data={data} launch={launch} />
+        <CompactHeading dark eyebrow={eyebrow} headline={<Accent text={headline} onDark />} className="mb-10 md:mb-12" />
+        {data && (hasPricing || launch) && <PricingBlock data={data} launch={launch} />}
+        {points.length > 0 && (
+          <ul className="m-0 mb-10 grid list-none grid-cols-1 gap-x-10 p-0 md:grid-cols-2">
+            {points.map((v) => (
+              <li key={v.num} className="flex gap-5 border-t border-[rgba(var(--project-accent-rgb),0.4)] py-5">
+                <span className="w-9 flex-none font-display text-lg leading-[1.3] text-[var(--project-accent-light)]">{v.num}</span>
+                <div>
+                  <div className="mb-1.5 font-ui text-[13px] leading-[1.45] font-bold tracking-[0.08em] text-[var(--color-warm-white)] uppercase">
+                    {pick(v.title)}
+                  </div>
+                  <p className="m-0 font-body text-[15px] leading-[var(--lh-body)] text-[var(--color-sand)] opacity-90">{pick(v.desc)}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
         <div className="flex flex-col gap-4 border-t border-[rgba(233,220,199,0.28)] pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="m-0 max-w-130 font-body text-sm leading-[var(--lh-body)] text-[var(--color-sand)] opacity-85">{pick(data.pricingBody)}</p>
+          {data && pick(data.pricingBody) && (
+            <p className="m-0 max-w-130 font-body text-sm leading-[var(--lh-body)] text-[var(--color-sand)] opacity-85">{pick(data.pricingBody)}</p>
+          )}
           <Link
-            href={data.pricingCtaHref}
-            className="inline-flex min-h-12 flex-none items-center justify-center rounded-xs border border-[var(--project-primary)] bg-[var(--project-primary)] px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase no-underline hover:bg-[var(--project-primary-dark)]"
+            href={data?.pricingCtaHref || "#lead"}
+            className="inline-flex min-h-12 flex-none items-center justify-center rounded-xs border border-[var(--project-primary)] bg-[var(--project-primary)] px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase no-underline hover:bg-[var(--project-primary-dark)] sm:ml-auto"
           >
-            {pick(data.pricingCtaLabel)}
+            {hasPricing && data && pick(data.pricingCtaLabel) ? pick(data.pricingCtaLabel) : pick(LATEST_PRICE_CTA)}
           </Link>
         </div>
       </Reveal>

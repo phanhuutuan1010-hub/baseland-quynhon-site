@@ -64,12 +64,12 @@ export default async function ProjectSectionsPage({ params }: { params: Promise<
   return (
     <div className="flex flex-col gap-6">
       <p className="m-0 font-body text-sm text-[var(--color-text-muted)]">
-        Ẩn/hiện và chỉnh nội dung từng section. Thứ tự hiển thị trên trang public luôn cố định (không đổi được ở đây) —
-        chỉ nội dung và trạng thái ẩn/hiện là chỉnh được.
-        {(project.hero as { layout?: string } | null)?.layout === "compact" && (
+        Ẩn/hiện và chỉnh nội dung từng section, xếp theo thứ tự hiển thị của layout chuẩn Q&apos;Terra. Thứ tự trên trang public cố
+        định; mục bật nhưng chưa có dữ liệu thì tự ẩn.
+        {(project.hero as { layout?: string } | null)?.layout !== "full" && (
           <>
             {" "}
-            <strong>Dự án đang dùng bố cục rút gọn:</strong> Thư viện ảnh, Mặt bằng, Giai đoạn bán hàng và Pháp lý được gộp vào Vị trí,
+            <strong>Layout chuẩn:</strong> Thư viện ảnh, Mặt bằng, Giai đoạn bán hàng và Pháp lý được gộp vào Vị trí,
             Căn hộ, Đầu tư và Tài liệu — chúng ẩn như mục riêng nhưng nội dung vẫn được dùng, sửa ở đây như bình thường.
           </>
         )}

@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/server/auth";
 import { prisma } from "@/lib/server/db";
 import { projectSectionKeys, NAMED_TABLE_KEYS, type EditableProjectSectionKey, type NamedTableKey } from "@/lib/server/validation/project";
 import { PROJECT_SECTION_LABELS } from "@/lib/server/validation/projectLabels";
-import { PROJECT_SECTION_DEFAULTS } from "@/lib/server/validation/projectSectionDefaults";
+import { PROJECT_SECTION_DEFAULTS, PROJECT_SECTION_ITEM_TEMPLATES } from "@/lib/server/validation/projectSectionDefaults";
 import { SectionEditClient } from "./SectionEditClient";
 import type { ProjectSectionType } from "@prisma/client";
 
@@ -83,7 +83,7 @@ export default async function ProjectSectionEditPage({ params }: { params: Promi
       <h2 className="m-0 font-ui text-lg font-bold text-[var(--color-charcoal)]">{PROJECT_SECTION_LABELS[key]}</h2>
       <div className="rounded-sm border border-[var(--color-border)] bg-[var(--color-warm-white)]">
         {user.role === "ADMIN" ? (
-          <SectionEditClient projectId={id} sectionKey={key} initial={initial} />
+          <SectionEditClient projectId={id} sectionKey={key} initial={initial} itemTemplates={PROJECT_SECTION_ITEM_TEMPLATES[key] ?? {}} />
         ) : (
           <pre className="overflow-auto p-6 font-body text-xs whitespace-pre-wrap text-[var(--color-charcoal)]">
             {JSON.stringify(initial, null, 2)}

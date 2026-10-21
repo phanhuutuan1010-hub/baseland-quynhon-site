@@ -58,7 +58,9 @@ function TowerPanel({ tower, curtainDelayMs }: { tower: ProjectTower; curtainDel
       {tower.image?.src ? (
         <Image src={tower.image.src} alt={pick(tower.image.alt)} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-105" style={{ objectPosition: focalPosition(tower.image) }} />
       ) : (
-        <ImagePlaceholder label={pick(tower.placeholderLabel ?? tower.name)} tone="dark" className="rounded-none border-none" />
+        // Label pinned to the top: the tower name/details sit at the bottom
+        // and would run into a centred placeholder label on phones.
+        <ImagePlaceholder label={pick(tower.placeholderLabel ?? tower.name)} tone="dark" className="items-start! rounded-none border-none pt-10" />
       )}
       {/* Curtain reveal (Simona brief mục 23): a solid panel draws away
           upward to uncover the tower photo, instead of a plain fade. */}
