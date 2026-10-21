@@ -116,6 +116,8 @@ model Settings {
   logoUrl           String?
   faviconUrl        String?
   defaultOgImageUrl String?
+  // Hero photo of the /projects listing page.
+  projectsHeroImageUrl String?
   updatedAt         DateTime @updatedAt
 
   @@map("settings")

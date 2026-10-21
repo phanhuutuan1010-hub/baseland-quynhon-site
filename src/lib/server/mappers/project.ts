@@ -124,3 +124,11 @@ export const getProjectCardImages = cache(async (): Promise<Record<string, Proje
   }
   return attachImageMeta(images);
 });
+
+/** Hero photo of the /projects listing (Admin → Cài đặt → Chung). */
+export const getProjectsPageHeroImage = cache(async (): Promise<ProjectCardImage | null> => {
+  const settings = await prisma.settings.findUnique({ where: { id: 1 }, select: { projectsHeroImageUrl: true } });
+  const src = settings?.projectsHeroImageUrl;
+  if (!src) return null;
+  return attachImageMeta({ src, alt: { vi: "Biển và thành phố Quy Nhơn", en: "Quy Nhon's sea and city" } } as ProjectCardImage);
+});

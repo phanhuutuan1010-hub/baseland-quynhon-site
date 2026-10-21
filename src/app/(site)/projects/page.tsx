@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { getProjectCardImages } from "@/lib/server/mappers/project";
+import { getProjectCardImages, getProjectsPageHeroImage } from "@/lib/server/mappers/project";
 import { ProjectsPageClient } from "./ProjectsPageClient";
 
 export const metadata: Metadata = buildMetadata({
@@ -11,5 +11,6 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function ProjectsPage() {
-  return <ProjectsPageClient images={await getProjectCardImages()} />;
+  const [images, heroImage] = await Promise.all([getProjectCardImages(), getProjectsPageHeroImage()]);
+  return <ProjectsPageClient images={images} heroImage={heroImage} />;
 }

@@ -12,6 +12,7 @@ export type GlobalSettingsValue = {
   logoUrl: string;
   faviconUrl: string;
   defaultOgImageUrl: string;
+  projectsHeroImageUrl: string;
 };
 
 export function GlobalSettingsForm({ initial }: { initial: GlobalSettingsValue }) {
@@ -38,6 +39,12 @@ export function GlobalSettingsForm({ initial }: { initial: GlobalSettingsValue }
         <MediaPickerField label="Logo (tuỳ chọn)" value={value.logoUrl} onChange={set("logoUrl")} kindFilter="IMAGE" />
         <MediaPickerField label="Favicon (tuỳ chọn)" value={value.faviconUrl} onChange={set("faviconUrl")} kindFilter="IMAGE" />
         <MediaPickerField label="Ảnh Open Graph mặc định (tuỳ chọn)" value={value.defaultOgImageUrl} onChange={set("defaultOgImageUrl")} kindFilter="IMAGE" />
+        <MediaPickerField
+          label="Ảnh đầu trang Dự án — /projects (để trống = khung trống)"
+          value={value.projectsHeroImageUrl}
+          onChange={set("projectsHeroImageUrl")}
+          kindFilter="IMAGE"
+        />
       </div>
       <SaveBar onSave={() => updateGlobalSettings(value)} />
     </div>

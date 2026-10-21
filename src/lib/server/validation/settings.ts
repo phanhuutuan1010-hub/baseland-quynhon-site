@@ -34,6 +34,7 @@ export const globalSettingsSchema = z.object({
   logoUrl: z.string().trim().optional().or(z.literal("")),
   faviconUrl: z.string().trim().optional().or(z.literal("")),
   defaultOgImageUrl: z.string().trim().optional().or(z.literal("")),
+  projectsHeroImageUrl: z.string().trim().optional().or(z.literal("")),
 });
 
 export const menuItemSchema = z.object({

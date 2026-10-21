@@ -70,6 +70,7 @@ export default async function AdminSettingsPage() {
           logoUrl: settings.logoUrl ?? "",
           faviconUrl: settings.faviconUrl ?? "",
           defaultOgImageUrl: settings.defaultOgImageUrl ?? "",
+          projectsHeroImageUrl: settings.projectsHeroImageUrl ?? "",
         }}
         menu={menuItems.map((m) => ({
           id: m.id,

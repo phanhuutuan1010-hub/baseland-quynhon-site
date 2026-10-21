@@ -112,6 +112,7 @@ export async function updateGlobalSettings(input: unknown): Promise<ActionResult
       logoUrl: parsed.data.logoUrl || null,
       faviconUrl: parsed.data.faviconUrl || null,
       defaultOgImageUrl: parsed.data.defaultOgImageUrl || null,
+      projectsHeroImageUrl: parsed.data.projectsHeroImageUrl || null,
     },
   });
 

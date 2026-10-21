@@ -38,7 +38,14 @@ function cardSpan(i: number): { colClass: string; aspect: string } {
 const selectClass =
   "cursor-pointer rounded-xs border border-[var(--color-border)] bg-[var(--color-warm-white)] px-3.5 py-2.5 font-ui text-xs font-semibold tracking-[0.02em] text-[var(--color-charcoal)]";
 
-export function ProjectsPageClient({ images }: { images: Record<string, ProjectCardImage> }) {
+export function ProjectsPageClient({
+  images,
+  heroImage,
+}: {
+  images: Record<string, ProjectCardImage>;
+  /** Admin → Cài đặt → Chung → Ảnh đầu trang Dự án. */
+  heroImage: ProjectCardImage | null;
+}) {
   const { lang, pick } = useLang();
   const t = pick(PROJECTS_CONTENT);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
@@ -70,11 +77,23 @@ export function ProjectsPageClient({ images }: { images: Record<string, ProjectC
       {/* Hero */}
       <section className="relative h-[clamp(380px,52vh,560px)] w-full overflow-hidden">
         <div className="absolute inset-0">
-          <ImagePlaceholder
-            label={pick({ vi: "Ảnh biển/thành phố Quy Nhơn", en: "Photo of the sea/city of Quy Nhon" })}
-            tone="dark"
-            className="rounded-none border-none"
-          />
+          {heroImage ? (
+            <Image
+              src={heroImage.src}
+              alt={pick(heroImage.alt)}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+              style={{ objectPosition: focalPosition(heroImage) }}
+            />
+          ) : (
+            <ImagePlaceholder
+              label={pick({ vi: "Ảnh biển/thành phố Quy Nhơn", en: "Photo of the sea/city of Quy Nhon" })}
+              tone="dark"
+              className="rounded-none border-none"
+            />
+          )}
         </div>
         <div
           className="absolute inset-0 pointer-events-none"
