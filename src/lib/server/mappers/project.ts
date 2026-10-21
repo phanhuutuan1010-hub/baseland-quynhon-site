@@ -109,3 +109,18 @@ export async function listProjectsForAdmin() {
 }
 
 export type { ProjectPublishStatus };
+
+export type ProjectCardImage = { src: string; alt: { vi: string; en: string }; focalX?: number; focalY?: number };
+
+/** Published projects' hero images by slug — the /projects listing cards
+ * use them (Admin → Dự án → Tổng quan → Ảnh hero), so there is no
+ * separate card image to keep in sync. */
+export const getProjectCardImages = cache(async (): Promise<Record<string, ProjectCardImage>> => {
+  const rows = await prisma.project.findMany({ where: { publishStatus: "PUBLISHED" }, select: { slug: true, hero: true } });
+  const images: Record<string, ProjectCardImage> = {};
+  for (const r of rows) {
+    const img = (r.hero as { image?: ProjectCardImage } | null)?.image;
+    if (img?.src) images[r.slug] = { ...img };
+  }
+  return attachImageMeta(images);
+});

@@ -58,6 +58,8 @@ async function revalidateProject(projectId: string) {
 
 function revalidateProjectPaths(projectId: string, slug: string | undefined) {
   if (slug) revalidatePath(`/projects/${slug}`);
+  // The /projects listing shows each project's hero image.
+  revalidatePath("/projects");
   revalidatePath("/admin/projects");
   // Admin's Next.js Router Cache can otherwise show a stale snapshot of the
   // editor after navigating away and back — revalidate every admin route
@@ -339,5 +341,6 @@ export async function deleteProject(projectId: string): Promise<ActionResult> {
   await logActivity({ userId: user.id, action: "project.delete", entityType: "Project", entityId: projectId });
   revalidatePath("/admin/projects");
   revalidatePath(`/projects/${project.slug}`);
+  revalidatePath("/projects");
   redirect("/admin/projects");
 }

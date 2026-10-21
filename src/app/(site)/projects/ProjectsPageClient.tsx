@@ -13,6 +13,8 @@ import {
 } from "@/lib/content/projects";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
+import type { ProjectCardImage } from "@/lib/server/mappers/project";
+import { focalPosition } from "@/components/project-detail/imageFrame";
 import { LeadFormFull } from "@/components/LeadFormFull";
 
 type Filters = {
@@ -36,7 +38,7 @@ function cardSpan(i: number): { colClass: string; aspect: string } {
 const selectClass =
   "cursor-pointer rounded-xs border border-[var(--color-border)] bg-[var(--color-warm-white)] px-3.5 py-2.5 font-ui text-xs font-semibold tracking-[0.02em] text-[var(--color-charcoal)]";
 
-export function ProjectsPageClient() {
+export function ProjectsPageClient({ images }: { images: Record<string, ProjectCardImage> }) {
   const { lang, pick } = useLang();
   const t = pick(PROJECTS_CONTENT);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
@@ -231,10 +233,23 @@ export function ProjectsPageClient() {
                     className={`group flex flex-col no-underline ${span.colClass}`}
                   >
                     <div className={`relative mb-4.5 overflow-hidden ${span.aspect}`}>
-                      <ImagePlaceholder
-                        label={`${p.slotId}.jpg`}
-                        className="transition-transform duration-300 ease-out group-hover:scale-105"
-                      />
+                      {/* Card photo = the project's hero image (Admin → Dự án →
+                          Tổng quan → Ảnh hero); placeholder until one is set. */}
+                      {images[p.slug] ? (
+                        <Image
+                          src={images[p.slug].src}
+                          alt={pick(images[p.slug].alt) || p.name}
+                          fill
+                          sizes={span.colClass === "col-span-12" ? "100vw" : "(min-width: 768px) 60vw, 100vw"}
+                          className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                          style={{ objectPosition: focalPosition(images[p.slug]) }}
+                        />
+                      ) : (
+                        <ImagePlaceholder
+                          label={`${p.slotId}.jpg`}
+                          className="transition-transform duration-300 ease-out group-hover:scale-105"
+                        />
+                      )}
                       {/* Overlay mờ + content reveal khi hover (desktop) — thẻ
                           vẫn tap được bình thường trên mobile vì không có gì
                           bị ẩn mặc định, chỉ thêm hiệu ứng khi hover có thật. */}

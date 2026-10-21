@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
+import { getProjectCardImages } from "@/lib/server/mappers/project";
 import { ProjectsPageClient } from "./ProjectsPageClient";
 
 export const metadata: Metadata = buildMetadata({
@@ -9,6 +10,6 @@ export const metadata: Metadata = buildMetadata({
   path: "/projects",
 });
 
-export default function ProjectsPage() {
-  return <ProjectsPageClient />;
+export default async function ProjectsPage() {
+  return <ProjectsPageClient images={await getProjectCardImages()} />;
 }
