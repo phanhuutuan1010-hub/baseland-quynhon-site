@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLang } from "@/lib/i18n";
+import { normalizeVnPhone } from "@/lib/phone";
 
 export type LeadFormState = {
   name: string;
@@ -47,8 +48,7 @@ export function useLeadForm(source: string, { requireConsent = false, initial }:
   function validate(state: LeadFormState) {
     const errs: Record<string, boolean> = {};
     if (!state.name.trim()) errs.name = true;
-    const digits = state.phone.replace(/[^0-9]/g, "");
-    if (digits.length < 9 || digits.length > 11) errs.phone = true;
+    if (!normalizeVnPhone(state.phone)) errs.phone = true;
     if (requireConsent && !state.consent) errs.consent = true;
     return errs;
   }
@@ -67,7 +67,7 @@ export function useLeadForm(source: string, { requireConsent = false, initial }:
       const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...lead, source, lang, requireConsent }),
+        body: JSON.stringify({ ...lead, phone: normalizeVnPhone(lead.phone) ?? lead.phone, source, lang, requireConsent }),
       });
       if (!res.ok) throw new Error("request_failed");
       setStatus("success");

@@ -12,15 +12,8 @@ import type { PopupTrigger } from "./LeadPopupTrigger";
 type Status = "idle" | "loading" | "success" | "error";
 type CloseMethod = "button" | "esc" | "backdrop";
 
-/** Vietnamese mobile (03/05/07/08/09 + 8 digits) or landline (02x + 8
- * digits); accepts +84 / 84 prefixes and spaces, dots, dashes. Returns the
- * normalized 0-prefixed number, or null. */
-export function normalizeVnPhone(raw: string): string | null {
-  let v = raw.replace(/[\s.\-()]/g, "");
-  if (v.startsWith("+84")) v = `0${v.slice(3)}`;
-  else if (/^84\d{9,10}$/.test(v)) v = `0${v.slice(2)}`;
-  return /^0[35789]\d{8}$/.test(v) || /^02\d{9}$/.test(v) ? v : null;
-}
+export { normalizeVnPhone } from "@/lib/phone";
+import { normalizeVnPhone } from "@/lib/phone";
 
 const primaryBtn =
   "inline-flex min-h-12 items-center justify-center rounded-xs border border-[var(--project-primary)] bg-[var(--project-primary)] px-6 py-3.5 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase no-underline hover:bg-[var(--project-primary-dark)] disabled:opacity-70";

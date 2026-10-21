@@ -6,7 +6,6 @@ import { trackEvent } from "@/lib/analytics";
 import { useLang } from "@/lib/i18n";
 import { cleanTelHref, useProjectContact } from "./ProjectContact";
 import { QuickChatLink } from "@/components/QuickChatLink";
-import type { SiteChromeData } from "@/lib/siteChrome";
 
 const c = QTERRA_LAUNCH;
 
@@ -16,7 +15,7 @@ const c = QTERRA_LAUNCH;
  * [data-track] link on the page (incl. the "Giai đoạn mở bán" block). The
  * lead pop-up itself lives in LeadPopupTrigger (DB-driven).
  */
-export function QterraQuickBar({ quickChat, projectNames }: Pick<SiteChromeData, "quickChat" | "projectNames">) {
+export function QterraQuickBar() {
   const { phoneHref } = useProjectContact();
   const { pick } = useLang();
   useEffect(() => {
@@ -55,8 +54,6 @@ export function QterraQuickBar({ quickChat, projectNames }: Pick<SiteChromeData,
         </a>
       ))}
       <QuickChatLink
-        quickChat={quickChat}
-        projectNames={projectNames}
         className="flex min-h-[52px] flex-1 items-center justify-center border-l border-[rgba(250,245,238,0.2)] bg-[var(--color-brand-green)] px-3 font-ui text-[13px] font-bold tracking-[0.07em] text-[var(--color-warm-white)] uppercase no-underline"
       />
     </nav>

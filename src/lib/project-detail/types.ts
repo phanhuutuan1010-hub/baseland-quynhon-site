@@ -443,6 +443,9 @@ export type ProjectCta = {
   headlineMaxWidth?: Localized<string>;
   body: Localized<string>;
   callNowLabel: Localized<string>;
+  /** "Bạn sẽ nhận được" list beside the form; omitted = default three items. */
+  benefitsTitle?: Localized<string>;
+  benefits?: Localized<string>[];
   /** Identifies this project to the shared lead form / API (e.g. "qterra"). */
   leadSource: string;
   /** Extra select fields on this project's lead form, stored on the Lead

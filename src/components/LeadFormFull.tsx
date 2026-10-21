@@ -4,21 +4,81 @@ import Link from "next/link";
 import type { Localized } from "@/lib/i18n";
 import { useLang } from "@/lib/i18n";
 import { LEAD_COPY, NEED_CTA_MAP, NEED_OPTIONS } from "@/lib/content/lead";
-import { CONTACT_PHONE_HREF } from "@/lib/content/nav";
 import { useLeadForm } from "@/lib/useLeadForm";
+import { useQuickChat } from "@/components/QuickChatLink";
 import type { ProjectLeadQualifier } from "@/lib/project-detail/types";
 
 const kicker = { vi: "Gửi yêu cầu tư vấn", en: "Request Consultation" };
 const title = { vi: "Cho chúng tôi biết bạn cần gì", en: "Tell us what you need" };
+const copy = {
+  name: { vi: "Họ tên *", en: "Full name *" },
+  phone: { vi: "Số điện thoại / Zalo *", en: "Phone / Zalo *" },
+  phonePlaceholder: { vi: "VD: 0901 234 567", en: "e.g. 0901 234 567" },
+  phoneError: { vi: "Số điện thoại chưa đúng (VD: 0901 234 567).", en: "Please enter a valid Vietnamese phone number (e.g. 0901 234 567)." },
+  optional: { vi: "không bắt buộc", en: "optional" },
+  submit: { vi: "Gửi yêu cầu", en: "Send request" },
+  chat: { vi: "Chat Zalo", en: "Chat on WhatsApp" },
+  success: {
+    vi: "Đã nhận yêu cầu. Chuyên viên Base Land Quy Nhơn sẽ liên hệ sớm nhất.",
+    en: "Request received. A Base Land Quy Nhon advisor will contact you as soon as possible.",
+  },
+};
 
-/** Full lead-capture form (kicker, need-based contextual CTA, consent
- * checkbox, retryable error state) — used on the Contact page and reused
- * anywhere else a full (not the compact Homepage-style) form is needed.
- * `source` identifies the originating page in the emailed lead.
- * `prefillNeed` preselects the "Interest" dropdown (e.g. from a video
- * story's CTA); `contextNote` shows a small banner above the form saying
- * what prompted it (e.g. which video), for the visitor's own clarity, not
- * just tracking. */
+const primaryBtn =
+  "inline-flex min-h-12 flex-1 cursor-pointer items-center justify-center rounded-xs border border-[var(--color-brand-green)] px-6 py-3.5 font-ui text-[13px] font-bold tracking-[0.08em] whitespace-nowrap text-[var(--color-warm-white)] uppercase sm:flex-none sm:px-8";
+const outlineBtn =
+  "inline-flex min-h-12 flex-1 items-center justify-center rounded-xs border border-[var(--color-brand-green)] bg-transparent px-6 py-3.5 font-ui text-[13px] font-bold tracking-[0.08em] whitespace-nowrap text-[var(--color-brand-green)] uppercase no-underline hover:bg-[color-mix(in_srgb,var(--color-brand-green)_8%,transparent)] sm:flex-none";
+const labelClass = "font-ui text-xs font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase";
+
+function chipClass(active: boolean) {
+  return `cursor-pointer rounded-full border px-3.5 py-2 font-body text-sm transition-colors ${
+    active
+      ? "border-[var(--color-brand-green)] bg-[var(--color-brand-green)] text-[var(--color-warm-white)]"
+      : "border-[var(--color-border)] bg-[var(--color-warm-white)] text-[var(--color-charcoal)] hover:border-[var(--color-brand-green)]"
+  }`;
+}
+
+/** Single-choice chip group; clicking the active chip clears it. */
+function ChipGroup({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const { pick } = useLang();
+  return (
+    <fieldset className="m-0 flex min-w-0 flex-col gap-2.5 border-0 p-0">
+      <legend className={`${labelClass} mb-2.5 p-0`}>
+        {label} <span className="font-normal tracking-normal normal-case opacity-70">({pick(copy.optional)})</span>
+      </legend>
+      <div className="flex flex-wrap gap-2">
+        {options.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            aria-pressed={value === o.value}
+            onClick={() => onChange(value === o.value ? "" : o.value)}
+            className={chipClass(value === o.value)}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+/** Shared lead-capture form (Contact, About, News, Projects, project CTA,
+ * lead modal). Name + VN phone required; the project's qualifiers (or the
+ * generic "Bạn đang tìm gì?" list) are optional single-choice chips.
+ * Secondary button opens Zalo (VI) / WhatsApp (EN), same as the sticky
+ * "Tư vấn nhanh". `prefillNeed` preselects the need (e.g. from a video
+ * story's CTA); `contextNote` shows a small banner saying what prompted it. */
 export function LeadFormFull({
   source = "contact",
   prefillNeed,
@@ -28,40 +88,40 @@ export function LeadFormFull({
   source?: string;
   prefillNeed?: string;
   contextNote?: Localized<string>;
-  /** Project-specific select fields; when present they replace the
-   * generic "Bạn đang tìm gì?" select. */
+  /** Project-specific fields (region/purpose/timeframe); when present they
+   * replace the generic need list. */
   qualifiers?: ProjectLeadQualifier[];
 }) {
   const { pick } = useLang();
+  const chat = useQuickChat();
   const { lead, updateField, errors, status, submit, retry } = useLeadForm(source, {
-    requireConsent: true,
     initial: prefillNeed ? { need: prefillNeed } : undefined,
   });
 
-  const inputClass = (hasError?: boolean) =>
-    `rounded-xs border px-3.5 py-3 text-[15px] bg-[var(--color-warm-white)] text-[var(--color-charcoal)] ${
-      hasError ? "border-[var(--color-error)]" : "border-[var(--color-border)]"
-    }`;
+  const chatButton = chat && (
+    <a href={chat.href} target="_blank" rel="noopener noreferrer" onClick={chat.track} className={outlineBtn}>
+      {pick(copy.chat)}
+    </a>
+  );
 
   if (status === "success") {
     return (
-      <div>
-        <h2 className="m-0 mb-4 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
-          {pick(LEAD_COPY.successTitle)}
-        </h2>
-        <p className="m-0 mb-7 font-body text-base leading-[var(--lh-body)] text-[var(--color-text-muted)]">
-          {pick(LEAD_COPY.successBody)}
+      <div role="status">
+        <div className="mb-4 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent-dark)] uppercase">
+          {pick(kicker)}
+        </div>
+        <p className="m-0 mb-7 font-display text-[length:var(--fs-h3)] leading-[var(--lh-heading)] text-[var(--color-charcoal)]">
+          {pick(copy.success)}
         </p>
-        <a
-          href={CONTACT_PHONE_HREF}
-          className="inline-flex items-center rounded-xs border border-[var(--project-primary)] bg-[var(--project-primary)] px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase no-underline hover:bg-[var(--project-primary-dark)]"
-        >
-          {pick(LEAD_COPY.callNow)}
-        </a>
+        {chatButton}
       </div>
     );
   }
 
+  const inputClass = (hasError?: boolean) =>
+    `min-h-12 rounded-xs border px-3.5 py-3 text-base bg-[var(--color-warm-white)] text-[var(--color-charcoal)] ${
+      hasError ? "border-[var(--color-error)]" : "border-[var(--color-border)]"
+    }`;
   const contextualCta = NEED_CTA_MAP[lead.need];
 
   return (
@@ -69,7 +129,7 @@ export function LeadFormFull({
       <div className="mb-4 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent-dark)] uppercase">
         {pick(kicker)}
       </div>
-      <h2 className="m-0 mb-7 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
+      <h2 className="m-0 mb-6 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
         {pick(title)}
       </h2>
 
@@ -92,96 +152,61 @@ export function LeadFormFull({
         </div>
       )}
 
-      <form onSubmit={submit} className="flex flex-col gap-4.5">
+      <form onSubmit={submit} noValidate className="flex flex-col gap-5">
         <label className="flex flex-col gap-2">
-          <span className="font-ui text-xs font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase">
-            {pick(LEAD_COPY.formName)}
-          </span>
+          <span className={labelClass}>{pick(copy.name)}</span>
           <input
             type="text"
+            name="name"
+            autoComplete="name"
+            required
             value={lead.name}
             onChange={(e) => updateField("name", e.target.value)}
+            aria-invalid={errors.name || undefined}
             className={inputClass(errors.name)}
           />
-          {errors.name && (
-            <span className="font-body text-[13px] text-[var(--color-error)]">{pick(LEAD_COPY.errNameRequired)}</span>
-          )}
+          {errors.name && <span className="font-body text-[13px] text-[var(--color-error)]">{pick(LEAD_COPY.errNameRequired)}</span>}
         </label>
 
         <label className="flex flex-col gap-2">
-          <span className="font-ui text-xs font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase">
-            {pick(LEAD_COPY.formPhone)}
-          </span>
+          <span className={labelClass}>{pick(copy.phone)}</span>
           <input
             type="tel"
+            name="phone"
             inputMode="tel"
+            autoComplete="tel"
+            required
+            placeholder={pick(copy.phonePlaceholder)}
             value={lead.phone}
             onChange={(e) => updateField("phone", e.target.value)}
+            aria-invalid={errors.phone || undefined}
             className={inputClass(errors.phone)}
           />
-          {errors.phone && (
-            <span className="font-body text-[13px] text-[var(--color-error)]">{pick(LEAD_COPY.errPhoneInvalid)}</span>
-          )}
-        </label>
-
-        <label className="flex flex-col gap-2">
-          <span className="font-ui text-xs font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase">
-            {pick(LEAD_COPY.formEmail)}
-          </span>
-          <input
-            type="email"
-            inputMode="email"
-            value={lead.email}
-            onChange={(e) => updateField("email", e.target.value)}
-            className={inputClass()}
-          />
+          {errors.phone && <span className="font-body text-[13px] text-[var(--color-error)]">{pick(copy.phoneError)}</span>}
         </label>
 
         {qualifiers?.length ? (
           qualifiers.map((q) => (
-            <label key={q.key} className="flex flex-col gap-2">
-              <span className="font-ui text-xs font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase">
-                {pick(q.label)}
-              </span>
-              <select
-                value={lead.qualifiers[q.key] ?? ""}
-                onChange={(e) => updateField("qualifiers", { ...lead.qualifiers, [q.key]: e.target.value })}
-                className={inputClass()}
-              >
-                <option value="">{pick(LEAD_COPY.needPlaceholder)}</option>
-                {q.options.map((opt) => (
-                  <option key={opt.vi} value={opt.vi}>
-                    {pick(opt)}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <ChipGroup
+              key={q.key}
+              label={pick(q.label)}
+              options={q.options.map((o) => ({ value: o.vi, label: pick(o) }))}
+              value={lead.qualifiers[q.key] ?? ""}
+              onChange={(v) => updateField("qualifiers", { ...lead.qualifiers, [q.key]: v })}
+            />
           ))
         ) : (
-          <label className="flex flex-col gap-2">
-            <span className="font-ui text-xs font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase">
-              {pick(LEAD_COPY.formNeed)}
-            </span>
-            <select
-              value={lead.need}
-              onChange={(e) => updateField("need", e.target.value)}
-              className={inputClass()}
-            >
-              <option value="">{pick(LEAD_COPY.needPlaceholder)}</option>
-              {NEED_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {pick(opt.label)}
-                </option>
-              ))}
-            </select>
-          </label>
+          <ChipGroup
+            label={pick(LEAD_COPY.formNeed)}
+            options={NEED_OPTIONS.map((o) => ({ value: o.value, label: pick(o.label) }))}
+            value={lead.need}
+            onChange={(v) => updateField("need", v)}
+          />
         )}
 
         {contextualCta && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xs border border-[rgba(var(--project-primary-rgb),0.3)] bg-[var(--color-warm-white)] px-4 py-3.5">
-            <span className="font-ui text-[13px] font-bold text-[var(--project-primary-text)]">
-              {pick(contextualCta.label)}
-            </span>
+            <span className="font-ui text-[13px] font-bold text-[var(--project-primary-text)]">{pick(contextualCta.label)}</span>
             {contextualCta.href && (
               <Link
                 href={contextualCta.href}
@@ -193,46 +218,22 @@ export function LeadFormFull({
           </div>
         )}
 
-        <label className="flex items-start gap-2.5">
-          <input
-            type="checkbox"
-            checked={lead.consent}
-            onChange={(e) => updateField("consent", e.target.checked)}
-            className="mt-0.5 h-4 w-4 flex-none accent-[var(--project-primary)]"
-          />
-          <span className="font-body text-[13px] leading-[1.5] text-[var(--color-text-muted)]">
-            {pick(LEAD_COPY.consentPre)}{" "}
-            <Link href="/privacy" className="text-[var(--project-primary-text)] underline">
-              {pick(LEAD_COPY.privacyLinkLabel)}
-            </Link>
-            {pick(LEAD_COPY.consentPost)}
-          </span>
-        </label>
-        {errors.consent && (
-          <span className="-mt-2 font-body text-[13px] text-[var(--color-error)]">
-            {pick(LEAD_COPY.errConsentRequired)}
-          </span>
-        )}
-
-        <div className="mt-2 flex flex-wrap gap-3">
+        <div className="mt-1 flex flex-wrap gap-3">
           <button
             type="submit"
             disabled={status === "loading"}
-            className="rounded-xs border border-[var(--project-primary)] px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase"
-            style={{
-              background: status === "loading" ? "var(--project-primary-light)" : "var(--project-primary)",
-              cursor: status === "loading" ? "default" : "pointer",
-            }}
+            className={primaryBtn}
+            style={{ background: status === "loading" ? "var(--color-brand-green-dark)" : "var(--color-brand-green)" }}
           >
-            {status === "loading" ? pick(LEAD_COPY.submitLoading) : pick(LEAD_COPY.submitIdle)}
+            {status === "loading" ? pick(LEAD_COPY.submitLoading) : pick(copy.submit)}
           </button>
-          <a
-            href={CONTACT_PHONE_HREF}
-            className="inline-flex items-center rounded-xs border border-[var(--project-accent)] bg-transparent px-7 py-[15px] font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--color-charcoal)] uppercase no-underline hover:bg-[rgba(var(--project-accent-rgb),0.15)]"
-          >
-            {pick(LEAD_COPY.callNow)}
-          </a>
+          {chatButton}
         </div>
+        <p className="m-0 font-body text-xs text-[var(--color-text-muted)]">
+          <Link href="/privacy" className="text-[var(--color-text-muted)] underline">
+            {pick(LEAD_COPY.privacyLinkLabel)}
+          </Link>
+        </p>
       </form>
     </div>
   );

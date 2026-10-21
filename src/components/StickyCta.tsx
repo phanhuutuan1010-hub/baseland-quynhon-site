@@ -26,8 +26,6 @@ export function StickyCta({ data }: { data: SiteChromeData }) {
           </a>
         )}
         <QuickChatLink
-          quickChat={data.quickChat}
-          projectNames={data.projectNames}
           className="inline-flex items-center rounded-full border border-[var(--color-brand-green)] bg-[var(--color-brand-green)] px-6 py-[13px] font-ui text-xs font-bold whitespace-nowrap text-[var(--color-warm-white)] uppercase no-underline shadow-[var(--shadow-md)] transition-colors hover:bg-[var(--color-brand-green-dark)]"
         />
       </div>
@@ -42,8 +40,6 @@ export function StickyCta({ data }: { data: SiteChromeData }) {
           </a>
         )}
         <QuickChatLink
-          quickChat={data.quickChat}
-          projectNames={data.projectNames}
           className="flex items-center justify-center bg-[var(--color-brand-green)] px-3 py-4 font-ui text-[13px] font-bold tracking-[0.07em] text-[var(--color-warm-white)] uppercase no-underline"
         />
       </div>
