@@ -53,7 +53,13 @@ export async function updateContactSettings(input: unknown): Promise<ActionResul
       addressVi: d.addressVi,
       addressEn: d.addressEn,
       mapsUrl: d.mapsUrl || null,
-      socialLinks: { facebook: d.facebookUrl || null, zalo: d.zaloUrl || null, youtube: d.youtubeUrl || null },
+      socialLinks: {
+        facebook: d.facebookUrl || null,
+        zalo: d.zaloUrl || null,
+        youtube: d.youtubeUrl || null,
+        quickChatZalo: d.quickChatZalo || null,
+        quickChatWhatsapp: d.quickChatWhatsapp || null,
+      },
     },
   });
 

@@ -17,6 +17,9 @@ export const contactSettingsSchema = z.object({
   facebookUrl: z.string().trim().optional().or(z.literal("")),
   zaloUrl: z.string().trim().optional().or(z.literal("")),
   youtubeUrl: z.string().trim().optional().or(z.literal("")),
+  // Quick-chat numbers in international format, digits only (84…).
+  quickChatZalo: z.string().trim().regex(/^\d*$/, "Số Zalo chỉ gồm chữ số, vd 84373910109").optional(),
+  quickChatWhatsapp: z.string().trim().regex(/^\d*$/, "Số WhatsApp chỉ gồm chữ số, vd 84373910109").optional(),
 });
 
 export const analyticsSettingsSchema = z.object({

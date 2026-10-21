@@ -19,6 +19,8 @@ export type ContactSettingsValue = {
   facebookUrl: string;
   zaloUrl: string;
   youtubeUrl: string;
+  quickChatZalo: string;
+  quickChatWhatsapp: string;
 };
 
 export function ContactSettingsForm({ initial }: { initial: ContactSettingsValue }) {
@@ -46,6 +48,18 @@ export function ContactSettingsForm({ initial }: { initial: ContactSettingsValue
           <AdminTextField label="Địa chỉ (EN)" value={value.addressEn} onChange={set("addressEn")} />
         </div>
         <AdminTextField label="Link Google Maps (tuỳ chọn)" value={value.mapsUrl} onChange={set("mapsUrl")} />
+        <div className="grid grid-cols-2 gap-5">
+          <AdminTextField
+            label="Số Zalo — nút Tư vấn nhanh (VI), vd 84373910109"
+            value={value.quickChatZalo}
+            onChange={set("quickChatZalo")}
+          />
+          <AdminTextField
+            label="Số WhatsApp — nút Quick chat (EN), vd 84373910109"
+            value={value.quickChatWhatsapp}
+            onChange={set("quickChatWhatsapp")}
+          />
+        </div>
         <div className="grid grid-cols-3 gap-5">
           <AdminTextField label="Facebook (tuỳ chọn)" value={value.facebookUrl} onChange={set("facebookUrl")} />
           <AdminTextField label="Zalo (tuỳ chọn)" value={value.zaloUrl} onChange={set("zaloUrl")} />

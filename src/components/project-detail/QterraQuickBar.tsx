@@ -5,16 +5,18 @@ import { QTERRA_LAUNCH } from "@/lib/content/qterraLaunch";
 import { trackEvent } from "@/lib/analytics";
 import { useLang } from "@/lib/i18n";
 import { cleanTelHref, useProjectContact } from "./ProjectContact";
+import { QuickChatLink } from "@/components/QuickChatLink";
+import type { SiteChromeData } from "@/lib/siteChrome";
 
 const c = QTERRA_LAUNCH;
 
 /**
- * Q'Terra's mobile bottom bar (Gọi ngay | Zalo | Nhận tư vấn) — replaces the
+ * Q'Terra's mobile bottom bar (Gọi ngay | Tư vấn nhanh) — replaces the
  * site-wide StickyCta bar on this route — plus click tracking for every
  * [data-track] link on the page (incl. the "Giai đoạn mở bán" block). The
  * lead pop-up itself lives in LeadPopupTrigger (DB-driven).
  */
-export function QterraQuickBar() {
+export function QterraQuickBar({ quickChat, projectNames }: Pick<SiteChromeData, "quickChat" | "projectNames">) {
   const { phoneHref } = useProjectContact();
   const { pick } = useLang();
   useEffect(() => {
@@ -28,9 +30,8 @@ export function QterraQuickBar() {
 
   const barLinks = [
     { key: "call", href: cleanTelHref(phoneHref), label: c.bar.call, track: "click_call", primary: false },
-    ...(c.ZALO_URL ? [{ key: "zalo", href: c.ZALO_URL, label: c.bar.zalo, track: "click_zalo", primary: false }] : []),
-    { key: "lead", href: "#lead", label: c.bar.consult, track: "", primary: true },
   ];
+  // The old separate Zalo button is gone: "Tư vấn nhanh" (VI) already opens Zalo.
 
   // Body already reserves 72px + safe-area padding on mobile (see
   // (site)/layout.tsx), so this ~52px bar never covers the page's last
@@ -53,6 +54,11 @@ export function QterraQuickBar() {
           {pick(l.label)}
         </a>
       ))}
+      <QuickChatLink
+        quickChat={quickChat}
+        projectNames={projectNames}
+        className="flex min-h-[52px] flex-1 items-center justify-center border-l border-[rgba(250,245,238,0.2)] bg-[var(--color-brand-green)] px-3 font-ui text-[13px] font-bold tracking-[0.07em] text-[var(--color-warm-white)] uppercase no-underline"
+      />
     </nav>
   );
 }

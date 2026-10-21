@@ -24,6 +24,8 @@ const FALLBACK: SiteChromeData = {
   contactAddress: { vi: "41 Hoa Lư, Phường Quy Nhơn, Tỉnh Gia Lai", en: "41 Hoa Lư, Quy Nhơn Ward, Gia Lai Province" },
   footerCopyright: FOOTER_COPYRIGHT,
   logoUrl: null,
+  quickChat: { zalo: "84373910109", whatsapp: "84373910109" },
+  projectNames: {},
 };
 
 function menuTypeToHref(item: { type: string; href: string | null; targetSlug: string | null }): string {
@@ -35,10 +37,12 @@ function menuTypeToHref(item: { type: string; href: string | null; targetSlug: s
 // cache() memoizes per-request — layout.tsx (Nav/Footer) and page.tsx
 // (Lead CTA's phone number) both call this without a duplicate DB round trip.
 export const getSiteChromeData = cache(async function getSiteChromeData(): Promise<SiteChromeData> {
-  const [settings, menuItems] = await Promise.all([
+  const [settings, menuItems, projects] = await Promise.all([
     prisma.settings.findUnique({ where: { id: 1 } }),
     prisma.menuItem.findMany({ where: { enabled: true }, orderBy: { order: "asc" } }),
+    prisma.project.findMany({ where: { publishStatus: "PUBLISHED" }, select: { slug: true, name: true, seoTitle: true } }),
   ]);
+  const projectNames = Object.fromEntries(projects.map((p) => [p.slug, projectDisplayName(p)]));
 
   const navLinks =
     menuItems.length > 0
@@ -46,8 +50,12 @@ export const getSiteChromeData = cache(async function getSiteChromeData(): Promi
       : FALLBACK.navLinks;
 
   if (!settings) {
-    return { ...FALLBACK, navLinks };
+    return { ...FALLBACK, navLinks, projectNames };
   }
+
+  const social = (settings.socialLinks as { quickChatZalo?: string | null; quickChatWhatsapp?: string | null } | null) ?? {};
+  // Empty field → the hotline's number (tel:+84… → 84…).
+  const hotlineDigits = digits(settings.hotlineHref);
 
   return {
     navLinks,
@@ -59,8 +67,23 @@ export const getSiteChromeData = cache(async function getSiteChromeData(): Promi
     contactAddress: { vi: settings.addressVi, en: settings.addressEn },
     footerCopyright: FOOTER_COPYRIGHT,
     logoUrl: settings.logoUrl,
+    quickChat: {
+      zalo: digits(social.quickChatZalo) || hotlineDigits,
+      whatsapp: digits(social.quickChatWhatsapp) || hotlineDigits,
+    },
+    projectNames,
   };
 });
+
+const digits = (v: string | null | undefined) => (v ?? "").replace(/\D/g, "");
+
+/** "Q'Terra Quy Nhơn" from the SEO title ("Q'Terra Quy Nhơn | …") when set,
+ * else the stored name; all-caps names ("Q'TERRA QUY NHƠN") are title-cased. */
+function projectDisplayName(p: { name: string; seoTitle: string | null }) {
+  const raw = (p.seoTitle?.split("|")[0] || p.name).trim();
+  if (raw !== raw.toUpperCase()) return raw;
+  return raw.toLowerCase().replace(/(^|[\s'-])(\p{L})/gu, (_, sep: string, ch: string) => sep + ch.toUpperCase());
+}
 
 export type SiteMetaSettings = {
   siteName: string;

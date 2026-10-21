@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { QTERRA_LAUNCH } from "@/lib/content/qterraLaunch";
 import { useLang } from "@/lib/i18n";
 import type { SiteChromeData } from "@/lib/siteChrome";
+import { QuickChatLink } from "@/components/QuickChatLink";
 
 /** Fixed call/request-consultation bar — floating pill pair on desktop, a
  * two-up bottom bar on mobile. Mirrors the design bundle's ct-sticky-desktop
@@ -25,14 +25,11 @@ export function StickyCta({ data }: { data: SiteChromeData }) {
             {data.contactPhone}
           </a>
         )}
-        {pick(data.navCtaLabel) && (
-          <Link
-            href="/contact"
-            className="inline-flex items-center rounded-full border border-[var(--color-brand-green)] bg-[var(--color-brand-green)] px-6 py-[13px] font-ui text-xs font-bold whitespace-nowrap text-[var(--color-warm-white)] uppercase no-underline shadow-[var(--shadow-md)] transition-colors hover:bg-[var(--color-brand-green-dark)]"
-          >
-            {pick(data.navCtaLabel)}
-          </Link>
-        )}
+        <QuickChatLink
+          quickChat={data.quickChat}
+          projectNames={data.projectNames}
+          className="inline-flex items-center rounded-full border border-[var(--color-brand-green)] bg-[var(--color-brand-green)] px-6 py-[13px] font-ui text-xs font-bold whitespace-nowrap text-[var(--color-warm-white)] uppercase no-underline shadow-[var(--shadow-md)] transition-colors hover:bg-[var(--color-brand-green-dark)]"
+        />
       </div>
 
       <div className={`fixed inset-x-0 bottom-0 z-[90] grid-cols-2 ${hideMobileBar ? "hidden" : "grid"} border-t border-[rgba(250,245,238,0.18)] bg-[var(--color-deep-earth)] pb-[env(safe-area-inset-bottom,0px)] md:hidden`}>
@@ -44,14 +41,11 @@ export function StickyCta({ data }: { data: SiteChromeData }) {
             {pick({ vi: "Gọi ngay", en: "Call Now" })}
           </a>
         )}
-        {pick(data.navCtaLabel) && (
-          <Link
-            href="/contact"
-            className="flex items-center justify-center bg-[var(--color-brand-green)] px-3 py-4 font-ui text-[13px] font-bold tracking-[0.07em] text-[var(--color-warm-white)] uppercase no-underline"
-          >
-            {pick(data.navCtaLabel)}
-          </Link>
-        )}
+        <QuickChatLink
+          quickChat={data.quickChat}
+          projectNames={data.projectNames}
+          className="flex items-center justify-center bg-[var(--color-brand-green)] px-3 py-4 font-ui text-[13px] font-bold tracking-[0.07em] text-[var(--color-warm-white)] uppercase no-underline"
+        />
       </div>
     </>
   );

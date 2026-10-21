@@ -45,7 +45,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
 
   const extras = (
     <>
-      {project.slug === QTERRA_LAUNCH.slug && <QterraQuickBar />}
+      {project.slug === QTERRA_LAUNCH.slug && <QterraQuickBar quickChat={chrome.quickChat} projectNames={chrome.projectNames} />}
       {isSectionVisible(project, "leadPopup") && project.leadPopup && (
         <LeadPopupTrigger
           data={project.leadPopup}

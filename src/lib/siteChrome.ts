@@ -18,4 +18,9 @@ export type SiteChromeData = {
   /** Admin-set logo (Settings > Chung) — falls back to the built-in Base
    * Land mark (Nav.tsx/Footer.tsx) when unset. */
   logoUrl: string | null;
+  /** Sticky "Tư vấn nhanh / Quick chat" numbers (Settings → Liên hệ),
+   * digits only, international format (84…). */
+  quickChat: { zalo: string; whatsapp: string };
+  /** Published project slug → display name, for the quick-chat message. */
+  projectNames: Record<string, string>;
 };

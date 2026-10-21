@@ -4,7 +4,7 @@ import { SettingsTabs } from "./SettingsTabs";
 
 export const metadata = { title: "Cài đặt" };
 
-type SocialLinks = { facebook?: string | null; zalo?: string | null; youtube?: string | null };
+type SocialLinks = { facebook?: string | null; zalo?: string | null; youtube?: string | null; quickChatZalo?: string | null; quickChatWhatsapp?: string | null };
 
 export default async function AdminSettingsPage() {
   await requireRole("ADMIN");
@@ -56,6 +56,8 @@ export default async function AdminSettingsPage() {
           facebookUrl: social.facebook ?? "",
           zaloUrl: social.zalo ?? "",
           youtubeUrl: social.youtube ?? "",
+          quickChatZalo: social.quickChatZalo ?? "",
+          quickChatWhatsapp: social.quickChatWhatsapp ?? "",
         }}
         analytics={{
           gaId: settings.gaId ?? "",
