@@ -14,7 +14,7 @@ export const PROJECT_SECTION_LABELS: Record<EditableProjectSectionKey, string> =
   lifestyle: "Phong cách sống (Lifestyle)",
   education: "Giáo dục (Education)",
   views: "Tầm nhìn (Views)",
-  investment: "Đầu tư (Investment)",
+  investment: "Giá & lộ trình · Booking · Thanh toán (Investment)",
   legal: "Pháp lý & Uy tín (Legal)",
   faq: "Hỏi đáp (FAQ)",
   verification: "Minh bạch dữ liệu (Verification)",

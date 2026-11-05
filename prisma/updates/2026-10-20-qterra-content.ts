@@ -173,8 +173,8 @@ const verification = {
     verified(
       ["Giá & thanh toán (dự kiến)", "Pricing & payment (indicative)"],
       [
-        "Từ 55 triệu/m², booking 50 triệu, 3 phương thức thanh toán — dự kiến, áp dụng theo từng đợt mở bán.",
-        "From VND 55 million/m², VND 50 million booking, 3 payment plans — indicative, applied per sales release.",
+        "Từ 55 triệu/m², booking 30 triệu, 3 phương thức thanh toán — dự kiến, áp dụng theo từng đợt mở bán.",
+        "From VND 55 million/m², VND 30 million booking, 3 payment plans — indicative, applied per sales release.",
       ],
     ),
     verified(
@@ -215,7 +215,7 @@ const legal = {
 };
 
 const step = (milestone: [string, string], desc: [string, string]) => ({ milestone: L(...milestone), desc: L(...desc) });
-const BOOKING = step(["T", "T"], ["Đặt chỗ (booking) 50 triệu", "Booking: VND 50 million"]);
+const BOOKING = step(["T", "T"], ["Đặt chỗ (booking) 30 triệu", "Booking: VND 30 million"]);
 
 const investmentPatch = {
   pricingBody: L(
@@ -225,7 +225,7 @@ const investmentPatch = {
   priceFacts: [
     { label: L("Giá từ (dự kiến)", "From (indicative)"), value: L("55 triệu/m²", "VND 55M/m²") },
     { label: L("Căn nhỏ nhất", "Smallest unit"), value: L("~1,79 tỷ", "~VND 1.79B") },
-    { label: L("Booking", "Booking"), value: L("50 triệu", "VND 50M") },
+    { label: L("Booking", "Booking"), value: L("30 triệu", "VND 30M") },
   ],
   paymentTitle: L("Phương thức thanh toán dự kiến", "Indicative payment plans"),
   paymentPlans: [
