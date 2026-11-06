@@ -58,7 +58,7 @@ export function ProjectPage({
         data={project.hero}
         tourCta={showTour && project.virtualTour ? { label: project.virtualTour.heroCtaLabel, href: "#virtual-tour" } : undefined}
       />
-      <AdNoticeBar text={project.salesPhases?.adNoticeText} ctaLabel={project.salesPhases?.adNoticeCtaLabel} />
+      <AdNoticeBar data={project.salesPhases} />
 
       {isSectionVisible(project, "intro") && project.intro && <ProjectIntro id="statement" data={project.intro} />}
 
@@ -207,7 +207,7 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
         data={{ ...project.hero, layout: "compact", facts: heroFacts(project) }}
         tourCta={showTour && project.virtualTour ? { label: project.virtualTour.heroCtaLabel, href: "#tour-360" } : undefined}
       />
-      <AdNoticeBar text={project.salesPhases?.adNoticeText} ctaLabel={project.salesPhases?.adNoticeCtaLabel} />
+      <AdNoticeBar data={project.salesPhases} />
       <ProjectAnchorNav items={anchors} />
 
       {show("towers") && towers && hasReasons && <ProjectWhy id="ly-do" data={towers} />}

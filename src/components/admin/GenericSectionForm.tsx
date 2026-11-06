@@ -83,7 +83,8 @@ const FIELD_LABELS: Record<string, string> = {
   actionLabel: "Nút CTA của mục — chữ (để trống = ẩn)",
   actionHref: "Nút CTA của mục — link (#lead, hoặc call = gọi hotline)",
   navLabel: "Nhãn trên thanh mục lục",
-  adNoticeText: "Dải thông báo dưới Hero — chỉ hiện cho khách từ quảng cáo (URL có utm_source); để trống = ẩn",
+  adNoticeLine1: "Dải thông báo — dòng 1, icon lịch (chỉ hiện cho khách từ quảng cáo, URL có utm_source; 2 dòng trống = ẩn)",
+  adNoticeLine2: "Dải thông báo — dòng 2, icon định vị",
   adNoticeCtaLabel: "Dải thông báo — chữ nút gọi",
 };
 

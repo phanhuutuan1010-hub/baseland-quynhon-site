@@ -58,7 +58,8 @@ export const PROJECT_SECTION_DEFAULTS: Record<EditableProjectSectionKey, object>
     ctaZaloLabel: { vi: "Chat Zalo", en: "Chat on Zalo" },
     zaloUrl: "",
     backgroundImage: emptyImage,
-    adNoticeText: L,
+    adNoticeLine1: L,
+    adNoticeLine2: L,
     adNoticeCtaLabel: { vi: "Gọi đặt lịch xem", en: "Call to book a viewing" },
   },
   virtualTour: {

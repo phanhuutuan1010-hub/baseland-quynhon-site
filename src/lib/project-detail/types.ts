@@ -566,8 +566,10 @@ export type ProjectSalesPhases = {
   /** Faint backdrop photo. Empty src → falls back to the hero image. */
   backgroundImage: { src: string; alt: Localized<string> };
   /** Strip under the hero, shown only to visitors arriving from an ad
-   * (URL has utm_source). Empty → no strip. */
-  adNoticeText?: Localized<string>;
+   * (URL has utm_source): line 1 (calendar icon, e.g. launch date) and
+   * line 2 (pin icon, e.g. show apartment). Both empty → no strip. */
+  adNoticeLine1?: Localized<string>;
+  adNoticeLine2?: Localized<string>;
   adNoticeCtaLabel?: Localized<string>;
 };
 
