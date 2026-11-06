@@ -8,6 +8,7 @@ import { QuickChatProvider } from "@/components/QuickChatLink";
 import { SiteContactProvider } from "@/components/SiteContact";
 import { StickyCta } from "@/components/StickyCta";
 import { Analytics } from "@/components/Analytics";
+import { PixelEvents } from "@/components/PixelEvents";
 import { getSiteChromeData, getSiteMetaSettings } from "@/lib/server/mappers/siteChrome";
 import { toJsonLdString } from "@/lib/jsonLd";
 import { SITE_URL } from "@/lib/site";
@@ -124,6 +125,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             defaults={{ phone: chrome.contactPhone, phoneHref: chrome.contactPhoneHref, zalo: chrome.quickChat.zalo }}
             refContacts={chrome.refContacts}
           >
+          <PixelEvents />
           <QuickChatProvider value={{ quickChat: chrome.quickChat, projectNames: chrome.projectNames }}>
           <SiteChrome data={chrome} />
           <main className="flex-1">{children}</main>

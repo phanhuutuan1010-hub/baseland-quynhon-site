@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { normalizeVnPhone } from "@/lib/phone";
 import { getAttribution } from "@/lib/attribution";
+import { pixelTrack } from "@/lib/pixel";
 
 export type LeadFormState = {
   name: string;
@@ -29,6 +30,7 @@ export function markLeadSubmitted() {
     localStorage.setItem(LEAD_SUBMITTED_KEY, String(Date.now()));
   } catch {}
   window.dispatchEvent(new Event(LEAD_SUBMITTED_EVENT));
+  pixelTrack("Lead", { page: window.location.pathname });
 }
 
 /** Shared validation/submit logic behind both the simple (Homepage) and

@@ -4,6 +4,7 @@ import { getPublishedProjectBySlug, getPublishedProjectSlugs } from "@/lib/serve
 import { ProjectPage } from "@/components/project-detail/ProjectPage";
 import { ProjectNav } from "@/components/project-detail/ProjectNav";
 import { ProjectCallBar } from "@/components/project-detail/ProjectCallBar";
+import { PixelViewContent } from "@/components/PixelEvents";
 import { LeadPopupTrigger } from "@/components/project-detail/LeadPopupTrigger";
 import { isSectionVisible } from "@/lib/project-detail/types";
 import { toJsonLdString } from "@/lib/jsonLd";
@@ -43,6 +44,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
   const extras = (
     <>
       <ProjectCallBar projectSlug={project.slug} />
+      <PixelViewContent slug={project.slug} />
       {isSectionVisible(project, "leadPopup") && project.leadPopup && (
         <LeadPopupTrigger data={project.leadPopup} projectSlug={project.slug} />
       )}

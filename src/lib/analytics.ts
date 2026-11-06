@@ -1,3 +1,5 @@
+import { pixelTrackCustom } from "@/lib/pixel";
+
 /**
  * Thin, swappable analytics hook — no analytics vendor is wired into the
  * site yet, so this pushes to `window.dataLayer` (the de-facto standard
@@ -18,6 +20,8 @@ export function trackTourLinkClick(href: string, tourUrl: string | undefined, pr
 
 export function trackEvent(name: string, payload: Record<string, string | number | boolean> = {}) {
   if (typeof window === "undefined") return;
+  // Every way of opening a project's 360° tour funnels through here.
+  if (name === "project_360_open") pixelTrackCustom("View360", { project: String(payload.project ?? ""), source: String(payload.source ?? "") });
   const w = window as unknown as { dataLayer?: Record<string, unknown>[] };
   w.dataLayer = w.dataLayer || [];
   w.dataLayer.push({ event: name, ...payload });
