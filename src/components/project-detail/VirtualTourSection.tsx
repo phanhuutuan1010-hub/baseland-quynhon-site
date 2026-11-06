@@ -85,22 +85,50 @@ export function VirtualTourSection({
     return () => io.disconnect();
   }, [data.tourUrl, data.allowEmbed]);
 
-  // Mobile viewer: lock page scroll; Esc / Android back close it.
+  // Mobile viewer: lock page scroll; close button / Esc / Android back close
+  // it. The tour adds its own history entries inside the iframe (shared
+  // with this page's history), so closing must NOT go through
+  // history.back() — that would just step the tour back and reload it.
+  // Instead: the button closes directly, and our own "viewer open" entry is
+  // re-pushed on top whenever the tour adds one, so Back closes in one press.
   useEffect(() => {
     if (!overlay) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    history.pushState({ blTour: true }, "");
-    const onPop = () => setOverlay(false);
+    let ourLength = 0;
+    let closedByBack = false;
+    const pushOurs = () => {
+      history.pushState({ blTour: true }, "");
+      ourLength = history.length;
+    };
+    pushOurs();
+    // Index of the page's own entry (the one before the viewer opened).
+    const pageIndex = history.length - 2;
+    const watch = window.setInterval(() => {
+      if (history.length > ourLength) pushOurs();
+    }, 400);
+    const onPop = () => {
+      closedByBack = true;
+      setOverlay(false);
+    };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") history.back();
+      if (e.key === "Escape") setOverlay(false);
     };
     window.addEventListener("popstate", onPop);
     window.addEventListener("keydown", onKey);
     return () => {
+      window.clearInterval(watch);
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("popstate", onPop);
       window.removeEventListener("keydown", onKey);
+      // Once the iframe is gone, jump back over every entry added while the
+      // viewer was open (ours + the tour's), so the next Back leaves the
+      // page as if the tour had never been opened.
+      window.setTimeout(() => {
+        const current = history.length - 1 - (closedByBack ? 1 : 0);
+        const steps = current - pageIndex;
+        if (steps > 0) history.go(-steps);
+      }, 0);
     };
   }, [overlay]);
 
@@ -249,7 +277,7 @@ export function VirtualTourSection({
           closeLabel={pick({ vi: "Đóng", en: "Close" })}
           newTabLabel={pick(data.newTabLabel)}
           loadingLabel={pick({ vi: "Đang tải tour 360°…", en: "Loading the 360° tour…" })}
-          onClose={() => history.back()}
+          onClose={() => setOverlay(false)}
         />
       )}
 
