@@ -27,6 +27,7 @@ import { ProjectCTA } from "./ProjectCTA";
 import { SalesPhasesSection } from "./SalesPhasesSection";
 import { VirtualTourSection } from "./VirtualTourSection";
 import { ProjectAnchorNav } from "./ProjectAnchorNav";
+import { AdNoticeBar } from "./AdNoticeBar";
 import { ProjectWhy } from "./ProjectWhy";
 import { VerifyTrustSection } from "./VerifyTrustSection";
 
@@ -56,6 +57,7 @@ export function ProjectPage({
         data={project.hero}
         tourCta={showTour && project.virtualTour ? { label: project.virtualTour.heroCtaLabel, href: "#virtual-tour" } : undefined}
       />
+      <AdNoticeBar text={project.salesPhases?.adNoticeText} ctaLabel={project.salesPhases?.adNoticeCtaLabel} />
 
       {isSectionVisible(project, "intro") && project.intro && <ProjectIntro id="statement" data={project.intro} />}
 
@@ -200,6 +202,7 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
         data={{ ...project.hero, layout: "compact", facts: heroFacts(project) }}
         tourCta={showTour && project.virtualTour ? { label: project.virtualTour.heroCtaLabel, href: "#virtual-tour" } : undefined}
       />
+      <AdNoticeBar text={project.salesPhases?.adNoticeText} ctaLabel={project.salesPhases?.adNoticeCtaLabel} />
       <ProjectAnchorNav items={anchors} />
 
       {show("towers") && towers && hasReasons && <ProjectWhy id="overview" data={towers} />}

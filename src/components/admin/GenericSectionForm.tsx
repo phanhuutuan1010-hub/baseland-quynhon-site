@@ -83,6 +83,8 @@ const FIELD_LABELS: Record<string, string> = {
   actionLabel: "Nút CTA của mục — chữ (để trống = ẩn)",
   actionHref: "Nút CTA của mục — link (#lead, hoặc call = gọi hotline)",
   navLabel: "Nhãn trên thanh mục lục",
+  adNoticeText: "Dải thông báo dưới Hero — chỉ hiện cho khách từ quảng cáo (URL có utm_source); để trống = ẩn",
+  adNoticeCtaLabel: "Dải thông báo — chữ nút gọi",
 };
 
 function prettifyKey(key: string): string {

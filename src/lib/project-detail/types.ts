@@ -565,6 +565,10 @@ export type ProjectSalesPhases = {
   zaloUrl: string;
   /** Faint backdrop photo. Empty src → falls back to the hero image. */
   backgroundImage: { src: string; alt: Localized<string> };
+  /** Strip under the hero, shown only to visitors arriving from an ad
+   * (URL has utm_source). Empty → no strip. */
+  adNoticeText?: Localized<string>;
+  adNoticeCtaLabel?: Localized<string>;
 };
 
 /** "Tham quan ảo 360°" — an external 360° tour (developer-hosted). The
