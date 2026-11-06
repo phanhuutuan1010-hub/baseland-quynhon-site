@@ -118,6 +118,9 @@ model Settings {
   defaultOgImageUrl String?
   // Hero photo of the /projects listing page.
   projectsHeroImageUrl String?
+  // ?ref= table (Admin → Cài đặt → Liên hệ): [{ ref, name, phone, zalo }].
+  // A visitor arriving with ?ref=<ref> sees that person's phone/Zalo.
+  refContacts       Json?
   updatedAt         DateTime @updatedAt
 
   @@map("settings")
@@ -412,6 +415,9 @@ model Lead {
   region       String?
   purpose      String?
   timeframe    String?
+  // Attribution captured in the browser: ?ref= code and utm_* params.
+  ref          String?
+  utm          Json?
   projectId    String?
   status       LeadStatus @default(NEW)
   assignedToId String?

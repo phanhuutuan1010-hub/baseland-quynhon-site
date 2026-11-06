@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { useSiteContact } from "@/components/SiteContact";
 import { LEAD_SUBMITTED_EVENT, LEAD_SUBMITTED_KEY } from "@/lib/useLeadForm";
 import type { ProjectLeadPopup } from "@/lib/project-detail/types";
 import { popupKeys, storageGet, storageSet } from "@/lib/leadPopupStorage";
@@ -41,14 +42,11 @@ function otherOverlayOpen(leadInView: boolean): boolean {
 export function LeadPopupTrigger({
   data,
   projectSlug,
-  phone,
-  phoneHref,
 }: {
   data: ProjectLeadPopup;
   projectSlug: string;
-  phone: string;
-  phoneHref: string;
 }) {
+  const { phone, phoneHref } = useSiteContact();
   const [trigger, setTrigger] = useState<PopupTrigger | null>(null);
   const [open, setOpen] = useState(false);
   const [Dialog, setDialog] = useState<DialogComponent | null>(null);

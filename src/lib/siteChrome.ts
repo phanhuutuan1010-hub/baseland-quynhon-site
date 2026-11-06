@@ -23,4 +23,9 @@ export type SiteChromeData = {
   quickChat: { zalo: string; whatsapp: string };
   /** Published project slug → display name, for the quick-chat message. */
   projectNames: Record<string, string>;
+  /** ?ref= table (Settings → Liên hệ) — see components/SiteContact. */
+  refContacts: RefContact[];
 };
+
+/** One row of the ?ref= table: `ref` code → that person's name/phone/Zalo. */
+export type RefContact = { ref: string; name: string; phone: string; zalo: string };

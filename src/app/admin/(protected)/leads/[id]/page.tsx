@@ -46,6 +46,13 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
         {[
           { label: "Khu vực", value: lead.region },
           { label: "Mục đích mua", value: lead.purpose },
+          { label: "Ref (người giới thiệu)", value: lead.ref },
+          {
+            label: "UTM",
+            value: lead.utm && typeof lead.utm === "object"
+              ? Object.entries(lead.utm as Record<string, string>).map(([k, v]) => `${k}=${v}`).join(" · ")
+              : null,
+          },
         ]
           .filter((f) => f.value)
           .map((f) => (

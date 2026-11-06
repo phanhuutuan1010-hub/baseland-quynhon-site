@@ -1,11 +1,15 @@
 "use client";
 
+import { useSiteContact } from "@/components/SiteContact";
 import Image from "next/image";
 import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 import type { SiteChromeData } from "@/lib/siteChrome";
 
-export function Footer({ data }: { data: SiteChromeData }) {
+export function Footer({ data: chromeData }: { data: SiteChromeData }) {
+  // Phone follows the visitor's ?ref= (see SiteContact), not just Settings.
+  const contact = useSiteContact();
+  const data = { ...chromeData, contactPhone: contact.phone, contactPhoneHref: contact.phoneHref };
   const { pick } = useLang();
 
   return (

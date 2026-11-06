@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { trackEvent } from "@/lib/analytics";
 import { markLeadSubmitted } from "@/lib/useLeadForm";
+import { getAttribution } from "@/lib/attribution";
 import { popupKeys, storageSet } from "@/lib/leadPopupStorage";
 import type { ProjectLeadPopup } from "@/lib/project-detail/types";
 import type { PopupTrigger } from "./LeadPopupTrigger";
@@ -124,6 +125,7 @@ export default function LeadPopupDialog({
           source: data.leadSource || `${projectSlug}-popup`,
           lang,
           website: honeypot,
+          ...getAttribution(),
         }),
       });
       if (!res.ok) throw new Error("request_failed");

@@ -26,6 +26,8 @@ type LeadBody = {
   lang?: unknown;
   requireConsent?: unknown;
   qualifiers?: unknown;
+  ref?: unknown;
+  utm?: unknown;
   website?: unknown; // honeypot — real visitors never fill it
 };
 
@@ -43,6 +45,24 @@ function readQualifiers(v: unknown): Partial<Record<LeadQualifierKey, string>> {
     if (isNonEmptyString(value)) out[key] = value.trim().slice(0, 100);
   }
   return out;
+}
+
+const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
+
+// Hidden attribution fields from the browser — untrusted, so whitelisted
+// keys and capped lengths only.
+function readUtm(v: unknown): Record<string, string> | null {
+  if (!v || typeof v !== "object") return null;
+  const out: Record<string, string> = {};
+  for (const key of UTM_KEYS) {
+    const value = (v as Record<string, unknown>)[key];
+    if (isNonEmptyString(value)) out[key] = value.trim().slice(0, 100);
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+function readRef(v: unknown): string | null {
+  return isNonEmptyString(v) && /^[a-z0-9_-]{1,40}$/i.test(v.trim()) ? v.trim().toLowerCase() : null;
 }
 
 function digitsOnly(v: string) {
@@ -85,6 +105,8 @@ export async function POST(request: Request) {
   const lang = body.lang === "en" ? "en" : "vi";
   const requireConsent = body.requireConsent === true;
   const qualifiers = readQualifiers(body.qualifiers);
+  const ref = readRef(body.ref);
+  const utm = readUtm(body.utm);
 
   const errors: Record<string, boolean> = {};
   if (!name) errors.name = true;
@@ -112,6 +134,8 @@ export async function POST(request: Request) {
         region: qualifiers.region ?? null,
         purpose: qualifiers.purpose ?? null,
         timeframe: qualifiers.timeframe ?? null,
+        ref,
+        utm: utm ?? undefined,
       },
     });
   } catch (err) {
@@ -138,6 +162,8 @@ export async function POST(request: Request) {
       ${qualifiers.purpose ? `<tr><td><strong>Mục đích</strong></td><td>${escapeHtml(qualifiers.purpose)}</td></tr>` : ""}
       ${qualifiers.timeframe ? `<tr><td><strong>Thời điểm</strong></td><td>${escapeHtml(qualifiers.timeframe)}</td></tr>` : ""}
       <tr><td><strong>Nguồn</strong></td><td>${escapeHtml(source)}</td></tr>
+      ${ref ? `<tr><td><strong>Ref</strong></td><td>${escapeHtml(ref)}</td></tr>` : ""}
+      ${utm ? `<tr><td><strong>UTM</strong></td><td>${escapeHtml(Object.entries(utm).map(([k, v]) => `${k}=${v}`).join(", "))}</td></tr>` : ""}
       <tr><td><strong>Ngôn ngữ</strong></td><td>${escapeHtml(lang)}</td></tr>
     </table>
   `;

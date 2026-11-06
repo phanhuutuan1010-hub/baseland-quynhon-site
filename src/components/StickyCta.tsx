@@ -1,5 +1,6 @@
 "use client";
 
+import { useSiteContact } from "@/components/SiteContact";
 import { usePathname } from "next/navigation";
 import { useLang } from "@/lib/i18n";
 import type { SiteChromeData } from "@/lib/siteChrome";
@@ -8,7 +9,10 @@ import { QuickChatLink } from "@/components/QuickChatLink";
 /** Fixed call/request-consultation bar — floating pill pair on desktop, a
  * two-up bottom bar on mobile. Mirrors the design bundle's ct-sticky-desktop
  * / ct-sticky-mobile treatment, applied site-wide rather than only on Contact. */
-export function StickyCta({ data }: { data: SiteChromeData }) {
+export function StickyCta({ data: chromeData }: { data: SiteChromeData }) {
+  // Phone follows the visitor's ?ref= (see SiteContact), not just Settings.
+  const contact = useSiteContact();
+  const data = { ...chromeData, contactPhone: contact.phone, contactPhoneHref: contact.phoneHref };
   const { pick } = useLang();
   // Project detail pages render their own mobile call bar (ProjectCallBar).
   const hideMobileBar = /^\/projects\/[^/]+\/?$/.test(usePathname() ?? "");

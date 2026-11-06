@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/lib/i18n";
 import { SiteChrome } from "@/components/SiteChrome";
 import { Footer } from "@/components/Footer";
 import { QuickChatProvider } from "@/components/QuickChatLink";
+import { SiteContactProvider } from "@/components/SiteContact";
 import { StickyCta } from "@/components/StickyCta";
 import { Analytics } from "@/components/Analytics";
 import { getSiteChromeData, getSiteMetaSettings } from "@/lib/server/mappers/siteChrome";
@@ -119,12 +120,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLdString(websiteSchema) }} />
         <Analytics gaId={meta.gaId} gtmId={meta.gtmId} metaPixelId={meta.metaPixelId} />
         <LanguageProvider>
+          <SiteContactProvider
+            defaults={{ phone: chrome.contactPhone, phoneHref: chrome.contactPhoneHref, zalo: chrome.quickChat.zalo }}
+            refContacts={chrome.refContacts}
+          >
           <QuickChatProvider value={{ quickChat: chrome.quickChat, projectNames: chrome.projectNames }}>
           <SiteChrome data={chrome} />
           <main className="flex-1">{children}</main>
           <Footer data={chrome} />
           <StickyCta data={chrome} />
           </QuickChatProvider>
+          </SiteContactProvider>
         </LanguageProvider>
       </body>
     </html>

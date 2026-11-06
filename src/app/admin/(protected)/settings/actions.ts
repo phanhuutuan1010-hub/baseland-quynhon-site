@@ -60,6 +60,7 @@ export async function updateContactSettings(input: unknown): Promise<ActionResul
         quickChatZalo: d.quickChatZalo || null,
         quickChatWhatsapp: d.quickChatWhatsapp || null,
       },
+      refContacts: d.refContacts,
     },
   });
 
@@ -69,7 +70,7 @@ export async function updateContactSettings(input: unknown): Promise<ActionResul
     entityType: "Settings",
     entityId: "1",
     oldValue: { hotline: before.hotline, contactEmail: before.contactEmail },
-    newValue: { hotline: d.hotline, contactEmail: d.contactEmail },
+    newValue: { hotline: d.hotline, contactEmail: d.contactEmail, refContacts: d.refContacts.length },
   });
 
   revalidatePath("/", "layout");

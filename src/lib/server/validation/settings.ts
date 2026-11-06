@@ -1,3 +1,4 @@
+import { normalizeVnPhone } from "@/lib/phone";
 import { z } from "zod";
 
 export const contactSettingsSchema = z.object({
@@ -20,6 +21,17 @@ export const contactSettingsSchema = z.object({
   // Quick-chat numbers in international format, digits only (84…).
   quickChatZalo: z.string().trim().regex(/^\d*$/, "Số Zalo chỉ gồm chữ số, vd 84373910109").optional(),
   quickChatWhatsapp: z.string().trim().regex(/^\d*$/, "Số WhatsApp chỉ gồm chữ số, vd 84373910109").optional(),
+  refContacts: z
+    .array(
+      z.object({
+        ref: z.string().trim().toLowerCase().regex(/^[a-z0-9_-]{1,40}$/, "Mã ref chỉ gồm chữ thường, số, - hoặc _ (vd phuoc)"),
+        name: z.string().trim(),
+        phone: z.string().trim().refine((v) => normalizeVnPhone(v) !== null, "Số điện thoại trong bảng ref không hợp lệ"),
+        zalo: z.string().trim().regex(/^[\d\s+.]*$/, "Zalo chỉ gồm chữ số"),
+      }),
+    )
+    .refine((rows) => new Set(rows.map((r) => r.ref)).size === rows.length, "Mã ref bị trùng")
+    .default([]),
 });
 
 export const analyticsSettingsSchema = z.object({

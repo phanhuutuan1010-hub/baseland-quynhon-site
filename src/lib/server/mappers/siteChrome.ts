@@ -3,7 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { prisma } from "@/lib/server/db";
 import { FOOTER_COPYRIGHT } from "@/lib/content/nav";
-import type { SiteChromeData } from "@/lib/siteChrome";
+import type { RefContact, SiteChromeData } from "@/lib/siteChrome";
 
 // Static fallback — used only if Settings/MenuItem rows don't exist yet
 // (e.g. straight after `prisma migrate dev`, before the first seed/edit).
@@ -26,6 +26,7 @@ const FALLBACK: SiteChromeData = {
   logoUrl: null,
   quickChat: { zalo: "84373910109", whatsapp: "84373910109" },
   projectNames: {},
+  refContacts: [],
 };
 
 function menuTypeToHref(item: { type: string; href: string | null; targetSlug: string | null }): string {
@@ -72,8 +73,21 @@ export const getSiteChromeData = cache(async function getSiteChromeData(): Promi
       whatsapp: digits(social.quickChatWhatsapp) || hotlineDigits,
     },
     projectNames,
+    refContacts: parseRefContacts(settings.refContacts),
   };
 });
+
+/** Settings.refContacts JSON → clean rows (ref lower-cased, blanks dropped). */
+export function parseRefContacts(raw: unknown): RefContact[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((r) => {
+      const o = (r ?? {}) as Record<string, unknown>;
+      const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
+      return { ref: str(o.ref).toLowerCase(), name: str(o.name), phone: str(o.phone), zalo: str(o.zalo) };
+    })
+    .filter((r) => r.ref && r.phone);
+}
 
 const digits = (v: string | null | undefined) => (v ?? "").replace(/\D/g, "");
 

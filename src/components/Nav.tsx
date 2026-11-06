@@ -1,5 +1,6 @@
 "use client";
 
+import { useSiteContact } from "@/components/SiteContact";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -19,7 +20,10 @@ function hasDarkHeroAtTop(pathname: string): boolean {
   return false;
 }
 
-export function Nav({ data }: { data: SiteChromeData }) {
+export function Nav({ data: chromeData }: { data: SiteChromeData }) {
+  // Phone follows the visitor's ?ref= (see SiteContact), not just Settings.
+  const contact = useSiteContact();
+  const data = { ...chromeData, contactPhone: contact.phone, contactPhoneHref: contact.phoneHref };
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { lang, setLang, pick } = useLang();

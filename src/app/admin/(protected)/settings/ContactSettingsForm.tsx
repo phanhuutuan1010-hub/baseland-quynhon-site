@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AdminTextField } from "@/components/admin/AdminField";
 import { SaveBar } from "@/components/admin/SaveBar";
 import { updateContactSettings } from "./actions";
+import type { RefContact } from "@/lib/siteChrome";
 
 export type ContactSettingsValue = {
   branchName: string;
@@ -21,6 +22,7 @@ export type ContactSettingsValue = {
   youtubeUrl: string;
   quickChatZalo: string;
   quickChatWhatsapp: string;
+  refContacts: RefContact[];
 };
 
 export function ContactSettingsForm({ initial }: { initial: ContactSettingsValue }) {
@@ -65,8 +67,53 @@ export function ContactSettingsForm({ initial }: { initial: ContactSettingsValue
           <AdminTextField label="Zalo (tuỳ chọn)" value={value.zaloUrl} onChange={set("zaloUrl")} />
           <AdminTextField label="YouTube (tuỳ chọn)" value={value.youtubeUrl} onChange={set("youtubeUrl")} />
         </div>
+        <RefContactsEditor rows={value.refContacts} onChange={(refContacts) => setValue((prev) => ({ ...prev, refContacts }))} />
       </div>
       <SaveBar onSave={() => updateContactSettings(value)} />
+    </div>
+  );
+}
+
+const EMPTY_ROW: RefContact = { ref: "", name: "", phone: "", zalo: "" };
+
+/** ?ref= table: a visitor opening baselandquynhon.com/...?ref=<mã> sees
+ * that person's phone + Zalo on every call button (kept 30 days). */
+function RefContactsEditor({ rows, onChange }: { rows: RefContact[]; onChange: (rows: RefContact[]) => void }) {
+  const update = (i: number, key: keyof RefContact, v: string) =>
+    onChange(rows.map((r, j) => (j === i ? { ...r, [key]: key === "ref" ? v.toLowerCase().replace(/[^a-z0-9_-]/g, "") : v } : r)));
+
+  return (
+    <div className="flex flex-col gap-3 border-t border-[var(--color-border)] pt-5">
+      <div>
+        <p className="m-0 font-ui text-sm font-bold text-[var(--color-charcoal)]">Số điện thoại theo link giới thiệu (?ref=)</p>
+        <p className="m-0 mt-1 font-body text-[13px] text-[var(--color-text-muted)]">
+          Khách mở link có <code>?ref=mã</code> (vd <code>/projects/qterra?ref=phuoc</code>) sẽ thấy số và Zalo của người đó
+          trên mọi nút gọi, trong 30 ngày. Không có ref hoặc mã không có trong bảng → dùng Hotline ở trên.
+          Zalo để trống = dùng số điện thoại.
+        </p>
+      </div>
+      {rows.map((row, i) => (
+        <div key={i} className="grid grid-cols-[1fr_1.4fr_1.4fr_1.4fr_auto] items-end gap-3">
+          <AdminTextField label="Mã ref" value={row.ref} onChange={(v) => update(i, "ref", v)} />
+          <AdminTextField label="Tên" value={row.name} onChange={(v) => update(i, "name", v)} />
+          <AdminTextField label="Số điện thoại" value={row.phone} onChange={(v) => update(i, "phone", v)} />
+          <AdminTextField label="Zalo (tuỳ chọn)" value={row.zalo} onChange={(v) => update(i, "zalo", v)} />
+          <button
+            type="button"
+            onClick={() => onChange(rows.filter((_, j) => j !== i))}
+            className="mb-1 cursor-pointer rounded-xs border border-[var(--color-border)] bg-transparent px-3 py-2 font-ui text-xs text-[var(--color-error)]"
+          >
+            Xoá
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => onChange([...rows, EMPTY_ROW])}
+        className="self-start cursor-pointer rounded-xs border border-[var(--color-brand-green)] bg-transparent px-4 py-2 font-ui text-xs font-bold text-[var(--color-brand-green)]"
+      >
+        + Thêm người
+      </button>
     </div>
   );
 }

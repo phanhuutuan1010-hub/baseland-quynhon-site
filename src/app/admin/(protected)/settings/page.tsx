@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/server/auth";
 import { prisma } from "@/lib/server/db";
 import { SettingsTabs } from "./SettingsTabs";
+import { parseRefContacts } from "@/lib/server/mappers/siteChrome";
 
 export const metadata = { title: "Cài đặt" };
 
@@ -58,6 +59,7 @@ export default async function AdminSettingsPage() {
           youtubeUrl: social.youtube ?? "",
           quickChatZalo: social.quickChatZalo ?? "",
           quickChatWhatsapp: social.quickChatWhatsapp ?? "",
+          refContacts: parseRefContacts(settings.refContacts),
         }}
         analytics={{
           gaId: settings.gaId ?? "",

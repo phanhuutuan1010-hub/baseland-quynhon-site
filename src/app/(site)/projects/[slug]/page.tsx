@@ -5,9 +5,7 @@ import { ProjectPage } from "@/components/project-detail/ProjectPage";
 import { ProjectNav } from "@/components/project-detail/ProjectNav";
 import { ProjectCallBar } from "@/components/project-detail/ProjectCallBar";
 import { LeadPopupTrigger } from "@/components/project-detail/LeadPopupTrigger";
-import { ProjectContactProvider } from "@/components/project-detail/ProjectContact";
 import { isSectionVisible } from "@/lib/project-detail/types";
-import { getSiteChromeData } from "@/lib/server/mappers/siteChrome";
 import { toJsonLdString } from "@/lib/jsonLd";
 import { buildMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
@@ -36,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function ProjectDetailPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
-  const [project, chrome] = await Promise.all([getPublishedProjectBySlug(slug), getSiteChromeData()]);
+  const project = await getPublishedProjectBySlug(slug);
 
   if (!project) {
     notFound();
@@ -46,12 +44,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
     <>
       <ProjectCallBar projectSlug={project.slug} />
       {isSectionVisible(project, "leadPopup") && project.leadPopup && (
-        <LeadPopupTrigger
-          data={project.leadPopup}
-          projectSlug={project.slug}
-          phone={chrome.contactPhone}
-          phoneHref={chrome.contactPhoneHref}
-        />
+        <LeadPopupTrigger data={project.leadPopup} projectSlug={project.slug} />
       )}
     </>
   );
@@ -67,13 +60,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
   };
 
   return (
-    <ProjectContactProvider phone={chrome.contactPhone} phoneHref={chrome.contactPhoneHref}>
+    <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLdString(breadcrumbSchema) }} />
       {/* Replaces the shared site Nav for this route (see SiteChrome) — now
           rendered here, not derived from a client-side static-registry
           lookup, since project content is DB-backed and can change per edit. */}
       <ProjectNav project={project} />
       <ProjectPage project={project} extras={extras} />
-    </ProjectContactProvider>
+    </>
   );
 }

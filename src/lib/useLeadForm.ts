@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { normalizeVnPhone } from "@/lib/phone";
+import { getAttribution } from "@/lib/attribution";
 
 export type LeadFormState = {
   name: string;
@@ -67,7 +68,8 @@ export function useLeadForm(source: string, { requireConsent = false, initial }:
       const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...lead, phone: normalizeVnPhone(lead.phone) ?? lead.phone, source, lang, requireConsent }),
+        // ref + utm_* ride along as hidden fields (see lib/attribution).
+        body: JSON.stringify({ ...lead, phone: normalizeVnPhone(lead.phone) ?? lead.phone, source, lang, requireConsent, ...getAttribution() }),
       });
       if (!res.ok) throw new Error("request_failed");
       setStatus("success");

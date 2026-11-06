@@ -12,7 +12,6 @@ import { cleanTelHref, useProjectContact } from "./ProjectContact";
 import type {
   ProjectVideoDuo as ProjectVideoDuoData,
   ProjectVideoItem,
-  ProjectAdvisor,
 } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
 import { Carousel } from "./Carousel";
@@ -33,24 +32,6 @@ const CONTENT_TYPE_LABEL: Record<
   faq: { vi: "Hỏi đáp", en: "FAQ" },
   "sales-insight": { vi: "Góc nhìn tư vấn", en: "Sales Insight" },
 };
-
-/** Resolves which advisor a video's CTA should use: its own override, then
- * the section's primary (video 0) / secondary (video 1+) advisor, then
- * `null` — meaning "fall back to the branch contact" (mục 3). No project
- * currently configures a real advisor (see ProjectAdvisor's doc comment). */
-function resolveAdvisor(
-  video: ProjectVideoItem,
-  index: number,
-  data: ProjectVideoDuoData,
-): ProjectAdvisor | null {
-  if (video.advisor?.enabled) return video.advisor;
-  const sectionFallback =
-    index === 0
-      ? data.primaryAdvisor
-      : (data.secondaryAdvisor ?? data.primaryAdvisor);
-  if (sectionFallback?.enabled) return sectionFallback;
-  return null;
-}
 
 export function ProjectVideoDuo({
   id,
@@ -109,7 +90,6 @@ export function ProjectVideoDuo({
                 video={video}
                 index={i}
                 projectSlug={projectSlug}
-                advisor={resolveAdvisor(video, i, data)}
                 /* Subtle editorial offset (mục 2) — the second card sits a
                    touch lower on desktop, never more than a small nudge. */
                 offsetClassName={!singleItem && i === 1 ? "md:mt-9" : undefined}
@@ -125,7 +105,6 @@ export function ProjectVideoDuo({
               video={video}
               index={i}
               projectSlug={projectSlug}
-              advisor={resolveAdvisor(video, i, data)}
               /* Subtle editorial offset (mục 2) — the second card sits a
                  touch lower on desktop, never more than a small nudge. */
               offsetClassName={!singleItem && i === 1 ? "md:mt-9" : undefined}
@@ -143,14 +122,12 @@ function VideoStoryCard({
   video,
   index,
   projectSlug,
-  advisor,
   offsetClassName,
   revealDelayMs,
 }: {
   video: ProjectVideoItem;
   index: number;
   projectSlug: string;
-  advisor: ProjectAdvisor | null;
   offsetClassName?: string;
   revealDelayMs: number;
 }) {
@@ -213,9 +190,10 @@ function VideoStoryCard({
 
   const contentTypeLabel = pick(CONTENT_TYPE_LABEL[video.contentType]);
   const ctaLabel = pick(video.ctaLabel ?? DEFAULT_CTA_LABEL);
-  // The advisor (TVBH) keeps their own number; no advisor → site hotline.
-  const callPhone = advisor?.phone || hotline.phone;
-  const callHref = cleanTelHref(advisor?.phone ? advisor.phoneHref || `tel:${advisor.phone}` : hotline.phoneHref);
+  // One number per page: the site hotline or the visitor's ?ref= person —
+  // a per-video advisor number would contradict every other call button.
+  const callPhone = hotline.phone;
+  const callHref = cleanTelHref(hotline.phoneHref);
   const leadSource = `project-video/${projectSlug}/${video.topicSlug}`;
 
   function handleCtaClick() {

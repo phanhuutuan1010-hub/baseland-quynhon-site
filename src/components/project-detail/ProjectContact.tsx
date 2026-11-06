@@ -1,33 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { createContext, useContext, type ReactNode } from "react";
 import { useLang } from "@/lib/i18n";
-import { CONTACT_PHONE, CONTACT_PHONE_HREF } from "@/lib/content/nav";
+import { useSiteContact } from "@/components/SiteContact";
 import type { ProjectSectionAction } from "@/lib/project-detail/types";
 
 /**
- * The site hotline (Admin → Cài đặt → Liên hệ) for project pages. Every
- * "Gọi ngay" link on a project page reads it from here, so the header menu,
- * CTA block, mobile bar and section buttons can never show different
- * numbers. Falls back to nav.ts when no provider is mounted.
+ * The one phone number for project pages — Settings hotline, or the ?ref=
+ * person's number (see SiteContact). Every "Gọi ngay" link on a project
+ * page reads it from here, so the header menu, CTA block, mobile bar and
+ * section buttons can never show different numbers.
  */
-type ProjectContact = { phone: string; phoneHref: string };
-
-const ProjectContactContext = createContext<ProjectContact>({ phone: CONTACT_PHONE, phoneHref: CONTACT_PHONE_HREF });
-
-export function ProjectContactProvider({ phone, phoneHref, children }: ProjectContact & { children: ReactNode }) {
-  return (
-    <ProjectContactContext.Provider
-      value={{ phone: phone || CONTACT_PHONE, phoneHref: phoneHref || CONTACT_PHONE_HREF }}
-    >
-      {children}
-    </ProjectContactContext.Provider>
-  );
-}
-
 export function useProjectContact() {
-  return useContext(ProjectContactContext);
+  return useSiteContact();
 }
 
 /** `tel:` links must not contain spaces ("tel:+84968 876 941" fails on

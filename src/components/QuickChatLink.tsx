@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useLang } from "@/lib/i18n";
 import { trackEvent } from "@/lib/analytics";
 import type { SiteChromeData } from "@/lib/siteChrome";
+import { useSiteContact } from "@/components/SiteContact";
 
 type QuickChatData = Pick<SiteChromeData, "quickChat" | "projectNames">;
 
@@ -22,13 +23,14 @@ export function QuickChatProvider({ value, children }: { value: QuickChatData; c
  */
 export function useQuickChat() {
   const { quickChat, projectNames } = useContext(QuickChatContext);
+  const { zalo } = useSiteContact();
   const { lang } = useLang();
   const page = usePathname() ?? "/";
   const slug = page.match(/^\/projects\/([^/]+)/)?.[1];
   const project = slug ? projectNames[slug] : undefined;
 
   const channel = lang === "en" ? ("whatsapp" as const) : ("zalo" as const);
-  const number = channel === "whatsapp" ? quickChat.whatsapp : quickChat.zalo;
+  const number = channel === "whatsapp" ? quickChat.whatsapp : zalo;
   if (!number) return null;
 
   // WhatsApp shows the text as typed, so drop Vietnamese diacritics.
@@ -41,8 +43,8 @@ export function useQuickChat() {
 /** `https://zalo.me/<number>` (Settings → Liên hệ), language-independent;
  * `null` when no number is configured. */
 export function useZaloHref() {
-  const { quickChat } = useContext(QuickChatContext);
-  return quickChat.zalo ? `https://zalo.me/${quickChat.zalo}` : null;
+  const { zalo } = useSiteContact();
+  return zalo ? `https://zalo.me/${zalo}` : null;
 }
 
 /** Sticky-bar button. `label` overrides the default "Tư vấn nhanh / Quick chat". */
