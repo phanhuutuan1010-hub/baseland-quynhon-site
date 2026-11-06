@@ -43,9 +43,12 @@ export function ProjectHero({
 
   return (
     <section id={id} className="relative h-screen min-h-[640px] w-full overflow-hidden">
-      <div className="absolute inset-0" style={{ opacity: entered ? 1 : 0, transition: "opacity 600ms var(--ease-editorial)" }}>
+      {/* Visible from the first paint (no JS fade-in): the hero photo is the
+          mobile LCP element, and an opacity-0 image only counts once the
+          fade finishes after hydration. Text still reveals in sequence. */}
+      <div className="absolute inset-0">
         {data.image?.src ? (
-          <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="100vw" priority className="object-cover" style={{ objectPosition: focalPosition(data.image) }} />
+          <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="100vw" preload className="object-cover" style={{ objectPosition: focalPosition(data.image) }} />
         ) : (
           <ImagePlaceholder
             label={stripAccent(pick(data.placeholderLabel ?? data.subhead))}

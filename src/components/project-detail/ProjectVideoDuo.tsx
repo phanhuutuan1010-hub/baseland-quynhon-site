@@ -171,8 +171,16 @@ function VideoStoryCard({
     }
   }, [inView, projectSlug, video.topicSlug, index, lang]);
 
+  // No `src` until the card first reaches the viewport — preload="none"
+  // alone still lets some mobile browsers fetch metadata/bytes up front.
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- driven by IntersectionObserver
+    if (inView) setArmed(true);
+  }, [inView]);
+
   const shouldPlay =
-    inView && !reducedMotion && !userPaused && !!video.videoUrl;
+    armed && inView && !reducedMotion && !userPaused && !!video.videoUrl;
 
   useEffect(() => {
     const el = videoRef.current;
@@ -267,7 +275,7 @@ function VideoStoryCard({
             <>
               <video
                 ref={videoRef}
-                src={video.videoUrl}
+                src={armed ? video.videoUrl : undefined}
                 poster={video.posterUrl}
                 muted={muted}
                 loop
