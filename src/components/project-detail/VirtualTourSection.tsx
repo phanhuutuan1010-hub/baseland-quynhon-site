@@ -12,12 +12,16 @@ import { Accent } from "@/components/Accent";
 import { focalPosition } from "./imageFrame";
 
 /**
- * "Tham quan ảo 360°" — poster-first: nothing from the tour host loads
- * until the visitor clicks play (the tour is heavy WebGL + third-party
- * scripts, so it must not cost the page anything up front). The play
- * control is a real link to the tour, so mobile / no-embed / no-JS all
- * just open it in a new tab; only desktop with `allowEmbed` intercepts the
- * click and swaps the poster for the iframe in place.
+ * "Tham quan ảo 360°" — poster-first: the tour itself (≈6–7 MB of WebGL,
+ * images and third-party scripts on the developer's site) only loads when
+ * the visitor clicks play. To make that click feel fast:
+ *  - section ~1 screen away → a hidden iframe opens the connection to the
+ *    tour host (DNS+TCP+TLS done before the click);
+ *  - play opens the tour IN this page (desktop: in place; mobile: a
+ *    full-screen viewer), because browsers partition cache and connections
+ *    per top-level site — a new tab would start cold and waste the warm-up.
+ * The play control stays a real link, so `allowEmbed: false` / no-JS just
+ * open the tour in a new tab.
  */
 const secondaryBtn =
   "inline-flex cursor-pointer items-center rounded-xs border border-[var(--project-accent)] bg-transparent px-5 py-3 font-ui text-xs font-bold tracking-[0.08em] text-[var(--color-charcoal)] uppercase hover:bg-[rgba(var(--project-accent-rgb),0.15)]";
@@ -44,6 +48,9 @@ export function VirtualTourSection({
   const [modalOpen, setModalOpen] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  // Mobile full-screen viewer (the same tour iframe, fixed over the page).
+  const [overlay, setOverlay] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const onChange = () => setIsFullscreen(document.fullscreenElement === frameRef.current);
@@ -51,17 +58,63 @@ export function VirtualTourSection({
     return () => document.removeEventListener("fullscreenchange", onChange);
   }, []);
 
+  // Once the section is about a screen away, open the connection to the
+  // tour host from a hidden iframe (its robots.txt, a few KB). It has to be
+  // an iframe: Chrome keys sockets/cache by (page site, frame site), so a
+  // <link rel=preconnect> from this page lands in a different bucket and the
+  // tour iframe would still connect from scratch (measured).
+  const [warmSrc, setWarmSrc] = useState("");
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || !data.tourUrl || !data.allowEmbed) return;
+    let origin = "";
+    try {
+      origin = new URL(data.tourUrl).origin;
+    } catch {
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        setWarmSrc(`${origin}/robots.txt`);
+      },
+      { rootMargin: "100% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [data.tourUrl, data.allowEmbed]);
+
+  // Mobile viewer: lock page scroll; Esc / Android back close it.
+  useEffect(() => {
+    if (!overlay) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    history.pushState({ blTour: true }, "");
+    const onPop = () => setOverlay(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") history.back();
+    };
+    window.addEventListener("popstate", onPop);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [overlay]);
+
   const posterSrc = data.poster.src || fallbackImage;
   const leadSource = data.leadSource || `${projectSlug}-360`;
 
   function handlePlay(e: React.MouseEvent<HTMLAnchorElement>) {
     const desktop = window.matchMedia("(min-width: 768px) and (hover: hover)").matches;
-    const mode = data.allowEmbed && desktop ? "embed" : "new_tab";
+    const mode = !data.allowEmbed ? "new_tab" : desktop ? "embed" : "overlay";
     trackEvent("project_360_open", { project: projectSlug, mode, source: "section", language: lang });
-    if (mode === "embed") {
-      e.preventDefault();
-      setEmbedded(true);
-    }
+    if (mode === "new_tab") return;
+    e.preventDefault();
+    if (mode === "embed") setEmbedded(true);
+    else setOverlay(true);
   }
 
   function toggleFullscreen() {
@@ -76,6 +129,7 @@ export function VirtualTourSection({
 
   return (
     <section
+      ref={sectionRef}
       id={id}
       className={`bg-[var(--color-warm-white)] px-5 sm:px-8 md:px-12 ${compact ? "py-14 sm:py-16 md:py-20" : "py-16 sm:py-20 md:py-28"}`}
     >
@@ -186,6 +240,19 @@ export function VirtualTourSection({
         </div>
       </Reveal>
 
+      {warmSrc && <iframe src={warmSrc} hidden aria-hidden="true" tabIndex={-1} title="" className="hidden" />}
+
+      {overlay && (
+        <TourOverlay
+          url={data.tourUrl}
+          title={pick(data.eyebrow)}
+          closeLabel={pick({ vi: "Đóng", en: "Close" })}
+          newTabLabel={pick(data.newTabLabel)}
+          loadingLabel={pick({ vi: "Đang tải tour 360°…", en: "Loading the 360° tour…" })}
+          onClose={() => history.back()}
+        />
+      )}
+
       <LeadModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -194,5 +261,64 @@ export function VirtualTourSection({
         contextNote={pick(data.ctaNote) ? data.ctaNote : undefined}
       />
     </section>
+  );
+}
+
+/** Mobile full-screen 360° viewer: the tour iframe over the whole screen,
+ * with close + "open in new tab". Sized with 100dvh, not the Fullscreen API
+ * (iPhone Safari doesn't support element fullscreen for iframes). */
+function TourOverlay({
+  url,
+  title,
+  closeLabel,
+  newTabLabel,
+  loadingLabel,
+  onClose,
+}: {
+  url: string;
+  title: string;
+  closeLabel: string;
+  newTabLabel: string;
+  loadingLabel: string;
+  onClose: () => void;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div role="dialog" aria-modal="true" aria-label={title} className="fixed inset-0 z-[200] flex h-dvh flex-col bg-[var(--color-charcoal)]">
+      <div className="flex flex-none items-center justify-between gap-3 px-3 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] pb-2">
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-ui text-[12px] font-bold tracking-[0.08em] text-[var(--color-warm-white)] uppercase no-underline"
+        >
+          {newTabLabel} ↗
+        </a>
+        <button
+          type="button"
+          onClick={onClose}
+          className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-full border border-[rgba(250,247,242,0.5)] bg-transparent px-4 font-ui text-[12px] font-bold tracking-[0.08em] text-[var(--color-warm-white)] uppercase"
+        >
+          <span aria-hidden>✕</span>
+          {closeLabel}
+        </button>
+      </div>
+      <div className="relative min-h-0 flex-1 pb-[env(safe-area-inset-bottom,0px)]">
+        {!loaded && (
+          <div role="status" className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+            <span className="h-10 w-10 animate-spin rounded-full border-2 border-[rgba(250,247,242,0.3)] border-t-[var(--color-warm-white)]" />
+            <span className="font-ui text-xs font-bold tracking-[0.1em] text-[var(--color-warm-white)] uppercase">{loadingLabel}</span>
+          </div>
+        )}
+        <iframe
+          src={url}
+          title={title}
+          allow="fullscreen; gyroscope; accelerometer; magnetometer; xr-spatial-tracking"
+          allowFullScreen
+          onLoad={() => setLoaded(true)}
+          className={`absolute inset-0 h-full w-full border-0 transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        />
+      </div>
+    </div>
   );
 }

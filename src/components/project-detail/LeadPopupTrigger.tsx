@@ -26,7 +26,7 @@ function otherOverlayOpen(leadInView: boolean): boolean {
   if (leadInView) return true;
   if (document.fullscreenElement) return true;
   if (document.querySelector('[role="dialog"][aria-modal="true"]')) return true;
-  if (document.querySelector("#tour-360 iframe, #virtual-tour iframe")) return true;
+  if (document.querySelector("#tour-360 iframe:not([hidden]), #virtual-tour iframe:not([hidden])")) return true;
   if (document.activeElement?.closest("form")) return true;
   if (document.body.style.overflow === "hidden") return true;
   return false;
