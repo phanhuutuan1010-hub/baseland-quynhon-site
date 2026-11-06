@@ -6,6 +6,7 @@ import { useLang } from "@/lib/i18n";
 import { trackEvent } from "@/lib/analytics";
 import { markLeadSubmitted } from "@/lib/useLeadForm";
 import { getAttribution } from "@/lib/attribution";
+import { useZaloHref } from "@/components/QuickChatLink";
 import { popupKeys, storageSet } from "@/lib/leadPopupStorage";
 import type { ProjectLeadPopup } from "@/lib/project-detail/types";
 import type { PopupTrigger } from "./LeadPopupTrigger";
@@ -39,6 +40,9 @@ export default function LeadPopupDialog({
   onClose: (method: CloseMethod, submitted: boolean) => void;
 }) {
   const { pick, lang } = useLang();
+  // The CMS field only switches the Zalo button on; the number follows the
+  // visitor's ?ref= like every other contact link.
+  const zaloHref = useZaloHref();
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [honeypot, setHoneypot] = useState("");
@@ -172,8 +176,8 @@ export default function LeadPopupDialog({
               <a href={phoneHref} data-track="click_call" className={`${primaryBtn} flex-1`}>
                 {pick(data.callLabel)} · {hotline}
               </a>
-              {data.zaloUrl && (
-                <a href={data.zaloUrl} target="_blank" rel="noopener noreferrer" data-track="click_zalo" className={`${secondaryBtn} flex-1`}>
+              {data.zaloUrl && zaloHref && (
+                <a href={zaloHref} target="_blank" rel="noopener noreferrer" data-track="click_zalo" className={`${secondaryBtn} flex-1`}>
                   {pick(data.zaloLabel)}
                 </a>
               )}
