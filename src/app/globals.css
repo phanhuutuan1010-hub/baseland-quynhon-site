@@ -417,6 +417,50 @@ textarea {
   }
 }
 
+/* Project hero reveal (cssStep / cssScaleStep / cssLine in
+ * lib/useSequenceReveal.ts) — pure CSS so it runs from the first paint. */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hero-rise-solid {
+  from {
+    transform: translateY(20px);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes hero-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hero-line {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Key-phrase highlight for `[[phrase]]` content marks (see components/
  * Accent.tsx). Reuses the existing accent tokens — terracotta site-wide,
  * each project's own accent inside [data-project-theme]. Max 1–2 per

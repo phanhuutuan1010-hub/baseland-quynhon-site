@@ -71,3 +71,30 @@ export function lineRevealStyle(entered: boolean, delayMs: number, widthPx: numb
     transition: `width ${durationMs}ms var(--ease-editorial) ${delayMs}ms, opacity ${Math.round(durationMs * 0.6)}ms var(--ease-editorial) ${delayMs}ms`,
   } as const;
 }
+
+/* CSS-only variants (keyframes in globals.css): the staged reveal starts on
+ * the browser's first paint instead of after React hydration. Used by the
+ * project hero, whose headline is the mobile LCP element — a JS-gated
+ * opacity:0 kept it invisible (and LCP waiting) until the bundle had run,
+ * ~4 s on a throttled phone. Reduced motion is handled by the global rule. */
+
+/** Fade + rise, like stepStyle. `fade: false` = rise only, for the LCP
+ * headline: Chrome skips text first painted at opacity 0 as an LCP
+ * candidate, which left a tiny header label as the "largest" paint. */
+export function cssStep(delayMs: number, durationMs = 550, { fade = true }: { fade?: boolean } = {}) {
+  return { animation: `${fade ? "hero-rise" : "hero-rise-solid"} ${durationMs}ms var(--ease-editorial) ${delayMs}ms both` } as const;
+}
+
+/** Fade + scale, like stepScaleStyle. */
+export function cssScaleStep(delayMs: number, durationMs = 450) {
+  return { animation: `hero-scale ${durationMs}ms var(--ease-editorial) ${delayMs}ms both` } as const;
+}
+
+/** Growing accent line, like lineRevealStyle. */
+export function cssLine(delayMs: number, widthPx: number, durationMs = 500) {
+  return {
+    width: `${widthPx}px`,
+    transformOrigin: "left center",
+    animation: `hero-line ${durationMs}ms var(--ease-editorial) ${delayMs}ms both`,
+  } as const;
+}

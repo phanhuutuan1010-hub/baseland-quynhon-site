@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
-import { useSequenceReveal, stepStyle, stepScaleStyle, lineRevealStyle } from "@/lib/useSequenceReveal";
+import { cssStep, cssScaleStep, cssLine } from "@/lib/useSequenceReveal";
 import type { ProjectHero as ProjectHeroData } from "@/lib/project-detail/types";
 import type { Localized } from "@/lib/i18n";
 import { Accent } from "@/components/Accent";
@@ -33,7 +33,6 @@ export function ProjectHero({
   tourCta?: { label: Localized<string>; href: string };
 }) {
   const { pick } = useLang();
-  const entered = useSequenceReveal();
   // Compact layout: badge pill + one line of key figures instead of the
   // subhead, and two CTAs only (consult first, then the 360° tour).
   const compact = data.layout === "compact";
@@ -67,7 +66,7 @@ export function ProjectHero({
         className={`relative z-[2] mx-auto flex h-full max-w-[1440px] flex-col justify-end px-5 sm:px-8 sm:pb-16 md:px-12 md:pb-22 ${compact ? "pb-20" : "pb-12"}`}
       >
         {badge && (
-          <div style={stepStyle(entered, 150, 500)} className="mb-4.5">
+          <div style={cssStep(150, 500)} className="mb-4.5">
             <span className="inline-flex items-center gap-2 rounded-full bg-[var(--project-primary)] px-3.5 py-1.5 font-ui text-[11px] font-bold tracking-[0.1em] text-[var(--project-primary-foreground)] uppercase">
               <span aria-hidden className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--project-primary-foreground)]" />
               {badge}
@@ -76,23 +75,23 @@ export function ProjectHero({
         )}
         {!badge && pick(data.eyebrow) && (
           <div
-            style={stepStyle(entered, 150, 500)}
+            style={cssStep(150, 500)}
             className="mb-4.5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--color-sand)] uppercase"
           >
             {pick(data.eyebrow)}
           </div>
         )}
         <h1
-          style={stepStyle(entered, 300, 650)}
+          style={cssStep(300, 650, { fade: false })}
           className="m-0 mb-4.5 font-display text-[clamp(3rem,11vw,8.5rem)] leading-[0.95] font-normal tracking-[-0.02em] text-[var(--color-warm-white)]"
         >
           {name}
         </h1>
         {pick(data.addressLine) && (
           <div className="mb-6.5 flex flex-wrap items-center gap-4">
-            <span style={lineRevealStyle(entered, 650, 48)} className="block h-0.5 rounded-sm bg-[var(--project-accent-light)]" />
+            <span style={cssLine(650, 48)} className="block h-0.5 rounded-sm bg-[var(--project-accent-light)]" />
             <span
-              style={stepStyle(entered, 700, 500)}
+              style={cssStep(700, 500)}
               className="font-ui text-sm font-semibold tracking-[0.16em] text-[var(--color-warm-white)] uppercase"
             >
               {pick(data.addressLine)}
@@ -101,7 +100,7 @@ export function ProjectHero({
         )}
         {facts && (
           <p
-            style={stepStyle(entered, 850, 500)}
+            style={cssStep(850, 500)}
             className="m-0 mb-8 flex max-w-[760px] flex-wrap gap-x-3 gap-y-1.5 font-ui text-[15px] font-semibold tracking-[0.04em] text-[var(--color-warm-white)] sm:text-base"
           >
             {facts.split("·").map((f, i, all) => (
@@ -114,7 +113,7 @@ export function ProjectHero({
         )}
         {!facts && pick(data.subhead) && (
           <p
-            style={stepStyle(entered, 850, 500)}
+            style={cssStep(850, 500)}
             className="m-0 mb-9.5 max-w-[520px] font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-sand)]"
           >
             <Accent text={pick(data.subhead)} onDark />
@@ -122,7 +121,7 @@ export function ProjectHero({
         )}
         {(pick(data.ctaExploreLabel) || pick(data.ctaConsultLabel) || (tourCta && pick(tourCta.label))) && (
           <div
-            style={stepScaleStyle(entered, 1100)}
+            style={cssScaleStep(1100)}
             className={compact ? "grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:gap-4 [&>a]:justify-center [&>a]:gap-1.5 [&>a]:px-2 [&>a]:text-xs [&>a]:tracking-[0.04em] [&>a]:whitespace-nowrap sm:[&>a]:px-8 sm:[&>a]:text-[13px] sm:[&>a]:tracking-[0.08em]" : "flex flex-wrap gap-4"}
           >
             {showExplore && (
