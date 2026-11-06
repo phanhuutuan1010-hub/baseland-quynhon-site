@@ -28,6 +28,7 @@ import { SalesPhasesSection } from "./SalesPhasesSection";
 import { VirtualTourSection } from "./VirtualTourSection";
 import { ProjectAnchorNav } from "./ProjectAnchorNav";
 import { AdNoticeBar } from "./AdNoticeBar";
+import { HashScroll } from "./HashScroll";
 import { ProjectWhy } from "./ProjectWhy";
 import { VerifyTrustSection } from "./VerifyTrustSection";
 
@@ -211,17 +212,20 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
 
       {show("towers") && towers && hasReasons && <ProjectWhy id="ly-do" data={towers} />}
       {show("towers") && towers && !hasReasons && hasTowerPair && <ProjectTowerSplit id="ly-do" data={towers} />}
+      {!(show("towers") && towers && (hasReasons || hasTowerPair)) && <EmptyAnchor id="ly-do" />}
 
-      {showLocation && location && <ProjectLocation id="vi-tri" data={location} compact destinations={project.gallery} />}
+      {showLocation && location ? <ProjectLocation id="vi-tri" data={location} compact destinations={project.gallery} /> : <EmptyAnchor id="vi-tri" />}
 
-      {showArchitecture && architecture && <ProjectPhotoStatement id="kien-truc" data={architecture} variant="compact" />}
+      {showArchitecture && architecture ? <ProjectPhotoStatement id="kien-truc" data={architecture} variant="compact" /> : <EmptyAnchor id="kien-truc" />}
       {show("education") && project.education && (
         <ProjectPhotoStatement id="education" data={project.education} variant="compact" />
       )}
 
       {show("masterplan") && project.masterplan && <ProjectMasterplan id="masterplan" data={project.masterplan} />}
-      {showResidences && residences && (
+      {showResidences && residences ? (
         <ResidenceSelector id="can-ho" data={residences} compact floorPlans={project.floorPlans} />
+      ) : (
+        <EmptyAnchor id="can-ho" />
       )}
 
       {showTour && project.virtualTour && (
@@ -235,9 +239,11 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
         />
       )}
 
-      {showAmenities && amenities && <AmenitySection id="tien-ich" data={amenities} compact />}
+      {!showTour && <EmptyAnchor id="tour-360" />}
 
-      {showVideo && videoDuo && <ProjectVideoDuo id="nen-biet" data={videoDuo} projectSlug={project.slug} compact />}
+      {showAmenities && amenities ? <AmenitySection id="tien-ich" data={amenities} compact /> : <EmptyAnchor id="tien-ich" />}
+
+      {showVideo && videoDuo ? <ProjectVideoDuo id="nen-biet" data={videoDuo} projectSlug={project.slug} compact /> : <EmptyAnchor id="nen-biet" />}
 
       <InvestmentSection
         id="gia"
@@ -255,6 +261,7 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
           projectSlug={project.slug}
         />
       )}
+      {!(showDocuments || showLegal) && <EmptyAnchor id="kiem-chung" />}
       {show("verification") && project.verification && !!project.verification.items.length && (
         <ProjectVerificationNote id="verification" data={project.verification} />
       )}
@@ -263,9 +270,17 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
 
       <ProjectCTA id="lead" data={project.cta} />
 
+      <HashScroll />
       {extras}
     </div>
   );
+}
+
+/** Zero-height stand-in for a section this project doesn't show, so every
+ * stable id (deep links from ads) exists exactly once and lands on the next
+ * section in order instead of nowhere. */
+function EmptyAnchor({ id }: { id: string }) {
+  return <div id={id} aria-hidden="true" className="scroll-mt-[104px] md:scroll-mt-[120px]" />;
 }
 
 function pickAny(v?: { vi: string; en: string }) {
