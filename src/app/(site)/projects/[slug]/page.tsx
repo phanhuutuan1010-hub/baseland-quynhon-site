@@ -3,10 +3,9 @@ import { notFound } from "next/navigation";
 import { getPublishedProjectBySlug, getPublishedProjectSlugs } from "@/lib/server/mappers/project";
 import { ProjectPage } from "@/components/project-detail/ProjectPage";
 import { ProjectNav } from "@/components/project-detail/ProjectNav";
-import { QterraQuickBar } from "@/components/project-detail/QterraQuickBar";
+import { ProjectCallBar } from "@/components/project-detail/ProjectCallBar";
 import { LeadPopupTrigger } from "@/components/project-detail/LeadPopupTrigger";
 import { ProjectContactProvider } from "@/components/project-detail/ProjectContact";
-import { QTERRA_LAUNCH } from "@/lib/content/qterraLaunch";
 import { isSectionVisible } from "@/lib/project-detail/types";
 import { getSiteChromeData } from "@/lib/server/mappers/siteChrome";
 import { toJsonLdString } from "@/lib/jsonLd";
@@ -45,7 +44,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
 
   const extras = (
     <>
-      {project.slug === QTERRA_LAUNCH.slug && <QterraQuickBar />}
+      <ProjectCallBar projectSlug={project.slug} />
       {isSectionVisible(project, "leadPopup") && project.leadPopup && (
         <LeadPopupTrigger
           data={project.leadPopup}

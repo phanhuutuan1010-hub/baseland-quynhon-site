@@ -38,6 +38,13 @@ export function useQuickChat() {
   return { channel, href, track: () => trackEvent("quick_chat_click", { channel, page }) };
 }
 
+/** `https://zalo.me/<number>` (Settings → Liên hệ), language-independent;
+ * `null` when no number is configured. */
+export function useZaloHref() {
+  const { quickChat } = useContext(QuickChatContext);
+  return quickChat.zalo ? `https://zalo.me/${quickChat.zalo}` : null;
+}
+
 /** Sticky-bar button. `label` overrides the default "Tư vấn nhanh / Quick chat". */
 export function QuickChatLink({ className, label }: { className: string; label?: { vi: string; en: string } }) {
   const { pick } = useLang();

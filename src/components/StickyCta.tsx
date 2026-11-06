@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { QTERRA_LAUNCH } from "@/lib/content/qterraLaunch";
 import { useLang } from "@/lib/i18n";
 import type { SiteChromeData } from "@/lib/siteChrome";
 import { QuickChatLink } from "@/components/QuickChatLink";
@@ -11,8 +10,8 @@ import { QuickChatLink } from "@/components/QuickChatLink";
  * / ct-sticky-mobile treatment, applied site-wide rather than only on Contact. */
 export function StickyCta({ data }: { data: SiteChromeData }) {
   const { pick } = useLang();
-  // Q'Terra renders its own mobile bottom bar (QterraQuickBar).
-  const hideMobileBar = usePathname()?.replace(/\/$/, "") === QTERRA_LAUNCH.path;
+  // Project detail pages render their own mobile call bar (ProjectCallBar).
+  const hideMobileBar = /^\/projects\/[^/]+\/?$/.test(usePathname() ?? "");
 
   return (
     <>
