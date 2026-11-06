@@ -5,9 +5,9 @@ import type { SiteMetaSettings } from "@/lib/server/mappers/siteChrome";
 // fills in an ID in Cài đặt > Analytics and it goes live on next request,
 // no deploy needed. Scripts load after the page is interactive so they
 // never block first paint.
-export function Analytics({ gaId, gtmId, metaPixelId: settingsPixelId }: Pick<SiteMetaSettings, "gaId" | "gtmId" | "metaPixelId">) {
-  // Env (Vercel) wins; the Admin field remains a fallback. No ID → no script.
-  const metaPixelId = sanitizeId(process.env.NEXT_PUBLIC_META_PIXEL_ID) || sanitizeId(settingsPixelId);
+export function Analytics({ gaId, gtmId }: Pick<SiteMetaSettings, "gaId" | "gtmId">) {
+  // Meta Pixel ID comes only from the Vercel env var; unset → no pixel script.
+  const metaPixelId = sanitizeId(process.env.NEXT_PUBLIC_META_PIXEL_ID);
   const zaloPixelId = sanitizeId(process.env.NEXT_PUBLIC_ZALO_PIXEL_ID);
   return (
     <>

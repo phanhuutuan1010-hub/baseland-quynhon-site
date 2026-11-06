@@ -19,7 +19,7 @@ export function AnalyticsSettingsForm({ initial }: { initial: AnalyticsSettingsV
         </p>
         <AdminTextField label="Google Analytics ID (vd G-XXXXXXX)" value={value.gaId} onChange={set("gaId")} />
         <AdminTextField label="Google Tag Manager ID (vd GTM-XXXXXXX)" value={value.gtmId} onChange={set("gtmId")} />
-        <AdminTextField label="Meta Pixel ID" value={value.metaPixelId} onChange={set("metaPixelId")} />
+        <AdminTextField label="Meta Pixel ID — KHÔNG còn dùng: đặt NEXT_PUBLIC_META_PIXEL_ID trên Vercel" value={value.metaPixelId} onChange={set("metaPixelId")} />
       </div>
       <SaveBar onSave={() => updateAnalyticsSettings(value)} />
     </div>

@@ -119,7 +119,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           dangerouslySetInnerHTML={{ __html: toJsonLdString(organizationSchema) }}
         />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLdString(websiteSchema) }} />
-        <Analytics gaId={meta.gaId} gtmId={meta.gtmId} metaPixelId={meta.metaPixelId} />
+        <Analytics gaId={meta.gaId} gtmId={meta.gtmId} />
         <LanguageProvider>
           <SiteContactProvider
             defaults={{ phone: chrome.contactPhone, phoneHref: chrome.contactPhoneHref, zalo: chrome.quickChat.zalo }}
