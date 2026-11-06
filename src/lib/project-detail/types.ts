@@ -769,22 +769,22 @@ export function getCompactAnchorItems(project: ProjectDetailData): ProjectNavIte
   const items: ProjectNavItem[] = [];
   const towers = project.towers;
   if (isSectionVisible(project, "towers") && (towers?.reasons?.length || towers?.towers?.length === 2)) {
-    items.push({ href: "#overview", label: navLabelOf(towers) });
+    items.push({ href: "#ly-do", label: navLabelOf(towers) });
   }
   if (isSectionVisible(project, "location") && project.location) {
-    items.push({ href: "#location", label: navLabelOf(project.location) });
+    items.push({ href: "#vi-tri", label: navLabelOf(project.location) });
   }
   if (isSectionVisible(project, "residences") && project.residences?.items.length) {
-    items.push({ href: "#residences", label: navLabelOf(project.residences) });
+    items.push({ href: "#can-ho", label: navLabelOf(project.residences) });
   } else if (isSectionVisible(project, "masterplan") && project.masterplan) {
     items.push({ href: "#masterplan", label: navLabelOf(project.masterplan) });
   }
   if (isSectionVisible(project, "amenities") && project.amenities?.chapters.length) {
-    items.push({ href: "#amenities", label: navLabelOf(project.amenities) });
+    items.push({ href: "#tien-ich", label: navLabelOf(project.amenities) });
   }
   // The price block is always rendered (at least its "Nhận bảng giá" CTA).
   const investment = isSectionVisible(project, "investment") ? project.investment : undefined;
-  items.push({ href: "#investment", label: investment ? navLabelOf(investment) : { vi: "Giá", en: "Pricing" } });
+  items.push({ href: "#gia", label: investment ? navLabelOf(investment) : { vi: "Giá", en: "Pricing" } });
   return items;
 }
 

@@ -160,6 +160,10 @@ export function ProjectPage({
  * Order: Hero → Vì sao → Vị trí → Kiến trúc → Chọn căn → 360° → Tiện ích →
  * Video → Giá & lộ trình → Kiểm chứng & Base Land → Form.
  *
+ * Section ids are stable deep-link targets (ads, Zalo messages link to
+ * e.g. /projects/qterra#gia) — don't rename: ly-do, vi-tri, kien-truc,
+ * can-ho, tour-360, tien-ich, nen-biet, gia, kiem-chung, lead.
+ *
  * Per-project differences come only from the theme and project modules,
  * placed in the matching slot:
  *   Vì sao   — towers.reasons cards, else the two-tower split (Simona's
@@ -200,29 +204,29 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
         id={project.slug}
         name={project.name}
         data={{ ...project.hero, layout: "compact", facts: heroFacts(project) }}
-        tourCta={showTour && project.virtualTour ? { label: project.virtualTour.heroCtaLabel, href: "#virtual-tour" } : undefined}
+        tourCta={showTour && project.virtualTour ? { label: project.virtualTour.heroCtaLabel, href: "#tour-360" } : undefined}
       />
       <AdNoticeBar text={project.salesPhases?.adNoticeText} ctaLabel={project.salesPhases?.adNoticeCtaLabel} />
       <ProjectAnchorNav items={anchors} />
 
-      {show("towers") && towers && hasReasons && <ProjectWhy id="overview" data={towers} />}
-      {show("towers") && towers && !hasReasons && hasTowerPair && <ProjectTowerSplit id="overview" data={towers} />}
+      {show("towers") && towers && hasReasons && <ProjectWhy id="ly-do" data={towers} />}
+      {show("towers") && towers && !hasReasons && hasTowerPair && <ProjectTowerSplit id="ly-do" data={towers} />}
 
-      {showLocation && location && <ProjectLocation id="location" data={location} compact destinations={project.gallery} />}
+      {showLocation && location && <ProjectLocation id="vi-tri" data={location} compact destinations={project.gallery} />}
 
-      {showArchitecture && architecture && <ProjectPhotoStatement id="architecture" data={architecture} variant="compact" />}
+      {showArchitecture && architecture && <ProjectPhotoStatement id="kien-truc" data={architecture} variant="compact" />}
       {show("education") && project.education && (
         <ProjectPhotoStatement id="education" data={project.education} variant="compact" />
       )}
 
       {show("masterplan") && project.masterplan && <ProjectMasterplan id="masterplan" data={project.masterplan} />}
       {showResidences && residences && (
-        <ResidenceSelector id="residences" data={residences} compact floorPlans={project.floorPlans} />
+        <ResidenceSelector id="can-ho" data={residences} compact floorPlans={project.floorPlans} />
       )}
 
       {showTour && project.virtualTour && (
         <VirtualTourSection
-          id="virtual-tour"
+          id="tour-360"
           compact
           data={project.virtualTour}
           projectSlug={project.slug}
@@ -231,12 +235,12 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
         />
       )}
 
-      {showAmenities && amenities && <AmenitySection id="amenities" data={amenities} compact />}
+      {showAmenities && amenities && <AmenitySection id="tien-ich" data={amenities} compact />}
 
-      {showVideo && videoDuo && <ProjectVideoDuo id="video-stories" data={videoDuo} projectSlug={project.slug} compact />}
+      {showVideo && videoDuo && <ProjectVideoDuo id="nen-biet" data={videoDuo} projectSlug={project.slug} compact />}
 
       <InvestmentSection
-        id="investment"
+        id="gia"
         data={show("investment") ? project.investment : undefined}
         compact
         salesPhases={project.salesPhases}
@@ -244,7 +248,7 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
 
       {(showDocuments || showLegal) && (
         <VerifyTrustSection
-          id="documents"
+          id="kiem-chung"
           documents={showDocuments ? documents : undefined}
           legal={showLegal ? legal : undefined}
           tourUrl={project.virtualTour?.tourUrl}
