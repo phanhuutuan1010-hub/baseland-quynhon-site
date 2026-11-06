@@ -3,20 +3,25 @@
  * shared the link) and `utm_*` params (which ad brought the visitor). Both
  * are kept in localStorage for 30 days so a visitor who comes back later
  * still sees the same phone number and their lead is still attributed.
+ * - ref: the latest ?ref= wins (the person who last shared the link).
+ * - utm: FIRST touch — stored once, never overwritten while it is valid, so
+ *   the ad that first brought the visitor keeps the credit. A lead form
+ *   still sends the current URL's utm when it has one, else the stored one.
  * Every storage access is wrapped — private mode / blocked storage just
  * means attribution lasts for this page view only.
  */
 const REF_KEY = "bl_ref";
 const UTM_KEY = "bl_utm";
 const TTL_MS = 30 * 86_400_000;
-const UTM_PARAMS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
+const UTM_PARAMS = ["utm_source", "utm_medium", "utm_campaign", "utm_content"] as const;
 
 export type Utm = Partial<Record<(typeof UTM_PARAMS)[number], string>>;
 export type Attribution = { ref: string; utm: Utm };
 
 type Stored<T> = { value: T; expires: number };
 
-let memory: Attribution = { ref: "", utm: {} };
+// In-memory copy too, for when localStorage is unavailable.
+let memory: Attribution & { firstUtm?: Utm } = { ref: "", utm: {} };
 
 function read<T>(key: string): T | null {
   try {
@@ -45,8 +50,9 @@ export function normalizeRef(raw: string | null | undefined) {
   return /^[a-z0-9_-]{1,40}$/.test(v) ? v : "";
 }
 
-/** Reads ?ref= / utm_* from the current URL (a new value replaces the stored
- * one and restarts the 30 days), then returns the effective attribution. */
+/** Reads ?ref= / utm_* from the current URL, stores them (ref: replaces;
+ * utm: only when nothing is stored yet), then returns the attribution for
+ * a lead: current URL's utm if any, else the stored first-touch utm. */
 export function captureAttribution(): Attribution {
   if (typeof window === "undefined") return memory;
   const params = new URLSearchParams(window.location.search);
@@ -59,13 +65,24 @@ export function captureAttribution(): Attribution {
     const v = params.get(key)?.trim();
     if (v) urlUtm[key] = v.slice(0, 100);
   }
-  if (Object.keys(urlUtm).length) write(UTM_KEY, urlUtm);
+  const hasUrlUtm = Object.keys(urlUtm).length > 0;
+  const storedUtm = read<Utm>(UTM_KEY);
+  if (hasUrlUtm && !storedUtm) write(UTM_KEY, urlUtm);
 
   memory = {
     ref: urlRef || read<string>(REF_KEY) || memory.ref,
-    utm: Object.keys(urlUtm).length ? urlUtm : read<Utm>(UTM_KEY) || memory.utm,
+    utm: hasUrlUtm ? urlUtm : storedUtm || memory.utm,
+    firstUtm: storedUtm || memory.firstUtm || (hasUrlUtm ? urlUtm : undefined),
   };
-  return memory;
+  return { ref: memory.ref, utm: memory.utm };
+}
+
+/** First-touch utm_source / utm_content for Pixel event params ("" when
+ * none) — splits FB vs Zalo visitors in Events Manager. */
+export function pixelUtmParams() {
+  captureAttribution();
+  const utm = memory.firstUtm ?? memory.utm;
+  return { utm_source: utm.utm_source ?? "", utm_content: utm.utm_content ?? "" };
 }
 
 /** Attribution to send with a lead form (hidden fields). */
