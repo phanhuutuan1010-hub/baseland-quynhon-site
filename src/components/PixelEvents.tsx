@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { pixelTrack, pixelTrackCustom } from "@/lib/pixel";
 import { useSiteContact } from "@/components/SiteContact";
+import { pixelUtmParams } from "@/lib/attribution";
 
 /** Where on the page a button sits: its data-track-pos, else the nearest
  * section/element id, else header/footer. */
@@ -38,7 +39,7 @@ export function PixelEvents() {
       const a = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>("a[href]");
       if (!a) return;
       const href = a.getAttribute("href") ?? "";
-      const params = { ref: ref || "none", vi_tri_nut: buttonPosition(a) };
+      const params = { ref: ref || "none", vi_tri_nut: buttonPosition(a), ...pixelUtmParams() };
       if (href.startsWith("tel:")) pixelTrack("Contact", params);
       else if (/^https?:\/\/(www\.)?zalo\.me\//.test(href)) pixelTrackCustom("ClickZalo", params);
     };
