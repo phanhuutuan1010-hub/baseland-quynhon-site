@@ -64,6 +64,7 @@ function assembleProjectDetailData(row: ProjectRow): ProjectDetailData {
     const key = SECTION_TYPE_TO_KEY[section.type];
     (data as unknown as Record<string, unknown>)[key] = section.content;
   }
+  if (data.videoDuo) data.videoDuo = withoutAdvisors(data.videoDuo);
   if (row.residences) data.residences = row.residences.content as ProjectDetailData["residences"];
   if (row.floorPlans) data.floorPlans = row.floorPlans.content as ProjectDetailData["floorPlans"];
   if (row.amenities) data.amenities = row.amenities.content as ProjectDetailData["amenities"];
@@ -158,3 +159,14 @@ export const getProjectsPageHeroImage = cache(async (): Promise<ProjectCardImage
   if (!src) return null;
   return attachImageMeta({ src, alt: { vi: "Biển và thành phố Quy Nhơn", en: "Quy Nhon's sea and city" } } as ProjectCardImage);
 });
+
+/** Per-video "advisor" numbers are no longer shown (every call button uses
+ * the hotline or the visitor's ?ref= number), so they're dropped before the
+ * data reaches the page — otherwise old numbers would still ship in the
+ * HTML/RSC payload. */
+function withoutAdvisors(v: NonNullable<ProjectDetailData["videoDuo"]>): NonNullable<ProjectDetailData["videoDuo"]> {
+  const rest = { ...v };
+  delete rest.primaryAdvisor;
+  delete rest.secondaryAdvisor;
+  return { ...rest, items: rest.items.map((item) => ({ ...item, advisor: undefined })) };
+}
