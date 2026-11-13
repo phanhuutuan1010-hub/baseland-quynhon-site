@@ -330,7 +330,9 @@ export default function VideoCallPopupDialog({
               </button>
             </form>
 
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            {/* Desktop only — on mobile the call bar right under the sheet
+                already has the same "Gọi ngay" + "Zalo" buttons. */}
+            <div className="mt-2 hidden grid-cols-2 gap-2 md:grid">
               <a href={telHref} data-track="click_call" className={secondaryBtn}>
                 <PhoneIcon className="hidden h-4 w-4 flex-none min-[380px]:block" />
                 <span>
