@@ -18,10 +18,10 @@ type CloseMethod = "button" | "esc" | "backdrop";
 export const VIDEO_CALL_LEAD_SOURCE = "popup_videocall";
 
 const primaryBtn =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-xs border border-[var(--project-primary)] bg-[var(--project-primary)] px-5 py-3 text-center font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase no-underline hover:bg-[var(--project-primary-dark)] disabled:opacity-70";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-xs border border-[var(--project-primary)] bg-[var(--project-primary)] px-5 py-2.5 text-center font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase no-underline hover:bg-[var(--project-primary-dark)] disabled:opacity-70";
 const secondaryBtn =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-xs border border-[var(--project-primary)] bg-transparent px-3 py-2.5 text-center font-ui text-[12px] font-bold tracking-[0.06em] text-[var(--project-primary-text)] uppercase no-underline hover:bg-[rgba(var(--project-primary-rgb),0.08)]";
-const fieldLabel = "font-ui text-[11px] font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase";
+  "inline-flex min-h-10 flex-wrap items-center justify-center gap-x-1.5 rounded-xs border border-[var(--project-primary)] bg-transparent px-2 py-2 text-center font-ui text-[11.5px] leading-[1.3] font-bold tracking-[0.04em] text-[var(--project-primary-text)] uppercase no-underline hover:bg-[rgba(var(--project-primary-rgb),0.08)]";
+const fieldLabel = "font-ui text-[10.5px] font-semibold tracking-[0.05em] text-[var(--color-text-muted)] uppercase";
 
 /** 10-digit VN number starting with 0 (+84 accepted), else null. */
 function normalizeZalo(raw: string) {
@@ -58,7 +58,8 @@ function useKeyboardInset() {
 
 /**
  * The video-call pop-up — loaded on demand by VideoCallPopupTrigger.
- * Mobile (<768px): bottom sheet (max 60vh) sitting ABOVE the fixed call bar,
+ * Mobile (<768px): bottom sheet (60vh, up to 520px on short phones so the
+ * form fits without scrolling) sitting ABOVE the fixed call bar,
  * which stays visible and clickable. Desktop: 480px centered modal.
  */
 export default function VideoCallPopupDialog({
@@ -199,13 +200,13 @@ export default function VideoCallPopupDialog({
         tabIndex={-1}
         data-track-pos="popup"
         onClick={(e) => e.stopPropagation()}
-        className="relative max-h-[60vh] w-full overflow-x-hidden overflow-y-auto overscroll-contain rounded-t-lg bg-[var(--color-warm-white)] px-4 pt-5 pb-4 shadow-[var(--shadow-lg)] outline-none motion-safe:animate-[rise-in_350ms_var(--ease-editorial)] min-[380px]:px-5 md:max-h-[90vh] md:max-w-[480px] md:rounded-sm md:px-8 md:pt-8 md:pb-7"
+        className="relative max-h-[min(max(60vh,520px),calc(100dvh-150px))] w-full overflow-x-hidden overflow-y-auto overscroll-contain rounded-t-lg bg-[var(--color-warm-white)] px-4 pt-4 pb-3 shadow-[var(--shadow-lg)] outline-none motion-safe:animate-[rise-in_350ms_var(--ease-editorial)] min-[380px]:px-5 md:max-h-[90vh] md:max-w-[480px] md:rounded-sm md:px-7 md:pt-6 md:pb-6"
       >
         <button
           type="button"
           onClick={() => close("button")}
           aria-label={pick(data.closeLabel)}
-          className="absolute top-1.5 right-1.5 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[28px] leading-none text-[var(--color-charcoal)] hover:bg-[rgba(38,34,32,0.08)]"
+          className="absolute top-1 right-1 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[28px] leading-none text-[var(--color-charcoal)] hover:bg-[rgba(38,34,32,0.08)]"
         >
           ×
         </button>
@@ -229,23 +230,23 @@ export default function VideoCallPopupDialog({
           <>
             <h2
               id="videocall-popup-title"
-              className="m-0 mb-2 pr-10 font-display text-[20px] leading-[1.25] font-normal text-[var(--color-charcoal)] md:text-[length:var(--fs-h3)] md:leading-[var(--lh-heading)]"
+              className="m-0 mb-1 pr-9 font-display text-[19px] leading-[1.2] font-normal text-[var(--color-charcoal)] md:text-[24px]"
             >
               {pick(data.title)}
             </h2>
-            <p id="videocall-popup-desc" className="m-0 mb-4 font-body text-[15px] leading-[1.45] font-semibold text-[var(--project-accent-dark)]">
+            <p id="videocall-popup-desc" className="m-0 mb-3 font-body text-[14px] leading-[1.4] font-semibold text-[var(--project-accent-dark)]">
               {pick(subtitle)}
             </p>
 
             {data.checklist.length > 0 && (
-              <div className="mb-4">
-                <p className="m-0 mb-2 font-ui text-[12px] font-bold tracking-[0.04em] text-[var(--color-charcoal)]">{pick(data.checklistTitle)}</p>
-                <ol className="m-0 flex list-none flex-col gap-1.5 p-0">
+              <div className="mb-3">
+                <p className="m-0 mb-1.5 font-ui text-[11.5px] font-bold tracking-[0.04em] text-[var(--color-charcoal)]">{pick(data.checklistTitle)}</p>
+                <ol className="m-0 flex list-none flex-col gap-1 p-0">
                   {data.checklist.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2.5 font-body text-[14px] leading-[1.4] text-[var(--color-charcoal)]">
+                    <li key={i} className="flex items-start gap-2 font-body text-[13.5px] leading-[1.35] text-[var(--color-charcoal)]">
                       <span
                         aria-hidden
-                        className="mt-px flex h-5 w-5 flex-none items-center justify-center rounded-full bg-[var(--project-primary)] font-ui text-[11px] font-bold text-[var(--project-primary-foreground)]"
+                        className="mt-px flex h-4.5 w-4.5 flex-none items-center justify-center rounded-full bg-[var(--project-primary)] font-ui text-[10px] font-bold text-[var(--project-primary-foreground)]"
                       >
                         {i + 1}
                       </span>
@@ -257,15 +258,15 @@ export default function VideoCallPopupDialog({
             )}
 
             {advisor.name && (
-              <div className="mb-4 flex items-center gap-3 rounded-xs bg-[rgba(var(--project-primary-rgb),0.06)] px-3 py-2.5">
+              <div className="mb-3 flex items-center gap-2.5">
                 {advisor.avatar && (
                   // eslint-disable-next-line @next/next/no-img-element -- small avatar from any Media/Blob URL
-                  <img src={advisor.avatar} alt="" width={44} height={44} className="h-11 w-11 flex-none rounded-full object-cover" />
+                  <img src={advisor.avatar} alt="" width={32} height={32} className="h-8 w-8 flex-none rounded-full object-cover" />
                 )}
-                <div className="min-w-0">
-                  <p className="m-0 font-ui text-[14px] font-bold text-[var(--color-charcoal)]">{advisor.name}</p>
-                  {advisor.title && <p className="m-0 font-body text-[13px] text-[var(--color-text-muted)]">{advisor.title}</p>}
-                </div>
+                <p className="m-0 font-body text-[13px] leading-[1.35] text-[var(--color-text-muted)]">
+                  <span className="font-ui font-bold text-[var(--color-charcoal)]">{advisor.name}</span>
+                  {advisor.title && <> · {advisor.title}</>}
+                </p>
               </div>
             )}
 
@@ -275,8 +276,9 @@ export default function VideoCallPopupDialog({
               </div>
             )}
 
-            <form onSubmit={submit} noValidate className="flex flex-col gap-3">
-              <label className="flex flex-col gap-1.5">
+            <form onSubmit={submit} noValidate className="flex flex-col gap-2.5">
+              <div className="grid grid-cols-[1.25fr_1fr] gap-2">
+              <label className="flex min-w-0 flex-col gap-1">
                 <span className={fieldLabel}>{pick(data.phoneLabel)} *</span>
                 <input
                   type="tel"
@@ -290,18 +292,13 @@ export default function VideoCallPopupDialog({
                   onBlur={onFieldBlur}
                   aria-invalid={phoneInvalid || undefined}
                   aria-describedby={phoneInvalid ? "videocall-phone-err" : undefined}
-                  className={`w-full rounded-xs border bg-[var(--color-warm-white)] px-3.5 py-3 text-[16px] text-[var(--color-charcoal)] ${
+                  className={`w-full min-w-0 rounded-xs border bg-[var(--color-warm-white)] px-3 py-2.5 text-[16px] text-[var(--color-charcoal)] ${
                     phoneInvalid ? "border-[var(--color-error)]" : "border-[var(--color-border)]"
                   }`}
                 />
-                {phoneInvalid && (
-                  <span id="videocall-phone-err" className="font-body text-[13px] text-[var(--color-error)]">
-                    {pick(data.phoneError)}
-                  </span>
-                )}
               </label>
 
-              <label className="flex flex-col gap-1.5">
+              <label className="flex min-w-0 flex-col gap-1">
                 <span className={fieldLabel}>{pick(data.nameLabel)}</span>
                 <input
                   type="text"
@@ -310,9 +307,15 @@ export default function VideoCallPopupDialog({
                   onChange={(e) => setName(e.target.value)}
                   onFocus={onFieldFocus}
                   onBlur={onFieldBlur}
-                  className="w-full rounded-xs border border-[var(--color-border)] bg-[var(--color-warm-white)] px-3.5 py-3 text-[16px] text-[var(--color-charcoal)]"
+                  className="w-full min-w-0 rounded-xs border border-[var(--color-border)] bg-[var(--color-warm-white)] px-3 py-2.5 text-[16px] text-[var(--color-charcoal)]"
                 />
               </label>
+              </div>
+              {phoneInvalid && (
+                <span id="videocall-phone-err" className="-mt-1 font-body text-[13px] text-[var(--color-error)]">
+                  {pick(data.phoneError)}
+                </span>
+              )}
 
               {/* Honeypot — hidden from people and assistive tech */}
               <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
@@ -327,16 +330,16 @@ export default function VideoCallPopupDialog({
               </button>
             </form>
 
-            <div className="mt-2.5 grid grid-cols-2 gap-2">
+            <div className="mt-2 grid grid-cols-2 gap-2">
               <a href={telHref} data-track="click_call" className={secondaryBtn}>
-                <PhoneIcon className="h-4 w-4 flex-none" />
+                <PhoneIcon className="hidden h-4 w-4 flex-none min-[380px]:block" />
                 <span>
                   {pick(data.callLabel)} <span className="whitespace-nowrap">{contact.phone}</span>
                 </span>
               </a>
               {zaloHref && (
                 <a href={zaloHref} target="_blank" rel="noopener noreferrer" data-track="click_zalo" className={secondaryBtn}>
-                  <ChatIcon className="h-4 w-4 flex-none" />
+                  <ChatIcon className="hidden h-4 w-4 flex-none min-[380px]:block" />
                   {pick(data.zaloLabel)}
                 </a>
               )}
