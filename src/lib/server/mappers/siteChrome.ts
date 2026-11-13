@@ -100,7 +100,7 @@ const digits = (v: string | null | undefined) => (v ?? "").replace(/\D/g, "");
 
 /** "Q'Terra Quy Nhơn" from the SEO title ("Q'Terra Quy Nhơn | …") when set,
  * else the stored name; all-caps names ("Q'TERRA QUY NHƠN") are title-cased. */
-function projectDisplayName(p: { name: string; seoTitle: string | null }) {
+export function projectDisplayName(p: { name: string; seoTitle: string | null }) {
   const raw = (p.seoTitle?.split("|")[0] || p.name).trim();
   if (raw !== raw.toUpperCase()) return raw;
   return raw.toLowerCase().replace(/(^|[\s'-])(\p{L})/gu, (_, sep: string, ch: string) => sep + ch.toUpperCase());

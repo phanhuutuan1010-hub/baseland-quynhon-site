@@ -3,6 +3,8 @@ import { Resend } from "resend";
 import { prisma } from "@/lib/server/db";
 import { resolveProjectIdFromSource } from "@/lib/server/leadProject";
 import { isRateLimited } from "@/lib/server/rateLimit";
+import { notifyTelegramLead } from "@/lib/server/telegram";
+import { projectDisplayName } from "@/lib/server/mappers/siteChrome";
 import { LEAD_QUALIFIER_KEYS, type LeadQualifierKey } from "@/lib/project-detail/types";
 
 export const runtime = "nodejs";
@@ -69,6 +71,17 @@ function readRef(v: unknown): string | null {
 
 function readSlug(v: unknown): string | null {
   return isNonEmptyString(v) && /^[a-z0-9-]{1,80}$/.test(v.trim()) ? v.trim() : null;
+}
+
+/** Absolute http(s) URL of the page the form was sent from (capped). */
+function readPage(v: unknown): string | null {
+  if (!isNonEmptyString(v)) return null;
+  try {
+    const url = new URL(v.trim());
+    return url.protocol === "https:" || url.protocol === "http:" ? url.toString().slice(0, 500) : null;
+  } catch {
+    return null;
+  }
 }
 
 function digitsOnly(v: string) {
@@ -151,43 +164,64 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "save_failed" }, { status: 500 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn("[api/lead] RESEND_API_KEY is not configured — lead saved, but no email sent.", { name, source });
-    return NextResponse.json({ ok: true });
-  }
-
-  const resend = new Resend(apiKey);
-  const subject = `Yêu cầu tư vấn mới — ${name}${need ? ` (${need})` : ""}`;
-  const html = `
-    <h2>Yêu cầu tư vấn mới — Base Land Quy Nhơn</h2>
-    <table cellpadding="6" cellspacing="0" style="border-collapse:collapse">
-      <tr><td><strong>Họ tên</strong></td><td>${escapeHtml(name)}</td></tr>
-      <tr><td><strong>Điện thoại</strong></td><td>${escapeHtml(phone)}</td></tr>
-      <tr><td><strong>Email</strong></td><td>${escapeHtml(email || "—")}</td></tr>
-      <tr><td><strong>Nhu cầu</strong></td><td>${escapeHtml(need || "—")}</td></tr>
-      ${qualifiers.region ? `<tr><td><strong>Khu vực</strong></td><td>${escapeHtml(qualifiers.region)}</td></tr>` : ""}
-      ${qualifiers.purpose ? `<tr><td><strong>Mục đích</strong></td><td>${escapeHtml(qualifiers.purpose)}</td></tr>` : ""}
-      ${qualifiers.timeframe ? `<tr><td><strong>Thời điểm</strong></td><td>${escapeHtml(qualifiers.timeframe)}</td></tr>` : ""}
-      <tr><td><strong>Nguồn</strong></td><td>${escapeHtml(source)}</td></tr>
-      ${ref ? `<tr><td><strong>Ref</strong></td><td>${escapeHtml(ref)}</td></tr>` : ""}
-      ${utm ? `<tr><td><strong>UTM</strong></td><td>${escapeHtml(Object.entries(utm).map(([k, v]) => `${k}=${v}`).join(", "))}</td></tr>` : ""}
-      <tr><td><strong>Ngôn ngữ</strong></td><td>${escapeHtml(lang)}</td></tr>
-    </table>
-  `;
-
-  try {
-    const { error } = await resend.emails.send({
-      from: LEAD_SENDER,
-      to: LEAD_RECIPIENT,
-      replyTo: email || undefined,
-      subject,
-      html,
-    });
-    if (error) console.error("[api/lead] Resend error (lead already saved):", error);
-  } catch (err) {
-    console.error("[api/lead] Unexpected error sending email (lead already saved):", err);
-  }
+  // Notifications are best-effort and run side by side: neither Telegram
+  // nor email can fail the lead, which is already saved above.
+  const project = projectId
+    ? await prisma.project.findUnique({ where: { id: projectId }, select: { name: true, seoTitle: true } }).catch(() => null)
+    : null;
+  await Promise.all([
+    notifyTelegramLead({
+      projectName: project ? projectDisplayName(project) : "Base Land Quy Nhơn",
+      name,
+      phone,
+      source,
+      ref,
+      utm,
+      page: readPage(body.page) ?? readPage(request.headers.get("referer")),
+    }),
+    sendLeadEmail(),
+  ]);
 
   return NextResponse.json({ ok: true });
+
+  async function sendLeadEmail() {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.warn("[api/lead] RESEND_API_KEY is not configured — lead saved, but no email sent.", { name, source });
+      return;
+    }
+
+    const resend = new Resend(apiKey);
+    const subject = `Yêu cầu tư vấn mới — ${name}${need ? ` (${need})` : ""}`;
+    const html = `
+      <h2>Yêu cầu tư vấn mới — Base Land Quy Nhơn</h2>
+      <table cellpadding="6" cellspacing="0" style="border-collapse:collapse">
+        <tr><td><strong>Họ tên</strong></td><td>${escapeHtml(name)}</td></tr>
+        <tr><td><strong>Điện thoại</strong></td><td>${escapeHtml(phone)}</td></tr>
+        <tr><td><strong>Email</strong></td><td>${escapeHtml(email || "—")}</td></tr>
+        <tr><td><strong>Nhu cầu</strong></td><td>${escapeHtml(need || "—")}</td></tr>
+        ${qualifiers.region ? `<tr><td><strong>Khu vực</strong></td><td>${escapeHtml(qualifiers.region)}</td></tr>` : ""}
+        ${qualifiers.purpose ? `<tr><td><strong>Mục đích</strong></td><td>${escapeHtml(qualifiers.purpose)}</td></tr>` : ""}
+        ${qualifiers.timeframe ? `<tr><td><strong>Thời điểm</strong></td><td>${escapeHtml(qualifiers.timeframe)}</td></tr>` : ""}
+        <tr><td><strong>Nguồn</strong></td><td>${escapeHtml(source)}</td></tr>
+        ${ref ? `<tr><td><strong>Ref</strong></td><td>${escapeHtml(ref)}</td></tr>` : ""}
+        ${utm ? `<tr><td><strong>UTM</strong></td><td>${escapeHtml(Object.entries(utm).map(([k, v]) => `${k}=${v}`).join(", "))}</td></tr>` : ""}
+        <tr><td><strong>Ngôn ngữ</strong></td><td>${escapeHtml(lang)}</td></tr>
+      </table>
+    `;
+
+    try {
+      const { error } = await resend.emails.send({
+        from: LEAD_SENDER,
+        to: LEAD_RECIPIENT,
+        replyTo: email || undefined,
+        subject,
+        html,
+      });
+      if (error) console.error("[api/lead] Resend error (lead already saved):", error);
+    } catch (err) {
+      console.error("[api/lead] Unexpected error sending email (lead already saved):", err);
+    }
+  }
 }
+
