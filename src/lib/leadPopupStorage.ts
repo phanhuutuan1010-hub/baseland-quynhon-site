@@ -20,3 +20,13 @@ export const popupKeys = (slug: string) => ({
   submitted: `lead_popup_${slug}_submitted`,
   shownThisSession: `lead_popup_${slug}_shown`,
 });
+
+/** sessionStorage flag: the visitor clicked a tel: or zalo.me link in this
+ * session (set by PixelEvents). */
+export const CONTACT_CLICKED_KEY = "bl_contact_clicked";
+
+export const videoCallPopupKeys = (slug: string) => ({
+  dismissedUntil: `videocall_popup_${slug}_dismissed_until`,
+  submitted: `videocall_popup_${slug}_submitted`,
+  shownThisSession: `videocall_popup_${slug}_shown`,
+});

@@ -39,7 +39,8 @@ export type ProjectSectionKey =
   | "videoDuo"
   | "salesPhases"
   | "virtualTour"
-  | "leadPopup";
+  | "leadPopup"
+  | "videoCallPopup";
 
 export type ProjectSections = Partial<Record<ProjectSectionKey, boolean>>;
 
@@ -636,6 +637,43 @@ export type ProjectLeadPopup = {
   fallbackName: string;
 };
 
+/** "Xem thực địa qua video Zalo" pop-up (overlay, not a page section).
+ * Shown near the end of the page; see VideoCallPopupTrigger. */
+export type ProjectVideoCallPopup = {
+  title: Localized<string>;
+  /** Subtitle when no rule below matches the visitor's utm_content. */
+  subtitle: Localized<string>;
+  /** First rule whose `utmContains` is found in utm_content wins. */
+  subtitleRules: { utmContains: string; text: Localized<string> }[];
+  checklistTitle: Localized<string>;
+  checklist: Localized<string>[];
+  /** Advisor shown when the visitor's ?ref= has no name in the ref table. */
+  advisorName: string;
+  advisorTitle: string;
+  /** Empty = no photo. */
+  advisorAvatar: string;
+  phoneLabel: Localized<string>;
+  phonePlaceholder: Localized<string>;
+  phoneError: Localized<string>;
+  nameLabel: Localized<string>;
+  consentLabel: Localized<string>;
+  consentError: Localized<string>;
+  submitLabel: Localized<string>;
+  submittingLabel: Localized<string>;
+  callLabel: Localized<string>;
+  zaloLabel: Localized<string>;
+  successMessage: Localized<string>;
+  successCallLabel: Localized<string>;
+  errorMessage: Localized<string>;
+  closeLabel: Localized<string>;
+  /** Shows after scrolling this % of the page (or reaching #kiem-chung / the footer). */
+  scrollPercent: number;
+  /** Closing hides it for this many hours. */
+  dismissHours: number;
+  /** Saved as the lead's name when the visitor leaves it blank. */
+  fallbackName: string;
+};
+
 export type ProjectRelatedArticle = { slug: string; title: Localized<string>; date: string; image: string };
 
 export type ProjectDetailData = {
@@ -674,6 +712,7 @@ export type ProjectDetailData = {
   floorPlans?: ProjectFloorPlans;
   virtualTour?: ProjectVirtualTour;
   leadPopup?: ProjectLeadPopup;
+  videoCallPopup?: ProjectVideoCallPopup;
   investment?: ProjectInvestment;
   news?: ProjectNewsTeaser;
   legal?: ProjectLegal;

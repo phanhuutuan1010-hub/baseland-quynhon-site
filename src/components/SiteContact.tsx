@@ -19,6 +19,8 @@ export type SiteContact = {
   zalo: string;
   /** Active ref code ("" = none), sent with Contact events and leads. */
   ref: string;
+  /** The ?ref= person's name/title/photo (ref table), null without a match. */
+  advisor: { name: string; title: string; avatar: string } | null;
 };
 
 const SiteContactContext = createContext<SiteContact | null>(null);
@@ -39,7 +41,7 @@ export function SiteContactProvider({
   refContacts,
   children,
 }: {
-  defaults: Omit<SiteContact, "ref">;
+  defaults: Omit<SiteContact, "ref" | "advisor">;
   refContacts: RefContact[];
   children: ReactNode;
 }) {
@@ -51,15 +53,16 @@ export function SiteContactProvider({
 
   const value = useMemo<SiteContact>(() => {
     const match = ref ? refContacts.find((r) => r.ref === ref) : undefined;
-    if (!match?.phone) return { ...defaults, ref };
+    if (!match?.phone) return { ...defaults, ref, advisor: null };
     const { display, href } = phoneParts(match.phone);
-    return { phone: display, phoneHref: href, zalo: digits(match.zalo || match.phone), ref };
+    const advisor = match.name ? { name: match.name, title: match.title ?? "", avatar: match.avatar ?? "" } : null;
+    return { phone: display, phoneHref: href, zalo: digits(match.zalo || match.phone), ref, advisor };
   }, [ref, refContacts, defaults]);
 
   return <SiteContactContext.Provider value={value}>{children}</SiteContactContext.Provider>;
 }
 
-const FALLBACK: SiteContact = { phone: "0373 910 109", phoneHref: "tel:+84373910109", zalo: "84373910109", ref: "" };
+const FALLBACK: SiteContact = { phone: "0373 910 109", phoneHref: "tel:+84373910109", zalo: "84373910109", ref: "", advisor: null };
 
 export function useSiteContact(): SiteContact {
   return useContext(SiteContactContext) ?? FALLBACK;

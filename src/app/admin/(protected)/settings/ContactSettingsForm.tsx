@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AdminTextField } from "@/components/admin/AdminField";
+import { MediaPickerField } from "@/components/admin/MediaPickerField";
 import { SaveBar } from "@/components/admin/SaveBar";
 import { updateContactSettings } from "./actions";
 import type { RefContact } from "@/lib/siteChrome";
@@ -74,7 +75,7 @@ export function ContactSettingsForm({ initial }: { initial: ContactSettingsValue
   );
 }
 
-const EMPTY_ROW: RefContact = { ref: "", name: "", phone: "", zalo: "" };
+const EMPTY_ROW: RefContact = { ref: "", name: "", phone: "", zalo: "", title: "", avatar: "" };
 
 /** ?ref= table: a visitor opening baselandquynhon.com/...?ref=<mã> sees
  * that person's phone + Zalo on every call button (kept 30 days). */
@@ -89,22 +90,29 @@ function RefContactsEditor({ rows, onChange }: { rows: RefContact[]; onChange: (
         <p className="m-0 mt-1 font-body text-[13px] text-[var(--color-text-muted)]">
           Khách mở link có <code>?ref=mã</code> (vd <code>/projects/qterra?ref=phuoc</code>) sẽ thấy số và Zalo của người đó
           trên mọi nút gọi, trong 30 ngày. Không có ref hoặc mã không có trong bảng → dùng Hotline ở trên.
-          Zalo để trống = dùng số điện thoại.
+          Zalo để trống = dùng số điện thoại. Tên, chức danh và ảnh hiện ở mục &quot;Người tư vấn&quot; trong pop-up video call
+          (không có ảnh thì ẩn ảnh).
         </p>
       </div>
       {rows.map((row, i) => (
-        <div key={i} className="grid grid-cols-[1fr_1.4fr_1.4fr_1.4fr_auto] items-end gap-3">
-          <AdminTextField label="Mã ref" value={row.ref} onChange={(v) => update(i, "ref", v)} />
-          <AdminTextField label="Tên" value={row.name} onChange={(v) => update(i, "name", v)} />
-          <AdminTextField label="Số điện thoại" value={row.phone} onChange={(v) => update(i, "phone", v)} />
-          <AdminTextField label="Zalo (tuỳ chọn)" value={row.zalo} onChange={(v) => update(i, "zalo", v)} />
-          <button
-            type="button"
-            onClick={() => onChange(rows.filter((_, j) => j !== i))}
-            className="mb-1 cursor-pointer rounded-xs border border-[var(--color-border)] bg-transparent px-3 py-2 font-ui text-xs text-[var(--color-error)]"
-          >
-            Xoá
-          </button>
+        <div key={i} className="flex flex-col gap-3 rounded-xs border border-[var(--color-border)] p-3">
+          <div className="grid grid-cols-[1fr_1.4fr_1.4fr_1.4fr_auto] items-end gap-3">
+            <AdminTextField label="Mã ref" value={row.ref} onChange={(v) => update(i, "ref", v)} />
+            <AdminTextField label="Tên" value={row.name} onChange={(v) => update(i, "name", v)} />
+            <AdminTextField label="Số điện thoại" value={row.phone} onChange={(v) => update(i, "phone", v)} />
+            <AdminTextField label="Zalo (tuỳ chọn)" value={row.zalo} onChange={(v) => update(i, "zalo", v)} />
+            <button
+              type="button"
+              onClick={() => onChange(rows.filter((_, j) => j !== i))}
+              className="mb-1 cursor-pointer rounded-xs border border-[var(--color-border)] bg-transparent px-3 py-2 font-ui text-xs text-[var(--color-error)]"
+            >
+              Xoá
+            </button>
+          </div>
+          <div className="grid grid-cols-[1fr_2fr] items-start gap-3">
+            <AdminTextField label="Chức danh (tuỳ chọn)" value={row.title ?? ""} onChange={(v) => update(i, "title", v)} />
+            <MediaPickerField label="Ảnh đại diện (tuỳ chọn)" value={row.avatar ?? ""} onChange={(v) => update(i, "avatar", v)} kindFilter="IMAGE" />
+          </div>
         </div>
       ))}
       <button

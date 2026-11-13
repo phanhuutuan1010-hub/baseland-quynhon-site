@@ -27,5 +27,6 @@ export type SiteChromeData = {
   refContacts: RefContact[];
 };
 
-/** One row of the ?ref= table: `ref` code → that person's name/phone/Zalo. */
-export type RefContact = { ref: string; name: string; phone: string; zalo: string };
+/** One row of the ?ref= table: `ref` code → that person's name/phone/Zalo,
+ * plus job title + photo shown as the advisor in the video-call pop-up. */
+export type RefContact = { ref: string; name: string; phone: string; zalo: string; title: string; avatar: string };

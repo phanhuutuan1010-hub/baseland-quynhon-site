@@ -210,6 +210,7 @@ enum ProjectSectionType {
   SALES_PHASES
   VIRTUAL_TOUR
   LEAD_POPUP
+  VIDEO_CALL_POPUP
 }
 
 // One project detail page. hero/cta/sections/category/statusLabel are kept

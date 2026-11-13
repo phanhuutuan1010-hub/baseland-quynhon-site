@@ -7,6 +7,7 @@ export const PROJECT_SECTION_LABELS: Record<EditableProjectSectionKey, string> =
   salesPhases: "Giai đoạn bán hàng (Sales Phases)",
   virtualTour: "Tham quan ảo 360° (Virtual Tour)",
   leadPopup: "Popup thu lead (Lead Popup)",
+  videoCallPopup: "Pop-up video call thực địa (Zalo)",
   location: "Vị trí (Location)",
   masterplan: "Mặt bằng tổng thể (Masterplan)",
   architecture: "Kiến trúc (Architecture)",
@@ -50,6 +51,7 @@ export const PROJECT_SECTION_ORDER: EditableProjectSectionKey[] = [
   "faq",
   "news",
   "leadPopup",
+  "videoCallPopup",
   // Used by the hero (stats → key-figure line) or only by the older full layout
   "stats",
   "intro",

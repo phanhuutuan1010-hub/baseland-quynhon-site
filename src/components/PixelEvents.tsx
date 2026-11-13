@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { pixelTrack, pixelTrackCustom } from "@/lib/pixel";
 import { useSiteContact } from "@/components/SiteContact";
 import { pixelUtmParams } from "@/lib/attribution";
+import { CONTACT_CLICKED_KEY } from "@/lib/leadPopupStorage";
 
 /** Where on the page a button sits: its data-track-pos, else the nearest
  * section/element id, else header/footer. */
@@ -20,6 +21,8 @@ function buttonPosition(el: HTMLElement): string {
  * Site-wide Meta Pixel events (mounted once in (site)/layout.tsx):
  * PageView on client-side route changes (the first one is sent by the init
  * snippet), Contact on any tel: click, ClickZalo on any zalo.me click.
+ * A tel:/Zalo click inside an element with data-track-pos="popup" is
+ * reported with vi_tri_nut "popup".
  */
 export function PixelEvents() {
   const pathname = usePathname();
@@ -40,8 +43,17 @@ export function PixelEvents() {
       if (!a) return;
       const href = a.getAttribute("href") ?? "";
       const params = { ref: ref || "none", vi_tri_nut: buttonPosition(a), ...pixelUtmParams() };
-      if (href.startsWith("tel:")) pixelTrack("Contact", params);
-      else if (/^https?:\/\/(www\.)?zalo\.me\//.test(href)) pixelTrackCustom("ClickZalo", params);
+      const isTel = href.startsWith("tel:");
+      const isZalo = /^https?:\/\/(www\.)?zalo\.me\//.test(href);
+      if (isTel) pixelTrack("Contact", params);
+      else if (isZalo) pixelTrackCustom("ClickZalo", params);
+      // Remembered for this session: the video-call pop-up stays away from
+      // visitors who already called or messaged.
+      if (isTel || isZalo) {
+        try {
+          sessionStorage.setItem(CONTACT_CLICKED_KEY, "1");
+        } catch {}
+      }
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);

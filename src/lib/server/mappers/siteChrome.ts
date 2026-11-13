@@ -84,7 +84,14 @@ export function parseRefContacts(raw: unknown): RefContact[] {
     .map((r) => {
       const o = (r ?? {}) as Record<string, unknown>;
       const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
-      return { ref: str(o.ref).toLowerCase(), name: str(o.name), phone: str(o.phone), zalo: str(o.zalo) };
+      return {
+        ref: str(o.ref).toLowerCase(),
+        name: str(o.name),
+        phone: str(o.phone),
+        zalo: str(o.zalo),
+        title: str(o.title),
+        avatar: str(o.avatar),
+      };
     })
     .filter((r) => r.ref && r.phone);
 }

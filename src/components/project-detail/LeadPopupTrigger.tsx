@@ -5,7 +5,7 @@ import { trackEvent } from "@/lib/analytics";
 import { useSiteContact } from "@/components/SiteContact";
 import { LEAD_SUBMITTED_EVENT, LEAD_SUBMITTED_KEY } from "@/lib/useLeadForm";
 import type { ProjectLeadPopup } from "@/lib/project-detail/types";
-import { popupKeys, storageGet, storageSet } from "@/lib/leadPopupStorage";
+import { popupKeys, storageGet, storageSet, videoCallPopupKeys } from "@/lib/leadPopupStorage";
 
 // The dialog (form, validation, copy rendering) is only downloaded once a
 // trigger fires — a plain import() at that moment, not next/dynamic (which
@@ -57,9 +57,11 @@ export function LeadPopupTrigger({
     if (storageGet("local", keys.submitted)) return false;
     if (storageGet("local", LEAD_SUBMITTED_KEY)) return false;
     if (storageGet("session", keys.shownThisSession)) return false;
+    // One pop-up per session: the video-call pop-up already had its turn.
+    if (storageGet("session", videoCallPopupKeys(projectSlug).shownThisSession)) return false;
     if (Number(storageGet("local", keys.dismissedUntil) || 0) > Date.now()) return false;
     return true;
-  }, [keys.submitted, keys.shownThisSession, keys.dismissedUntil]);
+  }, [keys.submitted, keys.shownThisSession, keys.dismissedUntil, projectSlug]);
 
   useEffect(() => {
     if (!eligible()) return;

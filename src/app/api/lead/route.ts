@@ -28,6 +28,8 @@ type LeadBody = {
   qualifiers?: unknown;
   ref?: unknown;
   utm?: unknown;
+  project?: unknown; // project slug, for sources that don't name it (popup_videocall)
+  page?: unknown; // page URL the form was sent from
   website?: unknown; // honeypot — real visitors never fill it
 };
 
@@ -63,6 +65,10 @@ function readUtm(v: unknown): Record<string, string> | null {
 
 function readRef(v: unknown): string | null {
   return isNonEmptyString(v) && /^[a-z0-9_-]{1,40}$/i.test(v.trim()) ? v.trim().toLowerCase() : null;
+}
+
+function readSlug(v: unknown): string | null {
+  return isNonEmptyString(v) && /^[a-z0-9-]{1,80}$/.test(v.trim()) ? v.trim() : null;
 }
 
 function digitsOnly(v: string) {
@@ -121,7 +127,9 @@ export async function POST(request: Request) {
   // The lead is durably recorded here FIRST — email below is a best-effort
   // notification, not the source of truth. Previously a missing/misconfigured
   // RESEND_API_KEY meant the lead was lost entirely; it no longer can be.
-  const projectId = await resolveProjectIdFromSource(source);
+  const projectSlug = readSlug(body.project);
+  const projectId =
+    (await resolveProjectIdFromSource(source)) ?? (projectSlug ? await resolveProjectIdFromSource(projectSlug) : null);
   try {
     await prisma.lead.create({
       data: {

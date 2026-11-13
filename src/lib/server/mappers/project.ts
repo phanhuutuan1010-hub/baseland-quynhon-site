@@ -26,6 +26,7 @@ const SECTION_TYPE_TO_KEY: Record<ProjectSectionType, ProjectSectionKey> = {
   SALES_PHASES: "salesPhases",
   VIRTUAL_TOUR: "virtualTour",
   LEAD_POPUP: "leadPopup",
+  VIDEO_CALL_POPUP: "videoCallPopup",
 };
 
 export const PROJECT_INCLUDE = {

@@ -25,12 +25,12 @@ export const LEAD_SUBMITTED_KEY = "bl_lead_submitted_at";
 export const LEAD_SUBMITTED_EVENT = "bl:lead-submitted";
 
 /** Records that a lead form was sent (read by LeadPopupTrigger to stay hidden). */
-export function markLeadSubmitted() {
+export function markLeadSubmitted(pixelParams?: Record<string, string>) {
   try {
     localStorage.setItem(LEAD_SUBMITTED_KEY, String(Date.now()));
   } catch {}
   window.dispatchEvent(new Event(LEAD_SUBMITTED_EVENT));
-  pixelTrack("Lead", { page: window.location.pathname, ...pixelUtmParams() });
+  pixelTrack("Lead", { page: window.location.pathname, ...pixelUtmParams(), ...pixelParams });
 }
 
 /** Shared validation/submit logic behind both the simple (Homepage) and

@@ -6,6 +6,7 @@ import { ProjectNav } from "@/components/project-detail/ProjectNav";
 import { ProjectCallBar } from "@/components/project-detail/ProjectCallBar";
 import { PixelViewContent } from "@/components/PixelEvents";
 import { LeadPopupTrigger } from "@/components/project-detail/LeadPopupTrigger";
+import { VideoCallPopupTrigger } from "@/components/project-detail/VideoCallPopupTrigger";
 import { isSectionVisible } from "@/lib/project-detail/types";
 import { toJsonLdString } from "@/lib/jsonLd";
 import { buildMetadata } from "@/lib/seo";
@@ -47,6 +48,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
       <PixelViewContent slug={project.slug} />
       {isSectionVisible(project, "leadPopup") && project.leadPopup && (
         <LeadPopupTrigger data={project.leadPopup} projectSlug={project.slug} />
+      )}
+      {isSectionVisible(project, "videoCallPopup") && project.videoCallPopup && (
+        <VideoCallPopupTrigger data={project.videoCallPopup} projectSlug={project.slug} />
       )}
     </>
   );

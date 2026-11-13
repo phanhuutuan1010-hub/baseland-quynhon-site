@@ -9,6 +9,55 @@ import type { EditableProjectSectionKey } from "./project";
 // arrays start empty; the admin adds rows via the form's own "+ Thêm" control.
 const L = { vi: "", en: "" };
 const emptyImage = { src: "", alt: L };
+const T = (vi: string, en: string) => ({ vi, en });
+
+export const VIDEO_CALL_POPUP_DEFAULT = {
+  title: T(
+    "Chưa tiện ra Quy Nhơn? Em dẫn anh/chị xem tận nơi qua video Zalo.",
+    "Can't make it to Quy Nhon yet? Let us show you the site live on a Zalo video call.",
+  ),
+  subtitle: T("15 phút, miễn phí, không ép quyết định.", "15 minutes, free, no pressure to decide."),
+  subtitleRules: [
+    {
+      utmContains: "z1",
+      text: T("Đứng tại 01 Ngô Mây, đi bộ khoảng 50m ra biển cùng em.", "Stand at 01 Ngo May and walk about 50m to the beach with us."),
+    },
+    {
+      utmContains: "z3",
+      text: T("Xem căn hộ mẫu tại KS Anya ngay trên điện thoại.", "Tour the show apartment at Anya Hotel right on your phone."),
+    },
+  ],
+  checklistTitle: T("Trong video call, em dẫn anh/chị xem:", "On the video call we'll show you:"),
+  checklist: [
+    T("Vị trí 01 Ngô Mây, Quảng trường Nguyễn Tất Thành", "The site at 01 Ngo May, Nguyen Tat Thanh Square"),
+    T("Đường ra biển khoảng 50m", "The roughly 50m walk to the beach"),
+    T("Hiện trạng công trường hôm nay", "Today's construction progress"),
+    T("Căn hộ mẫu tại KS Anya", "The show apartment at Anya Hotel"),
+  ],
+  advisorName: "Phan Hữu Tuấn",
+  advisorTitle: "TPKD Base Land Quy Nhơn",
+  advisorAvatar: "",
+  phoneLabel: T("Số Zalo của anh/chị", "Your Zalo number"),
+  phonePlaceholder: T("VD: 0901 234 567", "e.g. 0901 234 567"),
+  phoneError: T("Số Zalo chưa đúng (10 số, bắt đầu bằng 0 hoặc +84).", "Please enter a valid Vietnamese number (10 digits, starting with 0 or +84)."),
+  nameLabel: T("Tên", "Name"),
+  consentLabel: T("Em đồng ý để Base Land Quy Nhơn liên hệ qua số này.", "I agree to be contacted by Base Land Quy Nhon on this number."),
+  consentError: T("Vui lòng đánh dấu đồng ý để em gọi lại.", "Please tick the box so we can call you back."),
+  submitLabel: T("Đặt lịch video call", "Book a video call"),
+  submittingLabel: T("Đang gửi…", "Sending…"),
+  callLabel: T("Gọi ngay", "Call now"),
+  zaloLabel: T("Nhắn Zalo", "Message on Zalo"),
+  successMessage: T("Em sẽ gọi Zalo lại cho anh/chị trong 5 phút.", "We'll call you back on Zalo within 5 minutes."),
+  successCallLabel: T("Gọi luôn", "Call now"),
+  errorMessage: T(
+    "Chưa gửi được, có thể do mạng. Số anh/chị nhập vẫn còn — vui lòng thử lại hoặc gọi ngay.",
+    "We couldn't send that, possibly a connection issue. Your number is still here — please try again or call us.",
+  ),
+  closeLabel: T("Đóng", "Close"),
+  scrollPercent: 85,
+  dismissHours: 24,
+  fallbackName: "Khách video call (chưa để tên)",
+};
 
 export const PROJECT_SECTION_DEFAULTS: Record<EditableProjectSectionKey, object> = {
   intro: { eyebrow: L, headline: L, body: L },
@@ -102,6 +151,9 @@ export const PROJECT_SECTION_DEFAULTS: Record<EditableProjectSectionKey, object>
     leadSource: "",
     fallbackName: "Khách để lại SĐT (popup)",
   },
+  // Prefilled with the approved Q'Terra copy (13/11/2026) — every field
+  // stays editable per project in Admin.
+  videoCallPopup: VIDEO_CALL_POPUP_DEFAULT,
   location: { eyebrow: L, headline: L, body: L, navLabel: L, mapImage: emptyImage, journey: [], benefits: [], actionLabel: L, actionHref: "call" },
   masterplan: { eyebrow: L, headline: L, body: L, image: emptyImage, zones: [], ctaLabel: L, ctaHref: "#lead" },
   architecture: { headline: L, body: L, image: emptyImage },
@@ -179,6 +231,7 @@ export const PROJECT_SECTION_ITEM_TEMPLATES: Partial<Record<EditableProjectSecti
   faq: { items: { q: L, a: L, group: "" } },
   salesPhases: { steps: { title: L, body: L, tag: L } },
   leadPopup: { benefits: L },
+  videoCallPopup: { checklist: L, subtitleRules: { utmContains: "", text: L } },
   residences: {
     items: { key: "", name: L, tag: L, nfa: "", nsa: "", area: "", share: L, desc: L, floorPlanImage: emptyImage },
     orientations: L,

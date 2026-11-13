@@ -28,6 +28,8 @@ export const contactSettingsSchema = z.object({
         name: z.string().trim(),
         phone: z.string().trim().refine((v) => normalizeVnPhone(v) !== null, "Số điện thoại trong bảng ref không hợp lệ"),
         zalo: z.string().trim().regex(/^[\d\s+.]*$/, "Zalo chỉ gồm chữ số"),
+        title: z.string().trim().default(""),
+        avatar: z.string().trim().default(""),
       }),
     )
     .refine((rows) => new Set(rows.map((r) => r.ref)).size === rows.length, "Mã ref bị trùng")
