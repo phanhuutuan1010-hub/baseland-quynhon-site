@@ -24,6 +24,15 @@ async function main() {
     update: {},
     create: { projectId: project.id, type: "VIDEO_CALL_POPUP", content: VIDEO_CALL_POPUP_DEFAULT },
   });
+  // 13/11: consent checkbox dropped — remove its two fields from the stored
+  // row so Admin no longer shows them.
+  const row = await prisma.projectSection.findUniqueOrThrow({
+    where: { projectId_type: { projectId: project.id, type: "VIDEO_CALL_POPUP" } },
+  });
+  const { consentLabel: _l, consentError: _e, ...content } = row.content as Record<string, unknown>;
+  void _l;
+  void _e;
+  await prisma.projectSection.update({ where: { id: row.id }, data: { content: content as object } });
   console.log("Q'Terra video-call popup saved.");
 }
 

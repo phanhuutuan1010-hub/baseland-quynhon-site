@@ -656,8 +656,6 @@ export type ProjectVideoCallPopup = {
   phonePlaceholder: Localized<string>;
   phoneError: Localized<string>;
   nameLabel: Localized<string>;
-  consentLabel: Localized<string>;
-  consentError: Localized<string>;
   submitLabel: Localized<string>;
   submittingLabel: Localized<string>;
   callLabel: Localized<string>;

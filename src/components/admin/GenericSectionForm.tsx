@@ -85,8 +85,6 @@ const FIELD_LABELS: Record<string, string> = {
   advisorName: "Người tư vấn mặc định — tên (ref có tên trong bảng ref thì dùng của ref)",
   advisorTitle: "Người tư vấn mặc định — chức danh",
   advisorAvatar: "Người tư vấn mặc định — link ảnh (trống = ẩn ảnh)",
-  consentLabel: "Ô đồng ý — chữ",
-  consentError: "Thông báo chưa tick đồng ý",
   successCallLabel: "Nút gọi sau khi gửi — chữ",
   dismissHours: "Đóng thì ẩn (giờ)",
   reasons: "Lý do (mục \"Vì sao\")",

@@ -41,8 +41,6 @@ export const VIDEO_CALL_POPUP_DEFAULT = {
   phonePlaceholder: T("VD: 0901 234 567", "e.g. 0901 234 567"),
   phoneError: T("Số Zalo chưa đúng (10 số, bắt đầu bằng 0 hoặc +84).", "Please enter a valid Vietnamese number (10 digits, starting with 0 or +84)."),
   nameLabel: T("Tên", "Name"),
-  consentLabel: T("Em đồng ý để Base Land Quy Nhơn liên hệ qua số này.", "I agree to be contacted by Base Land Quy Nhon on this number."),
-  consentError: T("Vui lòng đánh dấu đồng ý để em gọi lại.", "Please tick the box so we can call you back."),
   submitLabel: T("Đặt lịch video call", "Book a video call"),
   submittingLabel: T("Đang gửi…", "Sending…"),
   callLabel: T("Gọi ngay", "Call now"),

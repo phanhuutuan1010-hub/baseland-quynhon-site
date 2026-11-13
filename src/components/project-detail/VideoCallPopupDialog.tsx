@@ -79,9 +79,8 @@ export default function VideoCallPopupDialog({
   const [subtitle] = useState(() => pickSubtitle(data));
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
-  const [consent, setConsent] = useState(false);
   const [honeypot, setHoneypot] = useState("");
-  const [errors, setErrors] = useState<{ phone?: boolean; consent?: boolean }>({});
+  const [phoneInvalid, setPhoneInvalid] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [typing, setTyping] = useState(false);
   const keyboard = useKeyboardInset();
@@ -147,13 +146,12 @@ export default function VideoCallPopupDialog({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const normalized = normalizeZalo(phone);
-    const errs = { phone: !normalized, consent: !consent };
-    if (errs.phone || errs.consent) {
-      setErrors(errs);
-      panelRef.current?.querySelector<HTMLElement>(errs.phone ? "input[type=tel]" : "input[type=checkbox]")?.focus();
+    if (!normalized) {
+      setPhoneInvalid(true);
+      panelRef.current?.querySelector<HTMLElement>("input[type=tel]")?.focus();
       return;
     }
-    setErrors({});
+    setPhoneInvalid(false);
     setStatus("loading");
     try {
       const res = await fetch("/api/lead", {
@@ -166,8 +164,6 @@ export default function VideoCallPopupDialog({
           source: VIDEO_CALL_LEAD_SOURCE,
           project: projectSlug,
           page: `${window.location.origin}${window.location.pathname}`,
-          consent: true,
-          requireConsent: true,
           lang,
           website: honeypot,
           ...getAttribution(),
@@ -292,13 +288,13 @@ export default function VideoCallPopupDialog({
                   onChange={(e) => setPhone(e.target.value)}
                   onFocus={onFieldFocus}
                   onBlur={onFieldBlur}
-                  aria-invalid={errors.phone || undefined}
-                  aria-describedby={errors.phone ? "videocall-phone-err" : undefined}
+                  aria-invalid={phoneInvalid || undefined}
+                  aria-describedby={phoneInvalid ? "videocall-phone-err" : undefined}
                   className={`w-full rounded-xs border bg-[var(--color-warm-white)] px-3.5 py-3 text-[16px] text-[var(--color-charcoal)] ${
-                    errors.phone ? "border-[var(--color-error)]" : "border-[var(--color-border)]"
+                    phoneInvalid ? "border-[var(--color-error)]" : "border-[var(--color-border)]"
                   }`}
                 />
-                {errors.phone && (
+                {phoneInvalid && (
                   <span id="videocall-phone-err" className="font-body text-[13px] text-[var(--color-error)]">
                     {pick(data.phoneError)}
                   </span>
@@ -317,26 +313,6 @@ export default function VideoCallPopupDialog({
                   className="w-full rounded-xs border border-[var(--color-border)] bg-[var(--color-warm-white)] px-3.5 py-3 text-[16px] text-[var(--color-charcoal)]"
                 />
               </label>
-
-              <div>
-                <label className="flex cursor-pointer items-start gap-2.5 font-body text-[14px] leading-[1.4] text-[var(--color-charcoal)]">
-                  <input
-                    type="checkbox"
-                    required
-                    checked={consent}
-                    onChange={(e) => setConsent(e.target.checked)}
-                    aria-invalid={errors.consent || undefined}
-                    aria-describedby={errors.consent ? "videocall-consent-err" : undefined}
-                    className="mt-0.5 h-5 w-5 flex-none accent-[var(--project-primary)]"
-                  />
-                  <span>{pick(data.consentLabel)}</span>
-                </label>
-                {errors.consent && (
-                  <span id="videocall-consent-err" className="mt-1 block font-body text-[13px] text-[var(--color-error)]">
-                    {pick(data.consentError)}
-                  </span>
-                )}
-              </div>
 
               {/* Honeypot — hidden from people and assistive tech */}
               <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
