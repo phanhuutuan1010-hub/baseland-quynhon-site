@@ -84,7 +84,13 @@ export function LeadFormFull({
   prefillNeed,
   contextNote,
   qualifiers,
+  unitField,
+  onSubmitted,
 }: {
+  /** Extra optional text field for a unit/floor code. */
+  unitField?: { label: Localized<string>; placeholder?: Localized<string> };
+  /** Called once the lead was accepted by /api/lead. */
+  onSubmitted?: () => void;
   source?: string;
   prefillNeed?: string;
   contextNote?: Localized<string>;
@@ -96,6 +102,7 @@ export function LeadFormFull({
   const chat = useQuickChat();
   const { lead, updateField, errors, status, submit, retry } = useLeadForm(source, {
     initial: prefillNeed ? { need: prefillNeed } : undefined,
+    onSuccess: onSubmitted,
   });
 
   const chatButton = chat && (
@@ -184,6 +191,21 @@ export function LeadFormFull({
           />
           {errors.phone && <span className="font-body text-[13px] text-[var(--color-error)]">{pick(copy.phoneError)}</span>}
         </label>
+
+        {unitField && (
+          <label className="flex flex-col gap-2">
+            <span className={labelClass}>{pick(unitField.label)}</span>
+            <input
+              type="text"
+              name="unitCode"
+              maxLength={60}
+              placeholder={unitField.placeholder ? pick(unitField.placeholder) : undefined}
+              value={lead.unitCode}
+              onChange={(e) => updateField("unitCode", e.target.value)}
+              className={inputClass()}
+            />
+          </label>
+        )}
 
         {qualifiers?.length ? (
           qualifiers.map((q) => (

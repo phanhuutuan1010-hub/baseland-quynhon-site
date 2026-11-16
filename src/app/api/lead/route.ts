@@ -23,6 +23,7 @@ type LeadBody = {
   phone?: unknown;
   email?: unknown;
   need?: unknown;
+  unitCode?: unknown; // optional unit/floor code (360° "welcome back" form)
   consent?: unknown;
   source?: unknown;
   lang?: unknown;
@@ -119,6 +120,7 @@ export async function POST(request: Request) {
   const phone = isNonEmptyString(body.phone) ? body.phone.trim() : "";
   const email = isNonEmptyString(body.email) ? body.email.trim() : "";
   const need = isNonEmptyString(body.need) ? body.need.trim() : "";
+  const unitCode = isNonEmptyString(body.unitCode) ? body.unitCode.trim().slice(0, 60) : "";
   const consent = body.consent === true;
   const source = isNonEmptyString(body.source) ? body.source.trim() : "unknown";
   const lang = body.lang === "en" ? "en" : "vi";
@@ -149,7 +151,9 @@ export async function POST(request: Request) {
         name,
         phone,
         email: email || null,
-        message: need || null,
+        // The optional unit/floor code (360° "welcome back" form) has no
+        // column of its own — it rides in the free-text message.
+        message: [need, unitCode && `Mã căn/tầng: ${unitCode}`].filter(Boolean).join(" · ") || null,
         source,
         projectId,
         region: qualifiers.region ?? null,
@@ -175,6 +179,7 @@ export async function POST(request: Request) {
       name,
       phone,
       source,
+      unitCode: unitCode || null,
       ref,
       utm,
       page: readPage(body.page) ?? readPage(request.headers.get("referer")),
@@ -203,6 +208,7 @@ export async function POST(request: Request) {
         ${qualifiers.region ? `<tr><td><strong>Khu vực</strong></td><td>${escapeHtml(qualifiers.region)}</td></tr>` : ""}
         ${qualifiers.purpose ? `<tr><td><strong>Mục đích</strong></td><td>${escapeHtml(qualifiers.purpose)}</td></tr>` : ""}
         ${qualifiers.timeframe ? `<tr><td><strong>Thời điểm</strong></td><td>${escapeHtml(qualifiers.timeframe)}</td></tr>` : ""}
+        ${unitCode ? `<tr><td><strong>Mã căn/tầng</strong></td><td>${escapeHtml(unitCode)}</td></tr>` : ""}
         <tr><td><strong>Nguồn</strong></td><td>${escapeHtml(source)}</td></tr>
         ${ref ? `<tr><td><strong>Ref</strong></td><td>${escapeHtml(ref)}</td></tr>` : ""}
         ${utm ? `<tr><td><strong>UTM</strong></td><td>${escapeHtml(Object.entries(utm).map(([k, v]) => `${k}=${v}`).join(", "))}</td></tr>` : ""}

@@ -15,7 +15,7 @@ export function DocumentSection({
 }: {
   id: string;
   data: ProjectDocumentsData;
-  /** Project's 360° tour URL — a link to it is tracked as project_360_open. */
+  /** Project's 360° tour URL — a link to it is tracked as tour_external_open. */
   tourUrl?: string;
   projectSlug?: string;
 }) {

@@ -19,14 +19,15 @@ const RECHECK_MS = 2_000;
 export type PopupTrigger = "time" | "scroll" | "exit";
 
 /** Something else is already asking for the visitor's attention: a lead
- * modal or other modal dialog, the 360° tour, fullscreen, a form being
+ * modal or other modal dialog, the 360° tour return card, fullscreen, a form being
  * filled in, the page's own lead form on screen, or a scroll-locked
  * overlay (mobile menu). */
 function otherOverlayOpen(leadInView: boolean): boolean {
   if (leadInView) return true;
   if (document.fullscreenElement) return true;
   if (document.querySelector('[role="dialog"][aria-modal="true"]')) return true;
-  if (document.querySelector("#tour-360 iframe:not([hidden]), #virtual-tour iframe:not([hidden])")) return true;
+  // The "welcome back from the 360° tour" card is on screen.
+  if (document.querySelector("[data-tour-return]")) return true;
   if (document.activeElement?.closest("form")) return true;
   if (document.body.style.overflow === "hidden") return true;
   return false;

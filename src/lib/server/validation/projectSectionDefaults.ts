@@ -114,8 +114,14 @@ export const PROJECT_SECTION_DEFAULTS: Record<EditableProjectSectionKey, object>
     headline: L,
     body: L,
     tourUrl: "",
-    allowEmbed: true,
     poster: emptyImage,
+    highlights: [],
+    returnPrompt: {
+      title: { vi: "Bạn đã chọn được căn ưng ý? Gửi mã căn để nhận báo giá", en: "Found a unit you like? Send its code to get a quote" },
+      ctaLabel: { vi: "Gửi mã căn", en: "Send unit code" },
+      unitLabel: { vi: "Mã căn/tầng quan tâm (không bắt buộc)", en: "Unit / floor you like (optional)" },
+      unitPlaceholder: { vi: "VD: A-1205 hoặc tầng 12", en: "e.g. A-1205 or floor 12" },
+    },
     playLabel: { vi: "Bắt đầu tham quan", en: "Start the tour" },
     fullscreenLabel: { vi: "Toàn màn hình", en: "Full screen" },
     newTabLabel: { vi: "Mở trong tab mới", en: "Open in a new tab" },
@@ -246,6 +252,7 @@ export const PROJECT_SECTION_ITEM_TEMPLATES: Partial<Record<EditableProjectSecti
   verification: { items: { label: L, note: L, source: "", verified: false, lastUpdated: "" } },
   faq: { items: { q: L, a: L, group: "" } },
   salesPhases: { steps: { title: L, body: L, tag: L } },
+  virtualTour: { highlights: L },
   leadPopup: { benefits: L },
   videoCallPopup: { checklist: L, subtitleRules: { utmContains: "", text: L } },
   residences: {

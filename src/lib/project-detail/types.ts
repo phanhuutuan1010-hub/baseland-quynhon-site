@@ -621,6 +621,14 @@ export type ProjectSalesPhases = {
   adNoticeCtaLabel?: Localized<string>;
 };
 
+export type ProjectTourReturnPrompt = {
+  title: Localized<string>;
+  ctaLabel: Localized<string>;
+  /** Label of the optional unit/floor field in the lead form. */
+  unitLabel: Localized<string>;
+  unitPlaceholder: Localized<string>;
+};
+
 /** A hotspot inside a 360° scene that moves the visitor to another scene. */
 export type ProjectTourHotspot = {
   /** `id` of the destination scene. */
@@ -645,21 +653,29 @@ export type ProjectTourScene = {
 };
 
 /** "Tham quan ảo 360°" — either an external tour (`tourUrl`, developer-
- * hosted) or a self-hosted multi-scene tour (`scenes`, Pannellum). The
- * page only ever shows the poster until the visitor clicks play: neither
- * the iframe nor the 360° viewer/images load up front. External tour:
- * desktop + `allowEmbed` → iframe in place; mobile → full-screen viewer;
- * `allowEmbed: false` → new tab. `tourUrl` wins when both are filled. */
+ * hosted) or a self-hosted multi-scene tour (`scenes`, Pannellum).
+ * External tour: poster + `highlights`, always opened in a new tab — the
+ * developer's site is never framed or preloaded (third-party trackers);
+ * coming back to the page shows the `returnPrompt` card once per session.
+ * Self-hosted scenes load only after "Bắt đầu tham quan". `tourUrl` wins
+ * when both are filled. */
 export type ProjectVirtualTour = {
   eyebrow: Localized<string>;
   headline: Localized<string>;
   body: Localized<string>;
   tourUrl: string;
+  /** External tour: what the visitor can do in it (e.g. "Lọc 864 căn theo
+   * view"), shown with the poster. Empty = none. */
+  highlights?: Localized<string>[];
+  /** External tour: card shown once per session when the visitor comes
+   * back from the tour tab; opens the lead form with an optional
+   * "unit/floor" field, source "<slug>-360-return". Empty title = no card. */
+  returnPrompt?: ProjectTourReturnPrompt;
   /** Self-hosted scenes; used when `tourUrl` is empty. No scene with an
    * image = the section hides itself. */
   scenes?: ProjectTourScene[];
-  /** Set false if the tour host starts refusing to be framed. */
-  allowEmbed: boolean;
+  /** No longer used — the external tour always opens in a new tab. */
+  allowEmbed?: boolean;
   /** Empty src → falls back to the hero image. */
   poster: { src: string; alt: Localized<string> };
   playLabel: Localized<string>;

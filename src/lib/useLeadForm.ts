@@ -15,9 +15,11 @@ export type LeadFormState = {
   /** Per-project select fields (see ProjectCta.qualifiers), keyed by
    * LeadQualifierKey — sent as-is and stored on the Lead row. */
   qualifiers: Record<string, string>;
+  /** Optional unit/floor code (360° tour "welcome back" form). */
+  unitCode: string;
 };
 
-const INITIAL: LeadFormState = { name: "", phone: "", email: "", need: "", consent: false, qualifiers: {} };
+const INITIAL: LeadFormState = { name: "", phone: "", email: "", need: "", consent: false, qualifiers: {}, unitCode: "" };
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -38,7 +40,10 @@ export function markLeadSubmitted(pixelParams?: Record<string, string>) {
  * lets a caller prefill fields (e.g. the video-story lead modal
  * preselecting "Interest" from the video that opened it) without changing
  * the validation/submit behavior. */
-export function useLeadForm(source: string, { requireConsent = false, initial }: { requireConsent?: boolean; initial?: Partial<LeadFormState> } = {}) {
+export function useLeadForm(
+  source: string,
+  { requireConsent = false, initial, onSuccess }: { requireConsent?: boolean; initial?: Partial<LeadFormState>; onSuccess?: () => void } = {},
+) {
   const { lang } = useLang();
   const [lead, setLead] = useState<LeadFormState>(() => ({ ...INITIAL, ...initial }));
   const [errors, setErrors] = useState<Record<string, boolean>>({});
@@ -76,6 +81,7 @@ export function useLeadForm(source: string, { requireConsent = false, initial }:
       if (!res.ok) throw new Error("request_failed");
       setStatus("success");
       markLeadSubmitted();
+      onSuccess?.();
     } catch {
       setStatus("error");
     }

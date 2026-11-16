@@ -11,8 +11,9 @@ import { prisma } from "./db";
 // server-side, rather than adding a new prop to every lead form call site.
 export async function resolveProjectIdFromSource(source: string): Promise<string | null> {
   const videoMatch = source.match(/^project-video\/([^/]+)\//);
-  // e.g. "qterra-popup" (lead pop-up), "qterra-360" (virtual tour CTA)
-  const popupMatch = source.match(/^(.+)-(?:popup|360)$/);
+  // e.g. "qterra-popup" (lead pop-up), "qterra-360" (virtual tour CTA),
+  // "qterra-360-return" (card shown on coming back from the tour tab)
+  const popupMatch = source.match(/^(.+)-(?:popup|360|360-return)$/);
   const candidateSlug = videoMatch ? videoMatch[1] : popupMatch ? popupMatch[1] : source;
 
   const project = await prisma.project.findUnique({ where: { slug: candidateSlug }, select: { id: true } });

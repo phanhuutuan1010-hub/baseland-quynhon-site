@@ -66,6 +66,8 @@ export type LeadNotice = {
   name: string;
   phone: string;
   source: string;
+  /** Optional unit/floor code the visitor typed. */
+  unitCode?: string | null;
   ref: string | null;
   utm: Record<string, string> | null;
   page: string | null;
@@ -89,6 +91,7 @@ export function formatLeadMessage(lead: LeadNotice) {
     `Tên: ${e(lead.name)}`,
     `SĐT: ${e(toIntlPhone(lead.phone))}`,
     `Nguồn: ${e(lead.source)}`,
+    ...(lead.unitCode ? [`Mã căn/tầng: ${e(lead.unitCode)}`] : []),
     `Tư vấn: ${e(lead.ref || "—")}`,
     `utm_source · utm_content: ${e(utmSource)} · ${e(utmContent)}`,
     `Thời gian: ${e(time)}`,

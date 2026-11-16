@@ -22,7 +22,11 @@ export function LeadModal({
   prefillNeed,
   contextNote,
   qualifiers,
+  unitField,
+  onSubmitted,
 }: {
+  unitField?: { label: Localized<string>; placeholder?: Localized<string> };
+  onSubmitted?: () => void;
   open: boolean;
   onClose: () => void;
   source: string;
@@ -73,7 +77,14 @@ export function LeadModal({
         >
           ×
         </button>
-        <LeadFormFull source={source} prefillNeed={prefillNeed} contextNote={contextNote} qualifiers={qualifiers} />
+        <LeadFormFull
+          source={source}
+          prefillNeed={prefillNeed}
+          contextNote={contextNote}
+          qualifiers={qualifiers}
+          unitField={unitField}
+          onSubmitted={onSubmitted}
+        />
       </div>
     </div>
   );
