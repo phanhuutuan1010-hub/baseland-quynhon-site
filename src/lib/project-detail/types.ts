@@ -58,6 +58,11 @@ export type ProjectHero = {
   /** Small print on the hero photo (e.g. "Hình ảnh minh họa" on a
    * rendering). Empty = none. */
   imageNote?: Localized<string>;
+  /** Desktop-only crop of the hero photo, without touching the file:
+   * zoom `scale` (e.g. 1.15) around the point `originX/originY` (0–1 of the
+   * frame). Lets something printed in a corner of the photo (a developer
+   * logo) move out from under the site header. Absent = plain cover. */
+  imageCrop?: { scale: number; originX: number; originY: number };
   placeholderLabel?: Localized<string>;
   /** Short label for ProjectNav's first item (e.g. "Q'Terra", not the
    * stylized all-caps hero title). Falls back to `project.name`. */

@@ -26,7 +26,7 @@ const missing = new Set<string>();
 function img(file: string, altVi: string, altEn: string): Img | undefined {
   const src = urls[`cyra-${file}.webp`];
   if (!src) {
-    if (!file.endsWith("-web")) missing.add(file);
+    missing.add(file);
     return undefined;
   }
   return { src, alt: L(altVi, altEn) };
@@ -53,11 +53,11 @@ function build() {
     ctaExploreHref: "#ly-do",
     ctaConsultLabel: L("Nhận bảng giá khi mở bán", "Get prices at launch"),
     ctaConsultHref: "#lead",
-    // "-web" = the same rendering with the developer logo in its top-left
-    // sky removed, so it doesn't collide with the site's own nav logo.
-    image:
-      img("hero-thap-hoang-hon-web", "Phối cảnh tháp Cyra Estero bên sông Hà Thanh lúc hoàng hôn — hình ảnh minh họa", "Cyra Estero tower on the Ha Thanh River at sunset — illustrative rendering") ??
-      img("hero-thap-hoang-hon", "Phối cảnh tháp Cyra Estero bên sông Hà Thanh lúc hoàng hôn — hình ảnh minh họa", "Cyra Estero tower on the Ha Thanh River at sunset — illustrative rendering"),
+    // The original rendering (developer logo kept). On desktop the photo is
+    // zoomed slightly around its right side so the logo printed in its
+    // top-left sky moves out from under the site header.
+    image: img("hero-thap-hoang-hon", "Phối cảnh tháp Cyra Estero bên sông Hà Thanh lúc hoàng hôn — hình ảnh minh họa", "Cyra Estero tower on the Ha Thanh River at sunset — illustrative rendering"),
+    imageCrop: { scale: 1.15, originX: 1, originY: 0 },
     imageNote: ILLUSTRATIVE,
     cardImage: img("hero-thap-hoang-hon-4x3", "Phối cảnh Cyra Estero Quy Nhơn — hình ảnh minh họa", "Cyra Estero Quy Nhon rendering — illustrative"),
     navLabel: "Cyra Estero",

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { useLang } from "@/lib/i18n";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { cssStep, cssScaleStep, cssLine } from "@/lib/useSequenceReveal";
@@ -36,6 +37,7 @@ export function ProjectHero({
   // Compact layout: badge pill + one line of key figures instead of the
   // subhead, and two CTAs only (consult first, then the 360° tour).
   const compact = data.layout === "compact";
+  const crop = data.imageCrop && data.imageCrop.scale > 1 ? data.imageCrop : undefined;
   const badge = compact && data.badge ? pick(data.badge) : "";
   const facts = compact && data.facts ? pick(data.facts) : "";
   const showExplore = !!pick(data.ctaExploreLabel) && !(compact && tourCta && pick(tourCta.label));
@@ -47,7 +49,20 @@ export function ProjectHero({
           fade finishes after hydration. Text still reveals in sequence. */}
       <div className="absolute inset-0">
         {data.image?.src ? (
-          <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="100vw" preload className="object-cover" style={{ objectPosition: focalPosition(data.image) }} />
+          <Image
+            src={data.image.src}
+            alt={pick(data.image.alt)}
+            fill
+            sizes="100vw"
+            preload
+            className={`object-cover ${crop ? "md:[transform-origin:var(--hero-crop-origin)] md:[transform:scale(var(--hero-crop-scale))]" : ""}`}
+            style={{
+              objectPosition: focalPosition(data.image),
+              ...(crop
+                ? ({ "--hero-crop-scale": crop.scale, "--hero-crop-origin": `${crop.originX * 100}% ${crop.originY * 100}%` } as CSSProperties)
+                : {}),
+            }}
+          />
         ) : (
           <ImagePlaceholder
             label={stripAccent(pick(data.placeholderLabel ?? data.subhead))}
