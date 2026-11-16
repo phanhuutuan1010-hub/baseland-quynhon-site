@@ -104,6 +104,15 @@ const FIELD_LABELS: Record<string, string> = {
   variants: "Các mẫu căn của loại này (2 mẫu trở lên = có tab con)",
   floorPlanImage: "Ảnh layout căn",
   showFlat: "Ảnh căn hộ mẫu (để trống = ẩn)",
+  panorama: "Ảnh toàn cảnh căn hộ mẫu (hiện trước dải ảnh căn hộ mẫu)",
+  enabled: "Bật",
+  srcLarge: "Ảnh bản lớn ~3600px (màn hình nét)",
+  srcFull: "Ảnh bản gốc ~5500px (chỉ tải khi mở toàn màn hình)",
+  hotspots: "Điểm chú thích trên ảnh",
+  x: "Vị trí ngang (% từ trái, 0–100)",
+  y: "Vị trí dọc (% từ trên, 0–100)",
+  openingDate: "Ngày khai trương nhà mẫu (YYYY-MM-DD; tự ẩn sau ngày này; trống = ẩn)",
+  openingLabel: "Chữ trước ngày khai trương",
   photos: "Ảnh",
   caption: "Chú thích",
   planImage: "Ảnh mặt bằng tiện ích (mở được để phóng to)",
@@ -200,7 +209,7 @@ function FieldEditor({
     // naming convention is what lets one generic field detect "this is
     // media", same spirit as isLocalizedLeaf() detecting bilingual leaves
     // by shape rather than a per-section field map.
-    if (path === "src" || path === "posterUrl" || path === "avatar") {
+    if (path === "src" || path === "srcLarge" || path === "srcFull" || path === "posterUrl" || path === "avatar") {
       return <MediaPickerField label={prettifyKey(path)} value={value} onChange={onChange} kindFilter="IMAGE" />;
     }
     if (path === "videoUrl") return <MediaPickerField label="Video" value={value} onChange={onChange} kindFilter="VIDEO" />;

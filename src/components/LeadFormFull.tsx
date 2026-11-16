@@ -86,7 +86,10 @@ export function LeadFormFull({
   qualifiers,
   unitField,
   onSubmitted,
+  project,
 }: {
+  /** Project slug sent with the lead (when `source` doesn't name it). */
+  project?: string;
   /** Extra optional text field for a unit/floor code. */
   unitField?: { label: Localized<string>; placeholder?: Localized<string> };
   /** Called once the lead was accepted by /api/lead. */
@@ -103,6 +106,7 @@ export function LeadFormFull({
   const { lead, updateField, errors, status, submit, retry } = useLeadForm(source, {
     initial: prefillNeed ? { need: prefillNeed } : undefined,
     onSuccess: onSubmitted,
+    project,
   });
 
   const chatButton = chat && (

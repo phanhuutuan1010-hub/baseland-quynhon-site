@@ -109,7 +109,7 @@ export function ProjectPage({
       )}
 
       {isSectionVisible(project, "residences") && project.residences && (
-        <ResidenceSelector id="residences" data={project.residences} />
+        <ResidenceSelector id="residences" data={project.residences} projectSlug={project.slug} qualifiers={project.cta.qualifiers} />
       )}
 
       {isSectionVisible(project, "videoDuo") && project.videoDuo && (
@@ -223,7 +223,14 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
 
       {show("masterplan") && project.masterplan && <ProjectMasterplan id="masterplan" data={project.masterplan} />}
       {showResidences && residences ? (
-        <ResidenceSelector id="can-ho" data={residences} compact floorPlans={project.floorPlans} />
+        <ResidenceSelector
+          id="can-ho"
+          data={residences}
+          compact
+          floorPlans={project.floorPlans}
+          projectSlug={project.slug}
+          qualifiers={project.cta.qualifiers}
+        />
       ) : (
         <EmptyAnchor id="can-ho" />
       )}

@@ -42,7 +42,18 @@ export function markLeadSubmitted(pixelParams?: Record<string, string>) {
  * the validation/submit behavior. */
 export function useLeadForm(
   source: string,
-  { requireConsent = false, initial, onSuccess }: { requireConsent?: boolean; initial?: Partial<LeadFormState>; onSuccess?: () => void } = {},
+  {
+    requireConsent = false,
+    initial,
+    onSuccess,
+    project,
+  }: {
+    requireConsent?: boolean;
+    initial?: Partial<LeadFormState>;
+    onSuccess?: () => void;
+    /** Project slug, for sources that don't name it (e.g. "cyra-panorama"). */
+    project?: string;
+  } = {},
 ) {
   const { lang } = useLang();
   const [lead, setLead] = useState<LeadFormState>(() => ({ ...INITIAL, ...initial }));
@@ -76,7 +87,7 @@ export function useLeadForm(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // ref + utm_* ride along as hidden fields (see lib/attribution).
-        body: JSON.stringify({ ...lead, phone: normalizeVnPhone(lead.phone) ?? lead.phone, source, lang, requireConsent, ...getAttribution() }),
+        body: JSON.stringify({ ...lead, phone: normalizeVnPhone(lead.phone) ?? lead.phone, source, lang, requireConsent, ...(project ? { project } : {}), ...getAttribution() }),
       });
       if (!res.ok) throw new Error("request_failed");
       setStatus("success");

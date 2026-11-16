@@ -24,7 +24,9 @@ export function LeadModal({
   qualifiers,
   unitField,
   onSubmitted,
+  project,
 }: {
+  project?: string;
   unitField?: { label: Localized<string>; placeholder?: Localized<string> };
   onSubmitted?: () => void;
   open: boolean;
@@ -84,6 +86,7 @@ export function LeadModal({
           qualifiers={qualifiers}
           unitField={unitField}
           onSubmitted={onSubmitted}
+          project={project}
         />
       </div>
     </div>

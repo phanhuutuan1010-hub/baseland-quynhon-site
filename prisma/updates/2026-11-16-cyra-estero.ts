@@ -12,6 +12,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, type Prisma, type ProjectSectionType } from "@prisma/client";
+import { cyraPanorama } from "./2026-11-16-cyra-panorama";
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
 
@@ -615,6 +616,9 @@ async function main() {
   console.log(`Ảnh Cyra trong Media Library: ${media.length}`);
 
   const c = build();
+  // Living-room panorama (separate script; kept when this one re-runs).
+  const panorama = await cyraPanorama(prisma).catch(() => undefined);
+  if (panorama) Object.assign(c.residences, { panorama });
   const existing = await prisma.project.findUnique({ where: { slug: SLUG } });
   if (existing && !overwrite) {
     console.log("Dự án đã tồn tại — chạy lại với --overwrite để ghi đè nội dung.");

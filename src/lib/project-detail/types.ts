@@ -351,8 +351,30 @@ export type ProjectResidences = {
   typicalFloor?: ProjectTypicalFloor;
   /** ProjectNav label override — falls back to `eyebrow`. */
   navLabel?: Localized<string>;
+  /** Wide panorama of the show apartment (flat image, not a 360° sphere),
+   * shown right before `showFlat`. Hidden while disabled or without image. */
+  panorama?: ProjectPanorama;
   /** "Bên trong căn hộ mẫu" photo row under the selector. Empty = hidden. */
   showFlat?: ProjectPhotoStrip;
+};
+
+export type ProjectPanorama = {
+  enabled: boolean;
+  title: Localized<string>;
+  caption: Localized<string>;
+  /** Same picture at three widths (WebP): `src` ~2700px (always),
+   * `srcLarge` ~3600px (sharper screens), `srcFull` ~5500px (loaded only in
+   * the full-screen viewer). */
+  image: { src: string; srcLarge: string; srcFull: string; alt: Localized<string> };
+  /** Positions in % of the image (0–100), so they stay put at any size. */
+  hotspots: { label: Localized<string>; x: number; y: number }[];
+  ctaLabel: Localized<string>;
+  /** Lead `source` of the CTA; empty → "<slug>-panorama". */
+  leadSource: string;
+  /** "YYYY-MM-DD"; the line "<openingLabel> dd/mm/yyyy" shows until the day
+   * is over. Empty = no line. */
+  openingDate: string;
+  openingLabel: Localized<string>;
 };
 
 export type ProjectFloorPlanGroupKey = string;

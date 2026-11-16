@@ -23,7 +23,10 @@ export function ZoomLightbox({
   width,
   height,
   onClose,
+  unoptimized,
 }: {
+  /** Serve `src` as-is (e.g. a 5500px original the optimizer would cap). */
+  unoptimized?: boolean;
   src: string;
   alt: string;
   caption?: string;
@@ -127,6 +130,7 @@ export function ZoomLightbox({
             height={height || 1800}
             sizes="100vw"
             quality={90}
+            unoptimized={unoptimized}
             draggable={false}
             className="pointer-events-none max-h-full w-auto max-w-full object-contain"
           />

@@ -12,15 +12,22 @@ import { Accent } from "@/components/Accent";
 import { frameRatio } from "./imageFrame";
 import { ZoomBadge, ZoomLightbox } from "./ZoomLightbox";
 import { PhotoStrip, hasPhotos } from "./PhotoStrip";
+import { PanoramaViewer, hasPanorama } from "./PanoramaViewer";
+import type { ProjectLeadQualifier } from "@/lib/project-detail/types";
 
 export function ResidenceSelector({
   id,
   data,
   compact,
   floorPlans,
+  projectSlug = "",
+  qualifiers,
 }: {
   id: string;
   data: ProjectResidencesData;
+  /** For the show-apartment panorama's lead form. */
+  projectSlug?: string;
+  qualifiers?: ProjectLeadQualifier[];
   /** Compact layout: no unit-mix table, a one-line typical-floor summary,
    * and the floor-plan button opens `floorPlans` in a dialog. */
   compact?: boolean;
@@ -258,6 +265,12 @@ export function ResidenceSelector({
         <p className="m-0 mt-8 max-w-180 font-body text-[13px] leading-[var(--lh-body)] text-[var(--color-deep-earth)] md:mt-10">
           {pick(data.footnote)}
         </p>
+
+        {hasPanorama(data.panorama) && (
+          <div className="mt-12 border-t border-[var(--color-border)] pt-10 md:mt-16 md:pt-14">
+            <PanoramaViewer data={data.panorama} projectSlug={projectSlug} qualifiers={qualifiers} />
+          </div>
+        )}
 
         {hasPhotos(data.showFlat) && <PhotoStrip data={data.showFlat} className="mt-12 border-t border-[var(--color-border)] pt-10 md:mt-16 md:pt-14" />}
       </Reveal>

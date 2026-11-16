@@ -440,6 +440,19 @@ textarea {
   }
 }
 
+/* Panorama hotspot halo (PanoramaViewer) — a soft, slow pulse. */
+@keyframes panorama-pulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
 /* Lead pop-up (LeadPopupDialog): backdrop fade + panel rising into place —
  * a bottom sheet on mobile, a centered modal on desktop. Covered by the
  * reduced-motion rule above like every other animation. */
