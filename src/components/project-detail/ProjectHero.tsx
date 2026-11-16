@@ -62,6 +62,11 @@ export function ProjectHero({
           background: "linear-gradient(180deg, rgba(38,34,32,0.30) 0%, rgba(38,34,32,0.10) 34%, rgba(38,34,32,0.78) 100%)",
         }}
       />
+      {data.image?.src && data.imageNote && pick(data.imageNote) && (
+        <span className="absolute top-20 right-4 z-[2] font-body text-[11px] italic text-[rgba(250,245,238,0.8)] md:top-24 md:right-8">
+          {pick(data.imageNote)}
+        </span>
+      )}
       <div
         className={`relative z-[2] mx-auto flex h-full max-w-[1440px] flex-col justify-end px-5 sm:px-8 sm:pb-16 md:px-12 md:pb-22 ${compact ? "pb-20" : "pb-12"}`}
       >

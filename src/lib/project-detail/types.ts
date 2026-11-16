@@ -55,6 +55,9 @@ export type ProjectHero = {
   /** Optional — a new project may not have a hero photo ready yet. Falls
    * back to ImagePlaceholder (dark tone, to keep hero text legible). */
   image?: { src: string; alt: Localized<string> };
+  /** Small print on the hero photo (e.g. "Hình ảnh minh họa" on a
+   * rendering). Empty = none. */
+  imageNote?: Localized<string>;
   placeholderLabel?: Localized<string>;
   /** Short label for ProjectNav's first item (e.g. "Q'Terra", not the
    * stylized all-caps hero title). Falls back to `project.name`. */

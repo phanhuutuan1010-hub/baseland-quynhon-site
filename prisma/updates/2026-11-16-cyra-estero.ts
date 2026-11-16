@@ -58,6 +58,7 @@ function build() {
     image:
       img("hero-thap-hoang-hon-web", "Phối cảnh tháp Cyra Estero bên sông Hà Thanh lúc hoàng hôn — hình ảnh minh họa", "Cyra Estero tower on the Ha Thanh River at sunset — illustrative rendering") ??
       img("hero-thap-hoang-hon", "Phối cảnh tháp Cyra Estero bên sông Hà Thanh lúc hoàng hôn — hình ảnh minh họa", "Cyra Estero tower on the Ha Thanh River at sunset — illustrative rendering"),
+    imageNote: ILLUSTRATIVE,
     cardImage: img("hero-thap-hoang-hon-4x3", "Phối cảnh Cyra Estero Quy Nhơn — hình ảnh minh họa", "Cyra Estero Quy Nhon rendering — illustrative"),
     navLabel: "Cyra Estero",
     layout: "compact",
