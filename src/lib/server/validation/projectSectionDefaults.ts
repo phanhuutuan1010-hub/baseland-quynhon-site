@@ -163,7 +163,7 @@ export const PROJECT_SECTION_DEFAULTS: Record<EditableProjectSectionKey, object>
   videoCallPopup: VIDEO_CALL_POPUP_DEFAULT,
   location: { eyebrow: L, headline: L, body: L, navLabel: L, mapImage: emptyImage, journey: [], benefits: [], actionLabel: L, actionHref: "call" },
   masterplan: { eyebrow: L, headline: L, body: L, image: emptyImage, zones: [], ctaLabel: L, ctaHref: "#lead" },
-  architecture: { headline: L, body: L, image: emptyImage },
+  architecture: { headline: L, body: L, image: emptyImage, facts: [] },
   materialStory: { kicker: L, headline: L, body: L, swatches: [], galleryImages: [] },
   lifestyle: { eyebrow: L, headline: L, chapters: [] },
   education: { headline: L, body: L, image: emptyImage },
@@ -264,6 +264,7 @@ export const PROJECT_SECTION_ITEM_TEMPLATES: Partial<Record<EditableProjectSecti
   faq: { items: { q: L, a: L, group: "" } },
   salesPhases: { steps: { title: L, body: L, tag: L } },
   virtualTour: { highlights: L },
+  architecture: { facts: { value: "", label: L } },
   leadPopup: { benefits: L },
   videoCallPopup: { checklist: L, subtitleRules: { utmContains: "", text: L } },
   residences: {

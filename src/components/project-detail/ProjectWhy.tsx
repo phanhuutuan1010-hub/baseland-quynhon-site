@@ -6,7 +6,6 @@ import type { ProjectTowers } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
 import { CompactHeading, scrollCardClass } from "./shared";
 import { Carousel } from "./Carousel";
-import { SectionAction } from "./ProjectContact";
 
 /**
  * Compact layout's "Vì sao …" block — the towers section's `reasons`
@@ -20,10 +19,9 @@ export function ProjectWhy({ id, data }: { id: string; data: ProjectTowers }) {
   return (
     <section id={id} className="bg-[var(--project-dark)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
       <Reveal className="mx-auto max-w-[1440px]">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-6 md:mb-12">
-          <CompactHeading dark eyebrow={pick(data.eyebrow)} headline={<Accent text={pick(data.headline)} onDark />} />
-          <SectionAction data={data} show="md-up" />
-        </div>
+        {/* No CTA here: the price button lives in the header, the hero and
+            "Giá" only. */}
+        <CompactHeading dark eyebrow={pick(data.eyebrow)} headline={<Accent text={pick(data.headline)} onDark />} className="mb-8 md:mb-12" />
         <Carousel dark label={pick(data.eyebrow)} className="md:mx-0 md:grid md:gap-6 md:overflow-visible md:scroll-px-0 md:px-0 md:pb-0 md:grid-cols-2 lg:grid-cols-4">
           {reasons.map((r, i) => (
             <div
@@ -49,7 +47,6 @@ export function ProjectWhy({ id, data }: { id: string; data: ProjectTowers }) {
             </div>
           ))}
         </Carousel>
-        <SectionAction data={data} show="md-down" className="mt-8 w-full" />
       </Reveal>
     </section>
   );

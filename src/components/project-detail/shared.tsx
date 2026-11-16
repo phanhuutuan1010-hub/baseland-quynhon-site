@@ -50,7 +50,7 @@ export function AnimatedNumber({ target }: { target: number }) {
 /** Pill/tab chip shared by the unit-type selector (ResidenceSelector) and
  * the floor-plan picker (FloorPlanViewer). */
 export function chipClass(active: boolean) {
-  return `whitespace-nowrap rounded-full border px-5 py-3 font-ui text-xs font-bold tracking-[0.07em] uppercase cursor-pointer transition-colors duration-200 ${
+  return `inline-flex min-h-11 items-center whitespace-nowrap rounded-full border px-5 py-2.5 font-ui text-sm font-bold tracking-[0.06em] uppercase cursor-pointer transition-colors duration-200 ${
     active
       ? "border-[var(--color-charcoal)] bg-[var(--color-charcoal)] text-[var(--color-warm-white)]"
       : "border-[rgba(38,34,32,0.25)] bg-transparent text-[var(--color-charcoal)]"

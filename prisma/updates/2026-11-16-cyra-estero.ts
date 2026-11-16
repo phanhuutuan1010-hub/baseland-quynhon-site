@@ -13,6 +13,7 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, type Prisma, type ProjectSectionType } from "@prisma/client";
 import { cyraPanorama } from "./2026-11-16-cyra-panorama";
+import { CYRA_AMENITIES_ACTION, CYRA_ARCHITECTURE_FACTS, CYRA_HERO_FRAME } from "./2026-11-16-cyra-ui-polish";
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
 
@@ -54,11 +55,11 @@ function build() {
     ctaExploreHref: "#ly-do",
     ctaConsultLabel: L("Nhận bảng giá khi mở bán", "Get prices at launch"),
     ctaConsultHref: "#lead",
-    // The original rendering (developer logo kept). On desktop the photo is
-    // zoomed slightly around its right side so the logo printed in its
-    // top-left sky moves out from under the site header.
+    // The original rendering (developer logo kept in the file). The strip of
+    // sky holding that logo is trimmed from view (CYRA_HERO_FRAME), so it
+    // never sits under the site header.
     image: img("hero-thap-hoang-hon", "Phối cảnh tháp Cyra Estero bên sông Hà Thanh lúc hoàng hôn — hình ảnh minh họa", "Cyra Estero tower on the Ha Thanh River at sunset — illustrative rendering"),
-    imageCrop: { scale: 1.15, originX: 1, originY: 0 },
+    ...CYRA_HERO_FRAME,
     imageNote: ILLUSTRATIVE,
     cardImage: img("hero-thap-hoang-hon-4x3", "Phối cảnh Cyra Estero Quy Nhơn — hình ảnh minh họa", "Cyra Estero Quy Nhon rendering — illustrative"),
     navLabel: "Cyra Estero",
@@ -189,6 +190,7 @@ function build() {
     ),
     image: img("phoi-canh-toan-canh", "Phối cảnh toàn cảnh Cyra Estero bên sông Hà Thanh — hình ảnh minh họa", "Aerial view of Cyra Estero on the Ha Thanh River — illustrative rendering"),
     navLabel: L("Kiến trúc", "Architecture"),
+    facts: CYRA_ARCHITECTURE_FACTS,
   };
 
   const unit = (
@@ -220,21 +222,22 @@ function build() {
     };
   };
 
+  // The wide living-room rendering (mau-phong-khach-toan-canh) is shown by
+  // the panorama viewer instead; no two neighbours share a caption.
   const showFlatPhotos = defined([
-    photo("mau-phong-khach-toan-canh", "Phòng khách", "Living room"),
     photo("mau-phong-khach-1", "Phòng khách", "Living room"),
-    photo("mau-phong-khach-2", "Phòng khách", "Living room"),
     photo("mau-ban-an", "Phòng khách & bàn ăn", "Living & dining"),
+    photo("mau-phong-khach-2", "Phòng khách", "Living room"),
     photo("mau-bep", "Bếp", "Kitchen"),
     photo("mau-pn-master-1", "Phòng ngủ master", "Master bedroom"),
-    photo("mau-pn-master-2", "Phòng ngủ master", "Master bedroom"),
-    photo("mau-pn", "Phòng ngủ", "Bedroom"),
     photo("mau-pn-tre-em-1", "Phòng ngủ trẻ em", "Kids' bedroom"),
+    photo("mau-pn-master-2", "Phòng ngủ master", "Master bedroom"),
     photo("mau-pn-tre-em-2", "Phòng ngủ trẻ em", "Kids' bedroom"),
+    photo("mau-pn", "Phòng ngủ", "Bedroom"),
     photo("mau-pn-tre-em-3", "Phòng ngủ trẻ em", "Kids' bedroom"),
     photo("mau-lo-gia-1", "Lô gia", "Loggia"),
-    photo("mau-lo-gia-2", "Lô gia", "Loggia"),
     photo("mau-khu-giat", "Khu giặt", "Laundry"),
+    photo("mau-lo-gia-2", "Lô gia", "Loggia"),
     photo("mau-wc", "Phòng tắm", "Bathroom"),
   ]);
 
@@ -377,8 +380,7 @@ function build() {
     eyebrow: L("Tiện ích", "Amenities"),
     headline: L("25+ tiện ích, [[từ bờ\u00a0sông lên sân\u00a0thượng]]", "25+ amenities, [[from riverbank to rooftop]]"),
     navLabel: L("Tiện ích", "Amenities"),
-    actionLabel: L("Nhận bảng giá khi mở bán", "Get prices at launch"),
-    actionHref: "#lead",
+    ...CYRA_AMENITIES_ACTION,
     planButtonLabel: L("Xem mặt bằng", "View plan"),
     chapters: [
       chapter(

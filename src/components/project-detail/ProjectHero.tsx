@@ -37,7 +37,7 @@ export function ProjectHero({
   // Compact layout: badge pill + one line of key figures instead of the
   // subhead, and two CTAs only (consult first, then the 360° tour).
   const compact = data.layout === "compact";
-  const crop = data.imageCrop && data.imageCrop.scale > 1 ? data.imageCrop : undefined;
+  const frame = heroFrame(data);
   const badge = compact && data.badge ? pick(data.badge) : "";
   const facts = compact && data.facts ? pick(data.facts) : "";
   const showExplore = !!pick(data.ctaExploreLabel) && !(compact && tourCta && pick(tourCta.label));
@@ -47,7 +47,7 @@ export function ProjectHero({
       {/* Visible from the first paint (no JS fade-in): the hero photo is the
           mobile LCP element, and an opacity-0 image only counts once the
           fade finishes after hydration. Text still reveals in sequence. */}
-      <div className="absolute inset-0">
+      <div className={`absolute inset-0 ${frame.vars ? "hero-frame" : ""}`}>
         {data.image?.src ? (
           <Image
             src={data.image.src}
@@ -55,13 +55,8 @@ export function ProjectHero({
             fill
             sizes="100vw"
             preload
-            className={`object-cover ${crop ? "md:[transform-origin:var(--hero-crop-origin)] md:[transform:scale(var(--hero-crop-scale))]" : ""}`}
-            style={{
-              objectPosition: focalPosition(data.image),
-              ...(crop
-                ? ({ "--hero-crop-scale": crop.scale, "--hero-crop-origin": `${crop.originX * 100}% ${crop.originY * 100}%` } as CSSProperties)
-                : {}),
-            }}
+            className={`object-cover ${frame.vars ? "hero-frame-img" : ""}`}
+            style={{ objectPosition: frame.position, ...frame.vars }}
           />
         ) : (
           <ImagePlaceholder
@@ -77,6 +72,22 @@ export function ProjectHero({
           background: "linear-gradient(180deg, rgba(38,34,32,0.30) 0%, rgba(38,34,32,0.10) 34%, rgba(38,34,32,0.78) 100%)",
         }}
       />
+      {/* Phones: the text covers the lower half of the photo, whatever is
+          there — a deeper shade from the middle down keeps white text at AA
+          contrast even over a bright facade. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[1] md:hidden"
+        style={{ background: "linear-gradient(180deg, rgba(20,22,24,0) 30%, rgba(20,22,24,0.62) 52%, rgba(20,22,24,0.8) 100%)" }}
+      />
+      {/* Desktop: the text block sits in the left 55% — darken that side so
+          white text keeps AA contrast on any photo; the subject stays clear
+          on the right. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[1] hidden md:block"
+        style={{ background: "linear-gradient(90deg, rgba(20,22,24,0.72) 0%, rgba(20,22,24,0.5) 32%, rgba(20,22,24,0) 62%)" }}
+      />
       {data.image?.src && data.imageNote && pick(data.imageNote) && (
         <span className="absolute top-20 right-4 z-[2] font-body text-[11px] italic text-[rgba(250,245,238,0.8)] md:top-24 md:right-8">
           {pick(data.imageNote)}
@@ -85,6 +96,7 @@ export function ProjectHero({
       <div
         className={`relative z-[2] mx-auto flex h-full max-w-[1440px] flex-col justify-end px-5 sm:px-8 sm:pb-16 md:px-12 md:pb-22 ${compact ? "pb-20" : "pb-12"}`}
       >
+        <div className="md:max-w-[55%]">
         {badge && (
           <div style={cssStep(150, 500)} className="mb-4.5">
             <span className="inline-flex items-center gap-2 rounded-full bg-[var(--project-primary)] px-3.5 py-1.5 font-ui text-[11px] font-bold tracking-[0.1em] text-[var(--project-primary-foreground)] uppercase">
@@ -103,12 +115,12 @@ export function ProjectHero({
         )}
         <h1
           style={cssStep(300, 650, { fade: false })}
-          className="m-0 mb-4.5 font-display text-[clamp(3rem,11vw,8.5rem)] leading-[0.95] font-normal tracking-[-0.02em] text-[var(--color-warm-white)]"
+          className="m-0 mb-4.5 font-display text-[clamp(44px,6.5vw,96px)] leading-[1] font-normal tracking-[-0.02em] text-[var(--color-warm-white)]"
         >
           {name}
         </h1>
         {pick(data.addressLine) && (
-          <div className="mb-6.5 flex flex-wrap items-center gap-4">
+          <div className="mb-6.5 flex flex-wrap items-center gap-4 md:max-w-[88%]">
             <span style={cssLine(650, 48)} className="block h-0.5 rounded-sm bg-[var(--project-accent-light)]" />
             <span
               style={cssStep(700, 500)}
@@ -119,17 +131,19 @@ export function ProjectHero({
           </div>
         )}
         {facts && (
-          <p
-            style={cssStep(850, 500)}
-            className="m-0 mb-8 flex max-w-[760px] flex-wrap gap-x-3 gap-y-1.5 font-ui text-[15px] font-semibold tracking-[0.04em] text-[var(--color-warm-white)] sm:text-base"
-          >
-            {facts.split("·").map((f, i, all) => (
-              <span key={i} className="flex items-center gap-3 whitespace-nowrap">
-                {f.trim()}
-                {i < all.length - 1 && <span aria-hidden className="text-[var(--project-accent-light)]">·</span>}
-              </span>
-            ))}
-          </p>
+          // Each figure carries its "·" in front; the row is pulled left by
+          // that much and clipped, so the first figure of every line loses
+          // its dot and no dot is ever left dangling at a line end.
+          <div style={cssStep(850, 500)} className="mb-8 max-w-[760px] overflow-hidden">
+            <p className="m-0 -ml-6 flex flex-wrap gap-y-1.5 font-ui text-[15px] font-semibold tracking-[0.04em] text-[var(--color-warm-white)] sm:text-base">
+              {facts.split("·").map((f, i) => (
+                <span key={i} className="relative pl-6 whitespace-nowrap">
+                  <span aria-hidden className="absolute left-2 text-[var(--project-accent-light)]">·</span>
+                  {f.trim()}
+                </span>
+              ))}
+            </p>
+          </div>
         )}
         {!facts && pick(data.subhead) && (
           <p
@@ -171,7 +185,58 @@ export function ProjectHero({
             )}
           </div>
         )}
+        </div>
       </div>
     </section>
   );
+}
+
+/**
+ * How the hero photo sits in its frame.
+ *
+ * Default (no imageFocus / imageTrim): a plain cover crop anchored on the
+ * Media focal point — `position` only.
+ *
+ * With `imageFocus` (the subject's place in the photo) and/or `imageTrim`
+ * (strips never shown), and when the image's real size is known, the photo
+ * is laid out by CSS (globals.css, .hero-frame) from these custom
+ * properties: the kept part always covers the frame, the trimmed strips
+ * stay outside at any screen shape, and the subject is centred on phones
+ * but placed in the right-hand part on desktop — clear of the text block
+ * in the left 55%.
+ */
+function heroFrame(data: ProjectHeroData): { position: string; vars?: CSSProperties } {
+  const meta = (data.image ?? {}) as { width?: number; height?: number; focalX?: number; focalY?: number };
+  const focus = data.imageFocus;
+  const sx = focus ? clampPct(focus.x) / 100 : (meta.focalX ?? 0.5);
+  const sy = focus ? clampPct(focus.y) / 100 : (meta.focalY ?? 0.5);
+  const position = focus ? `${Math.round(sx * 100)}% ${Math.round(sy * 100)}%` : focalPosition(data.image);
+  const t = data.imageTrim;
+  const top = clampPct(t?.top) / 100;
+  const right = clampPct(t?.right) / 100;
+  const bottom = clampPct(t?.bottom) / 100;
+  const left = clampPct(t?.left) / 100;
+  const keepW = 1 - left - right;
+  const keepH = 1 - top - bottom;
+  const hasTrim = top + right + bottom + left > 0;
+  if (!meta.width || !meta.height || (!focus && !hasTrim) || keepW < 0.2 || keepH < 0.2) return { position };
+  return {
+    position,
+    vars: {
+      "--hero-ratio": meta.width / meta.height,
+      "--hero-keep-w": keepW,
+      "--hero-keep-h": keepH,
+      "--hero-trim-l": left,
+      "--hero-trim-t": top,
+      "--hero-sx": sx,
+      "--hero-sy": sy,
+      // Without an explicit subject, desktop keeps it centred too.
+      ...(focus ? {} : { "--hero-tx-desktop": 0.5 }),
+    } as CSSProperties,
+  };
+}
+
+function clampPct(v: unknown): number {
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 0;
 }

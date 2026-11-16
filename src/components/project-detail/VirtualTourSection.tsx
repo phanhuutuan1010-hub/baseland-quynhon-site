@@ -143,7 +143,7 @@ function ExternalTour({ id, data, projectSlug, fallbackImage, qualifiers, compac
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-5">
           {pick(data.note) && (
-            <p className="m-0 max-w-150 min-w-60 flex-1 font-body text-[13px] leading-[var(--lh-body)] text-[var(--color-deep-earth)]">{pick(data.note)}</p>
+            <p className="m-0 max-w-150 min-w-60 flex-1 font-body text-[13px] leading-[var(--lh-body)] text-[var(--color-text-muted)]">{pick(data.note)}</p>
           )}
           {pick(data.ctaLabel) && (
             <button

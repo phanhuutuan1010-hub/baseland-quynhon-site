@@ -68,6 +68,14 @@ export const verificationContentSchema = z.object({
 // a content choice) stay required. Every other field is display copy an
 // admin may leave blank while staging content; ProjectPage's components
 // hide the element instead of rendering it empty (see e.g. ProjectHero).
+// "" (not set) or a number 0–100, typed as text in the Overview form.
+const percentText = z
+  .string()
+  .trim()
+  .refine((v) => v === "" || (/^\d+(\.\d+)?$/.test(v) && Number(v) <= 100), "Nhập số từ 0 đến 100 (hoặc để trống)")
+  .optional()
+  .or(z.literal(""));
+
 export const projectOverviewSchema = z.object({
   name: z.string().trim().min(1, "Bắt buộc"),
   categoryVi: z.string().trim(),
@@ -89,6 +97,12 @@ export const projectOverviewSchema = z.object({
   heroCtaConsultLabelEn: z.string().trim(),
   heroCtaConsultHref: z.string().trim().min(1),
   heroImageSrc: z.string().trim().optional().or(z.literal("")),
+  heroFocusX: percentText,
+  heroFocusY: percentText,
+  heroTrimTop: percentText,
+  heroTrimRight: percentText,
+  heroTrimBottom: percentText,
+  heroTrimLeft: percentText,
   cardImageSrc: z.string().trim().optional().or(z.literal("")),
   heroLayout: z.enum(["full", "compact"]),
   heroBadgeVi: z.string().trim(),

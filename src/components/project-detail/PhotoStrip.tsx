@@ -8,6 +8,15 @@ import { Carousel } from "./Carousel";
 import { focalPosition, frameRatio } from "./imageFrame";
 import { ZoomLightbox } from "./ZoomLightbox";
 
+/** `sizes` for one strip photo: the row has a fixed height (224 / 256 /
+ * 320px) and each photo keeps its own ratio, so the displayed width is
+ * height × ratio — never under-report it (a too-small file looks soft). */
+function stripSizes(photo: object): string {
+  const m = photo as { width?: number; height?: number };
+  const r = m.width && m.height ? m.width / m.height : 4 / 3;
+  return `(min-width: 768px) ${Math.ceil(320 * r)}px, (min-width: 640px) ${Math.ceil(256 * r)}px, ${Math.ceil(224 * r)}px`;
+}
+
 /** True when the strip has at least one photo to show. */
 export function hasPhotos(strip?: ProjectPhotoStrip): strip is ProjectPhotoStrip {
   return !!strip?.photos?.some((p) => p.src?.trim());
@@ -49,7 +58,7 @@ export function PhotoStrip({ data, dark, className = "" }: { data: ProjectPhotoS
                 alt={pick(p.alt) || pick(p.caption)}
                 width={960}
                 height={720}
-                sizes="(min-width: 768px) 560px, 86vw"
+                sizes={stripSizes(p)}
                 className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.03]"
                 style={{ objectPosition: focalPosition(p) }}
               />
@@ -63,7 +72,7 @@ export function PhotoStrip({ data, dark, className = "" }: { data: ProjectPhotoS
         ))}
       </Carousel>
       {pick(data.note) && (
-        <p className={`m-0 mt-3 font-body text-[13px] italic ${dark ? "text-[var(--color-sand)]" : "text-[var(--color-deep-earth)]"}`}>{pick(data.note)}</p>
+        <p className={`m-0 mt-3 font-body text-[13px] italic ${dark ? "text-[var(--color-sand)]" : "text-[var(--color-text-muted)]"}`}>{pick(data.note)}</p>
       )}
       {active && (
         <ZoomLightbox

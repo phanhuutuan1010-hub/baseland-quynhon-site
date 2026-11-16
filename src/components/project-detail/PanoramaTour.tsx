@@ -380,7 +380,7 @@ export function PanoramaTour({ id, compact, data, projectSlug, fallbackImage, qu
               </div>
             )}
             {pick(data.note) && (
-              <p className="m-0 max-w-150 font-body text-[13px] leading-[var(--lh-body)] text-[var(--color-deep-earth)]">{pick(data.note)}</p>
+              <p className="m-0 max-w-150 font-body text-[13px] leading-[var(--lh-body)] text-[var(--color-text-muted)]">{pick(data.note)}</p>
             )}
           </div>
           {pick(data.ctaLabel) && (

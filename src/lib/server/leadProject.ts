@@ -14,7 +14,7 @@ export async function resolveProjectIdFromSource(source: string): Promise<string
   // e.g. "qterra-popup" (lead pop-up), "qterra-360" (virtual tour CTA),
   // "qterra-360-return" (card shown on coming back from the tour tab)
   // "cyra-estero-panorama"/"cyra-panorama" (show-apartment panorama CTA)
-  const popupMatch = source.match(/^(.+)-(?:popup|360|360-return|panorama)$/);
+  const popupMatch = source.match(/^(.+)-(?:popup|360|360-return|panorama|tien-ich)$/);
   const candidateSlug = videoMatch ? videoMatch[1] : popupMatch ? popupMatch[1] : source;
 
   const project = await prisma.project.findUnique({ where: { slug: candidateSlug }, select: { id: true } });

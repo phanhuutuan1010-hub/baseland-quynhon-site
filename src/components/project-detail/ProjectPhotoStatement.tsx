@@ -118,8 +118,16 @@ function FullBleedPhotoStatement({
   );
 }
 
+/** Frame ratio of the compact photo: the image's own when it is landscape
+ * (≥ 1.2), else 16:10. */
+function compactFrame(img: object): string {
+  const m = img as { width?: number; height?: number };
+  return m.width && m.height && m.width / m.height >= 1.2 ? `${m.width} / ${m.height}` : "16 / 10";
+}
+
 function CompactPhotoStatement({ id, data }: { id?: string; data: ProjectPhotoStatementData }) {
   const { pick } = useLang();
+  const facts = (data.facts ?? []).filter((f) => f.value?.trim());
   return (
     <section id={id} className="bg-[var(--color-warm-white)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
       <Reveal
@@ -127,8 +135,15 @@ function CompactPhotoStatement({ id, data }: { id?: string; data: ProjectPhotoSt
       >
         {/* No photo yet → text only (no grey placeholder). */}
         {data.image?.src && (
-          <div className="relative aspect-16/10 overflow-hidden" style={{ background: TONE_BG[data.tone ?? "charcoal"] }}>
-            <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="(min-width: 768px) 55vw, 100vw" className="object-cover" style={{ objectPosition: focalPosition(data.image) }} />
+          // Landscape photos keep their own ratio — nothing is cropped (a
+          // logo or caption printed in the picture stays whole). Portrait /
+          // square ones would tower over the text, so those keep the 16:10
+          // frame, cropped around the focal point.
+          <div
+            className="relative overflow-hidden"
+            style={{ aspectRatio: compactFrame(data.image), background: TONE_BG[data.tone ?? "charcoal"] }}
+          >
+            <Image src={data.image.src} alt={pick(data.image.alt)} fill sizes="(min-width: 768px) 58vw, 100vw" className="object-cover" style={{ objectPosition: focalPosition(data.image) }} />
           </div>
         )}
         <div>
@@ -143,6 +158,16 @@ function CompactPhotoStatement({ id, data }: { id?: string; data: ProjectPhotoSt
           <p className="m-0 max-w-120 font-body text-[length:var(--fs-body)] leading-[var(--lh-body)] text-[var(--color-text-muted)]">
             <Accent text={pick(data.body)} />
           </p>
+          {facts.length > 0 && (
+            <dl className="m-0 mt-7 flex max-w-120 flex-wrap gap-x-7 gap-y-5 border-t border-[rgba(var(--project-accent-rgb),0.35)] pt-6">
+              {facts.map((f, i) => (
+                <div key={i} className="flex min-w-16 flex-col-reverse">
+                  <dt className="mt-1 font-ui text-[11px] leading-[1.4] font-bold tracking-[0.1em] text-[var(--color-text-muted)] uppercase">{pick(f.label)}</dt>
+                  <dd className="m-0 font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-none text-[var(--color-charcoal)] tabular-nums">{f.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
       </Reveal>
     </section>

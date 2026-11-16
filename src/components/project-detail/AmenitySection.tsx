@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
-import type { ProjectAmenities as ProjectAmenitiesData } from "@/lib/project-detail/types";
+import type { ProjectAmenities as ProjectAmenitiesData, ProjectLeadQualifier } from "@/lib/project-detail/types";
+import { LeadModal } from "@/components/LeadModal";
+import { trackEvent } from "@/lib/analytics";
 import { Accent } from "@/components/Accent";
 import { CompactHeading } from "./shared";
 import { Carousel } from "./Carousel";
@@ -14,9 +16,22 @@ import { SectionAction } from "./ProjectContact";
 import { ZoomBadge, ZoomLightbox } from "./ZoomLightbox";
 import { PhotoStrip, hasPhotos } from "./PhotoStrip";
 
-export function AmenitySection({ id, data, compact }: { id: string; data: ProjectAmenitiesData; compact?: boolean }) {
+export function AmenitySection({
+  id,
+  data,
+  compact,
+  projectSlug = "",
+  qualifiers,
+}: {
+  id: string;
+  data: ProjectAmenitiesData;
+  compact?: boolean;
+  /** For the section CTA's lead form (`actionHref: "form"`). */
+  projectSlug?: string;
+  qualifiers?: ProjectLeadQualifier[];
+}) {
   const { pick } = useLang();
-  if (compact) return <AmenityCards id={id} data={data} />;
+  if (compact) return <AmenityCards id={id} data={data} projectSlug={projectSlug} qualifiers={qualifiers} />;
   return (
     <section id={id} className="bg-[var(--color-limestone)] px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-28">
       <Reveal className="mx-auto max-w-[1440px]">
@@ -73,8 +88,36 @@ export function AmenitySection({ id, data, compact }: { id: string; data: Projec
 /** Compact layout: one card per amenity floor (photo, floor, title, short
  * description, items) — a 4-column grid on desktop, a sideways row on
  * mobile. */
-function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) {
-  const { pick } = useLang();
+function AmenityCards({
+  id,
+  data,
+  projectSlug,
+  qualifiers,
+}: {
+  id: string;
+  data: ProjectAmenitiesData;
+  projectSlug: string;
+  qualifiers?: ProjectLeadQualifier[];
+}) {
+  const { pick, lang } = useLang();
+  const [formOpen, setFormOpen] = useState(false);
+  const closeForm = useCallback(() => setFormOpen(false), []);
+  // actionHref "form" = the CTA opens the lead form right here, with its
+  // own source ("<slug>-tien-ich"), instead of jumping to the page form.
+  const formCta = data.actionHref === "form" && !!pick(data.actionLabel ?? { vi: "", en: "" });
+  const cta = (extra: string) =>
+    formCta ? (
+      <button
+        type="button"
+        onClick={() => {
+          trackEvent("amenities_cta_click", { project: projectSlug, language: lang });
+          setFormOpen(true);
+        }}
+        className={`inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xs border border-[var(--project-primary)] bg-[var(--project-primary)] px-7 py-3.5 text-center font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase hover:bg-[var(--project-primary-dark)] ${extra}`}
+      >
+        {pick(data.actionLabel!)}
+      </button>
+    ) : null;
   const [zoomSlot, setZoomSlot] = useState<string | null>(null);
   const zoomChapter = data.chapters.find((c) => c.slotId === zoomSlot && c.planImage?.src);
   const planLabel = pick(data.planButtonLabel ?? { vi: "", en: "" }) || pick({ vi: "Xem mặt bằng", en: "View plan" });
@@ -83,7 +126,7 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
       <Reveal className="mx-auto max-w-[1440px]">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-6 md:mb-12">
           <CompactHeading eyebrow={pick(data.eyebrow)} headline={<Accent text={pick(data.headline)} />} />
-          <SectionAction data={data} show="md-up" />
+          {formCta ? <div className="hidden md:block">{cta("")}</div> : <SectionAction data={data} show="md-up" />}
         </div>
         <Carousel label={pick(data.eyebrow)} className={amenityGrid(data.chapters.length).row}>
           {data.chapters.map((ch) => (
@@ -92,7 +135,15 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
                   neither → text card only (no grey box). */}
               {ch.image?.src ? (
                 <div className="aspect-4/3 overflow-hidden">
-                  <Image src={ch.image.src} alt={pick(ch.image.alt)} width={640} height={480} className="h-full w-full object-cover" style={{ objectPosition: focalPosition(ch.image) }} />
+                  <Image
+                    src={ch.image.src}
+                    alt={pick(ch.image.alt)}
+                    width={640}
+                    height={480}
+                    sizes="(min-width: 768px) 440px, 80vw"
+                    className="h-full w-full object-cover"
+                    style={{ objectPosition: focalPosition(ch.image) }}
+                  />
                 </div>
               ) : (
                 ch.planImage?.src && (
@@ -108,7 +159,7 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
                       alt={pick(ch.planImage.alt)}
                       width={800}
                       height={600}
-                      sizes="(min-width: 1024px) 420px, 80vw"
+                      sizes="(min-width: 768px) 440px, 80vw"
                       className="h-full w-full object-contain"
                     />
                     <ZoomBadge label={planLabel} />
@@ -121,9 +172,18 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
                 <p className="m-0 mb-4 font-body text-sm leading-[var(--lh-body)] text-[var(--color-text-muted-accessible)]">
                   {pick(ch.desc)}
                 </p>
-                <p className="m-0 mt-auto font-ui text-[11px] leading-[1.7] font-semibold tracking-[0.06em] text-[var(--color-charcoal)] uppercase">
-                  {ch.items.map((item) => pick(item)).join(" · ")}
-                </p>
+                {/* "·" sits in front of each item and the row is pulled left and
+                    clipped, so no line starts or ends with a stray dot. */}
+                <div className="mt-auto overflow-hidden">
+                  <ul className="m-0 -ml-4 flex list-none flex-wrap p-0 font-ui text-[11px] leading-[1.7] font-semibold tracking-[0.06em] text-[var(--color-charcoal)] uppercase">
+                    {ch.items.map((item, i) => (
+                      <li key={i} className="relative max-w-full pl-4">
+                        <span aria-hidden className="absolute left-1.5 opacity-60">·</span>
+                        {pick(item)}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
                 {ch.image?.src && ch.planImage?.src && (
                   <button
                     type="button"
@@ -138,8 +198,18 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
           ))}
         </Carousel>
         {hasPhotos(data.gallery) && <PhotoStrip data={data.gallery} className="mt-12 md:mt-16" />}
-        <SectionAction data={data} show="md-down" className="mt-8 w-full" />
+        {formCta ? <div className="mt-8 md:hidden">{cta("w-full")}</div> : <SectionAction data={data} show="md-down" className="mt-8 w-full" />}
       </Reveal>
+      {formCta && (
+        <LeadModal
+          open={formOpen}
+          onClose={closeForm}
+          source={`${projectSlug}-tien-ich`}
+          project={projectSlug}
+          qualifiers={qualifiers}
+          contextNote={data.actionLabel}
+        />
+      )}
       {zoomChapter?.planImage && (
         <ZoomLightbox
           src={zoomChapter.planImage.src}

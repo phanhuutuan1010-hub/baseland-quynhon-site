@@ -71,7 +71,7 @@ export function FloorPlanViewer({ id, data }: { id: string; data: ProjectFloorPl
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-5">
-          <p className="m-0 max-w-160 font-body text-[13px] text-[var(--color-deep-earth)]">{pick(data.footnote)}</p>
+          <p className="m-0 max-w-160 font-body text-[13px] text-[var(--color-text-muted)]">{pick(data.footnote)}</p>
           <Link
             href={data.ctaHref}
             className="whitespace-nowrap font-ui text-xs font-bold tracking-[0.08em] text-[var(--project-primary-text)] uppercase no-underline hover:text-[var(--project-primary-dark)]"
@@ -213,7 +213,7 @@ export function FloorPlanModal({ data, open, onClose }: { data: ProjectFloorPlan
               onClose={() => setZoom(false)}
             />
           )}
-          <p className="m-0 mt-2 font-body text-xs text-[var(--color-deep-earth)]">{pick(data.footnote)}</p>
+          <p className="m-0 mt-2 font-body text-xs text-[var(--color-text-muted)]">{pick(data.footnote)}</p>
         </div>
         <div className="border-t border-[var(--color-border)] px-5 py-4 sm:px-7">
           <Link

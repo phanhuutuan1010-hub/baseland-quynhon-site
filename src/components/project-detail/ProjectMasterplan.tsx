@@ -29,7 +29,7 @@ export function ProjectMasterplan({ id, data }: { id: string; data: ProjectMaste
           <div className="mb-5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent-dark)] uppercase">
             {pick(data.eyebrow)}
           </div>
-          <h2 className="m-0 mb-5 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
+          <h2 className="m-0 mb-5 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
             <Accent text={pick(data.headline)} />
           </h2>
           <p className="m-0 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--project-muted)]">

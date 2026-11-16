@@ -34,7 +34,7 @@ export function ProjectCTA({ id, data }: { id: string; data: ProjectCtaData }) {
           )}
           {pick(data.headline) && (
             <h2
-              className="m-0 mb-5 font-display md:mb-6 text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-warm-white)]"
+              className="m-0 mb-5 font-display md:mb-6 text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-warm-white)]"
               style={{ maxWidth: data.headlineMaxWidth ? pick(data.headlineMaxWidth) : "24ch" }}
             >
               <Accent text={pick(data.headline)} onDark />

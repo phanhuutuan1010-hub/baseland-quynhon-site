@@ -66,7 +66,7 @@ export function ResidenceSelector({
         <div className="mb-5 font-ui text-[length:var(--fs-label)] tracking-[var(--ls-label)] text-[var(--project-accent)] uppercase">
           {pick(data.eyebrow)}
         </div>
-        <h2 className="m-0 mb-5 font-display text-[length:var(--fs-h1)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
+        <h2 className="m-0 mb-5 font-display text-[length:var(--fs-h2)] leading-[var(--lh-heading)] font-normal text-[var(--color-charcoal)]">
           <Accent text={pick(data.headline)} />
         </h2>
         <p className="m-0 mb-8 font-body text-[length:var(--fs-body-lg)] leading-[var(--lh-body)] text-[var(--color-text-muted)] md:mb-12">
@@ -88,7 +88,7 @@ export function ResidenceSelector({
                 setUnitIndex(i);
                 setVariantIndex(0);
               }}
-              className={`${chipClass(i === unitIndex)} inline-flex items-center gap-2`}
+              className={`${chipClass(i === unitIndex)} gap-2`}
             >
               {u.color?.trim() && (
                 <span
@@ -119,7 +119,7 @@ export function ResidenceSelector({
                   alt={pick(activeUnit.floorPlanImage.alt)}
                   width={1200}
                   height={900}
-                  sizes="(min-width: 1024px) 640px, 100vw"
+                  sizes="(min-width: 1024px) 55vw, 100vw"
                   className="h-full w-full object-contain"
                 />
                 <ZoomBadge label={pick({ vi: "Phóng to", en: "Zoom" })} />
@@ -145,7 +145,7 @@ export function ResidenceSelector({
                     role="tab"
                     aria-selected={v === variant}
                     onClick={() => setVariantIndex(i)}
-                    className={`cursor-pointer rounded-xs border px-4 py-2 font-ui text-xs font-bold tracking-[0.07em] uppercase transition-colors ${
+                    className={`inline-flex min-h-11 cursor-pointer items-center rounded-xs border px-4 py-2 font-ui text-sm font-bold tracking-[0.06em] uppercase transition-colors ${
                       v === variant
                         ? "border-[var(--project-accent)] bg-[rgba(var(--project-accent-rgb),0.1)] text-[var(--project-accent-dark)]"
                         : "border-[var(--color-border)] bg-transparent text-[var(--color-charcoal)] hover:border-[var(--project-accent)]"
@@ -262,7 +262,7 @@ export function ResidenceSelector({
           </div>
         )}
 
-        <p className="m-0 mt-8 max-w-180 font-body text-[13px] leading-[var(--lh-body)] text-[var(--color-deep-earth)] md:mt-10">
+        <p className="m-0 mt-8 max-w-180 font-body text-[13px] leading-[var(--lh-body)] text-[var(--color-text-muted)] md:mt-10">
           {pick(data.footnote)}
         </p>
 

@@ -316,7 +316,7 @@
   --color-deep-earth: #0d4a4c; /* Deep river teal — dark sections, small print */
   --color-clay: #17686b; /* River teal — start of the lead-form gradient */
   --color-border: rgba(13, 74, 76, 0.14);
-  --color-text-muted: #55605d;
+  --color-text-muted: #5f6160; /* neutral grey — body notes, disclaimers */
   --project-accent: #a8353d; /* Deep coral — eyebrows, markers */
   --project-accent-dark: #9e3139;
   --project-accent-light: #f39a93; /* Sunrise coral — light text on teal */
@@ -326,7 +326,7 @@
   --project-dark: #0d4a4c;
   --project-dark-alt: #0b3f42; /* River teal, deeper */
   --project-border: rgba(18, 122, 126, 0.24);
-  --project-muted: #55605d;
+  --project-muted: #5f6160;
   --project-teal: #127a7e; /* Logo teal */
   --project-coral: #e8525a; /* Logo coral */
   --reveal-x: -24px;
@@ -440,16 +440,70 @@ textarea {
   }
 }
 
+/* Hero photo laid out from the project's imageFocus / imageTrim
+ * (ProjectHero → heroFrame). The kept part of the photo (after trimming)
+ * always covers the frame; within the slack that leaves, the subject
+ * (--hero-sx/-sy, fractions of the full photo) is put at --hero-tx of the
+ * frame's width: the middle on phones, the right-hand part on desktop where
+ * the text block owns the left 55%. Browsers without container units fall
+ * back to a plain object-fit: cover at the same focus. */
+.hero-frame {
+  container-type: size;
+  overflow: hidden;
+  --hero-tx: var(--hero-tx-mobile, 0.5);
+}
+@media (min-width: 768px) {
+  .hero-frame {
+    --hero-tx: var(--hero-tx-desktop, 0.76);
+  }
+}
+@supports (width: 1cqw) {
+  .hero-frame > img.hero-frame-img {
+    /* Trimmed strips apply from tablet width up. A phone shows only a
+     * narrow slice around the subject anyway, and trimming there would
+     * just zoom the photo in further. */
+    --kw: 1;
+    --kh: 1;
+    --tl: 0;
+    --tt: 0;
+    --hero-w: max(calc(100cqw / var(--kw)), calc(100cqh * var(--hero-ratio) / var(--kh)));
+    --hero-h: calc(var(--hero-w) / var(--hero-ratio));
+    inset: auto !important;
+    max-width: none;
+    width: var(--hero-w) !important;
+    height: var(--hero-h) !important;
+    left: clamp(
+      calc(100cqw - (var(--tl) + var(--kw)) * var(--hero-w)),
+      calc(var(--hero-tx) * 100cqw - var(--hero-sx) * var(--hero-w)),
+      calc(-1 * var(--tl) * var(--hero-w))
+    ) !important;
+    top: clamp(
+      calc(100cqh - (var(--tt) + var(--kh)) * var(--hero-h)),
+      calc(50cqh - var(--hero-sy) * var(--hero-h)),
+      calc(-1 * var(--tt) * var(--hero-h))
+    ) !important;
+    object-fit: fill;
+  }
+  @media (min-width: 768px) {
+    .hero-frame > img.hero-frame-img {
+      --kw: var(--hero-keep-w);
+      --kh: var(--hero-keep-h);
+      --tl: var(--hero-trim-l);
+      --tt: var(--hero-trim-t);
+    }
+  }
+}
+
 /* Panorama hotspot halo (PanoramaViewer) — a soft, slow pulse. */
 @keyframes panorama-pulse {
   0% {
     opacity: 0.9;
-    transform: scale(0.6);
+    transform: scale(0.5);
   }
   70%,
   100% {
     opacity: 0;
-    transform: scale(1.6);
+    transform: scale(1.25);
   }
 }
 

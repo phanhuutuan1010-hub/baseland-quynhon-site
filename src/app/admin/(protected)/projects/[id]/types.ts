@@ -19,6 +19,14 @@ export type ProjectOverviewValue = {
   heroCtaConsultLabelEn: string;
   heroCtaConsultHref: string;
   heroImageSrc: string;
+  /** Hero photo anchor (object-position %) and trimmed strips (%), as typed
+   * — blank = not set. */
+  heroFocusX: string;
+  heroFocusY: string;
+  heroTrimTop: string;
+  heroTrimRight: string;
+  heroTrimBottom: string;
+  heroTrimLeft: string;
   cardImageSrc: string;
   heroLayout: "full" | "compact";
   heroBadgeVi: string;

@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectDocuments, ProjectLegal } from "@/lib/project-detail/types";
@@ -65,7 +64,9 @@ export function VerifyTrustSection({
                   <div className="font-ui text-[13px] leading-[1.45] font-bold tracking-[0.06em] text-[var(--color-charcoal)] uppercase">{pick(d.name)}</div>
                   <div className="mt-1 font-body text-[13px] text-[var(--color-text-muted)]">{pick(d.note)}</div>
                 </div>
-                {d.fileUrl ? (
+                {/* A row without its own link is just listed — the section's
+                    single button (documents.actionLabel) asks for the file. */}
+                {d.fileUrl && (
                   <a
                     href={d.fileUrl}
                     onClick={() => trackTourLinkClick(d.fileUrl!, tourUrl, projectSlug, "documents", lang)}
@@ -75,13 +76,6 @@ export function VerifyTrustSection({
                   >
                     {pick(d.linkLabel ?? documents.ctaLabel)}
                   </a>
-                ) : (
-                  <Link
-                    href={documents.ctaHref}
-                    className="flex-none font-ui text-xs font-bold tracking-[0.08em] text-[var(--project-primary-text)] uppercase no-underline hover:text-[var(--project-primary-dark)]"
-                  >
-                    {pick(documents.ctaLabel)}
-                  </Link>
                 )}
               </div>
             ))}

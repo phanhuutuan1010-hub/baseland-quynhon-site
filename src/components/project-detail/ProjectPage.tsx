@@ -248,7 +248,7 @@ function CompactProjectPage({ project, extras }: { project: ProjectDetailData; e
 
       {!showTour && <EmptyAnchor id="tour-360" />}
 
-      {showAmenities && amenities ? <AmenitySection id="tien-ich" data={amenities} compact /> : <EmptyAnchor id="tien-ich" />}
+      {showAmenities && amenities ? <AmenitySection id="tien-ich" data={amenities} compact projectSlug={project.slug} qualifiers={project.cta.qualifiers} /> : <EmptyAnchor id="tien-ich" />}
 
       {showVideo && videoDuo ? <ProjectVideoDuo id="nen-biet" data={videoDuo} projectSlug={project.slug} compact /> : <EmptyAnchor id="nen-biet" />}
 

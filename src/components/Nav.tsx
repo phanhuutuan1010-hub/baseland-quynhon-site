@@ -55,7 +55,7 @@ export function Nav({ data: chromeData }: { data: SiteChromeData }) {
   return (
     <>
       <nav
-        className={`fixed inset-x-0 top-0 z-[100] flex items-center justify-between px-5 py-4 transition-colors duration-[480ms] sm:px-8 md:px-12 ${
+        className={`fixed inset-x-0 top-0 z-[100] flex items-center justify-between px-5 py-3 transition-colors md:py-4 duration-[480ms] sm:px-8 md:px-12 ${
           solid
             ? "border-b border-[var(--color-border)] bg-[var(--color-warm-white)]"
             : "border-b border-transparent bg-transparent"
@@ -63,7 +63,7 @@ export function Nav({ data: chromeData }: { data: SiteChromeData }) {
         style={{ transitionTimingFunction: "var(--ease-editorial)" }}
       >
         <Link href="/" className="flex items-center gap-3 no-underline">
-          <Image src={data.logoUrl || "/images/brand/icon-baseland.png"} alt="Base Land Quy Nhơn — về trang chủ" width={54} height={24} className="h-6 w-auto" priority />
+          <Image src={data.logoUrl || "/images/brand/icon-baseland.png"} alt="Base Land Quy Nhơn — về trang chủ" width={90} height={40} className="h-8 w-auto md:h-10" priority />
           <span className={`font-ui text-[13px] font-semibold tracking-[0.1em] uppercase whitespace-nowrap ${textColor}`}>
             Quy Nhơn
           </span>

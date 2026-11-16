@@ -30,8 +30,9 @@ const subscribeMinute = (cb: () => void) => {
  * right edge (the front door) and drifts slowly to the left once (~8s),
  * stopping at the first touch (no drift with prefers-reduced-motion).
  * Desktop: the whole image, edge to edge; a click opens it full screen
- * (largest file, drag + zoom). Hotspots sit at x/y % of the image and show
- * a short label on tap. One CTA below → lead form.
+ * (largest file, drag + zoom). Hotspots sit at x/y % of the image: a 20px
+ * dot with a pulsing ring; the label shows on tap on phones and is always
+ * visible as a pill beside the dot on desktop. One CTA below → lead form.
  */
 export function PanoramaViewer({
   data,
@@ -180,7 +181,16 @@ export function PanoramaViewer({
             />
             {data.hotspots.map((h, i) => {
               const open = activeSpot === i;
-              const align = h.x > 70 ? "right-0" : h.x < 30 ? "left-0" : "left-1/2 -translate-x-1/2";
+              // Phones: the label opens above the dot on tap. Desktop: it is
+              // always shown as a pill beside the dot (on the left of it
+              // near the right edge, so it never runs off the image).
+              const tipAlign = h.x > 70 ? "right-0" : h.x < 30 ? "left-0" : "left-1/2 -translate-x-1/2";
+              // The pill goes right of the dot unless the dot is near the right
+              // edge; its width is capped by the room left on that side, so
+              // it can never run past the image.
+              const pillLeft = h.x > 80;
+              const pillSide = pillLeft ? "right-[18px]" : "left-[18px]";
+              const pillMax = `min(240px, calc(${pillLeft ? h.x : 100 - h.x}vw - 34px))`;
               return (
                 <div key={i} className="absolute z-[1]" style={{ left: `${h.x}%`, top: `${h.y}%` }}>
                   <button
@@ -191,19 +201,26 @@ export function PanoramaViewer({
                     }}
                     aria-expanded={open}
                     aria-label={pick(h.label)}
-                    className="relative -mt-5 -ml-5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-none bg-transparent p-0"
+                    className="relative -mt-[22px] -ml-[22px] flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border-none bg-transparent p-0"
                   >
-                    <span aria-hidden className="absolute h-7 w-7 animate-[panorama-pulse_2.4s_ease-out_infinite] rounded-full bg-[rgba(255,255,255,0.55)]" />
-                    <span aria-hidden className="relative h-3.5 w-3.5 rounded-full border-2 border-white bg-[var(--project-accent)] shadow-[0_0_0_1px_rgba(0,0,0,0.15)]" />
+                    <span aria-hidden className="absolute h-10 w-10 animate-[panorama-pulse_2.4s_ease-out_infinite] rounded-full bg-[rgba(255,255,255,0.6)]" />
+                    <span aria-hidden className="relative h-5 w-5 rounded-full border-[3px] border-white bg-[var(--project-accent)] shadow-[0_1px_4px_rgba(0,0,0,0.35)]" />
                   </button>
                   {open && (
                     <span
                       role="status"
-                      className={`absolute bottom-7 w-max max-w-[min(260px,70vw)] rounded-xs bg-[var(--color-warm-white)] px-3 py-2 font-ui text-xs leading-[1.4] font-bold text-[var(--color-charcoal)] shadow-[var(--shadow-md)] ${align}`}
+                      className={`absolute bottom-8 w-max max-w-[min(260px,70vw)] rounded-xs bg-[var(--color-warm-white)] px-3 py-2 font-ui text-xs leading-[1.4] font-bold text-[var(--color-charcoal)] shadow-[var(--shadow-md)] lg:hidden ${tipAlign}`}
                     >
                       {pick(h.label)}
                     </span>
                   )}
+                  <span
+                    aria-hidden
+                    style={{ maxWidth: pillMax }}
+                    className={`pointer-events-none absolute top-0 hidden w-max -translate-y-1/2 rounded-2xl bg-[rgba(251,247,240,0.94)] px-3.5 py-1.5 font-ui text-xs leading-[1.4] font-bold text-[var(--color-charcoal)] shadow-[var(--shadow-sm)] lg:block ${pillSide}`}
+                  >
+                    {pick(h.label)}
+                  </span>
                 </div>
               );
             })}
@@ -236,7 +253,7 @@ export function PanoramaViewer({
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-5">
-        {pick(data.caption) && <p className="m-0 max-w-150 min-w-60 flex-1 font-body text-[13px] leading-[var(--lh-body)] text-[var(--color-deep-earth)] italic">{pick(data.caption)}</p>}
+        {pick(data.caption) && <p className="m-0 max-w-150 min-w-60 flex-1 font-body text-[13px] leading-[var(--lh-body)] text-[var(--color-text-muted)] italic">{pick(data.caption)}</p>}
         {pick(data.ctaLabel) && (
           <div className="flex flex-col items-start gap-2 sm:items-end">
             <button

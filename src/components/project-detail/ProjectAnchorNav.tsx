@@ -54,7 +54,16 @@ export function ProjectAnchorNav({ items }: { items: ProjectNavItem[] }) {
       aria-label={pick({ vi: "Mục lục trang", en: "On this page" })}
       className="sticky top-[57px] z-[90] border-b border-[var(--color-border)] bg-[rgba(250,247,242,0.96)] backdrop-blur md:top-[72px]"
     >
-      <div ref={barRef} className="no-scrollbar mx-auto flex max-w-[1440px] gap-1 overflow-x-auto px-3 sm:px-6 md:justify-center md:gap-2 md:px-12">
+      {/* Phones: the row scrolls sideways; the fade on the right edge and
+          the half-visible next item show there is more (peek). */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-10 bg-[linear-gradient(90deg,rgba(250,247,242,0),rgba(250,247,242,0.96))] lg:hidden"
+      />
+      <div
+        ref={barRef}
+        className="no-scrollbar mx-auto flex max-w-[1440px] gap-1 overflow-x-auto px-3 pr-10 sm:px-6 sm:pr-10 lg:justify-center lg:gap-2 lg:px-12"
+      >
         {items.map((item) => {
           const isActive = item.href === active;
           return (
@@ -62,14 +71,14 @@ export function ProjectAnchorNav({ items }: { items: ProjectNavItem[] }) {
               key={item.href}
               href={item.href}
               aria-current={isActive ? "true" : undefined}
-              className={`relative flex-none px-3.5 py-3.5 font-ui text-xs font-bold tracking-[0.08em] whitespace-nowrap uppercase no-underline transition-colors md:px-5 ${
+              className={`relative flex min-h-11 flex-none items-center px-3.5 py-3.5 font-ui text-xs font-bold tracking-[0.08em] whitespace-nowrap uppercase no-underline transition-colors lg:px-5 ${
                 isActive ? "text-[var(--project-primary-text)]" : "text-[var(--color-charcoal)] opacity-75 hover:opacity-100"
               }`}
             >
               {pick(item.label)}
               <span
                 aria-hidden
-                className={`absolute inset-x-3.5 bottom-0 h-0.5 bg-[var(--project-primary)] transition-opacity md:inset-x-5 ${isActive ? "opacity-100" : "opacity-0"}`}
+                className={`absolute inset-x-3.5 bottom-0 h-0.5 bg-[var(--project-primary)] transition-opacity lg:inset-x-5 ${isActive ? "opacity-100" : "opacity-0"}`}
               />
             </a>
           );

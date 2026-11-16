@@ -59,6 +59,28 @@ export function OverviewForm({ projectId, initial }: { projectId: string; initia
           </div>
           <AdminTextField label="CTA tư vấn — href" value={value.heroCtaConsultHref} onChange={set("heroCtaConsultHref")} />
           <MediaPickerField label="Ảnh hero (để trống = dùng placeholder)" value={value.heroImageSrc} onChange={set("heroImageSrc")} kindFilter="IMAGE" />
+          <div className="flex flex-col gap-2 rounded-xs border border-[var(--color-border)] p-3">
+            <span className="font-ui text-xs font-semibold tracking-[0.04em] uppercase">Tiêu điểm ảnh hero — vị trí chủ thể trong ảnh (%)</span>
+            <div className="grid grid-cols-2 gap-4">
+              <AdminTextField label="Ngang — 0 = mép trái, 100 = mép phải" value={value.heroFocusX} onChange={set("heroFocusX")} />
+              <AdminTextField label="Dọc — 0 = mép trên, 100 = mép dưới" value={value.heroFocusY} onChange={set("heroFocusY")} />
+            </div>
+            <span className="font-body text-xs text-[var(--color-text-muted)]">
+              VD tòa tháp nằm ở khoảng 60% chiều ngang ảnh → nhập 60. Hero luôn giữ chủ thể trong khung: điện thoại canh giữa, desktop tự đẩy chủ thể sang
+              phần bên phải (khối chữ chiếm 55% bên trái). Để trống = cắt ảnh quanh điểm lấy nét trong Thư viện Media như cũ.
+            </span>
+            <span className="mt-1 font-ui text-xs font-semibold tracking-[0.04em] uppercase">Cắt bớt mép ảnh hero (% — không sửa file ảnh)</span>
+            <div className="grid grid-cols-4 gap-3">
+              <AdminTextField label="Trên" value={value.heroTrimTop} onChange={set("heroTrimTop")} />
+              <AdminTextField label="Phải" value={value.heroTrimRight} onChange={set("heroTrimRight")} />
+              <AdminTextField label="Dưới" value={value.heroTrimBottom} onChange={set("heroTrimBottom")} />
+              <AdminTextField label="Trái" value={value.heroTrimLeft} onChange={set("heroTrimLeft")} />
+            </div>
+            <span className="font-body text-xs text-[var(--color-text-muted)]">
+              Dải ảnh không hiển thị trên tablet/desktop (VD logo in sẵn ở góc ảnh nằm dưới thanh menu). Điện thoại chỉ hiện phần ảnh quanh chủ thể nên không
+              áp dụng. Để trống = không cắt.
+            </span>
+          </div>
           <CardImageField value={value.cardImageSrc} onChange={set("cardImageSrc")} />
           <label className="flex flex-col gap-1.5">
             <span className="font-ui text-xs font-semibold tracking-[0.04em] uppercase">Bố cục trang</span>

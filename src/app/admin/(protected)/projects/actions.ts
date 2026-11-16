@@ -171,11 +171,26 @@ export async function updateProjectOverview(projectId: string, input: unknown): 
   // doesn't show (hero.navLabel/placeholderLabel, cta.qualifiers,
   // headlineMaxWidth…) instead of dropping them on every save. The hero
   // image is the exception: it is form-controlled, so blank = removed.
-  const { image: prevHeroImage, cardImage: _prevCardImage, ...prevHero } = (before.hero ?? {}) as Record<string, unknown> & {
+  const {
+    image: prevHeroImage,
+    cardImage: _prevCardImage,
+    imageFocus: _prevFocus,
+    imageTrim: _prevTrim,
+    ...prevHero
+  } = (before.hero ?? {}) as Record<string, unknown> & {
     image?: { src?: string; alt?: { vi: string; en: string } };
     cardImage?: unknown;
+    imageFocus?: unknown;
+    imageTrim?: unknown;
   };
   void _prevCardImage;
+  void _prevFocus;
+  void _prevTrim;
+  // Hero photo anchor / trimmed strips: form-controlled, blank = not set.
+  const pct = (v?: string) => (v ? Number(v) : 0);
+  const imageFocus = d.heroFocusX || d.heroFocusY ? { x: d.heroFocusX ? Number(d.heroFocusX) : 50, y: d.heroFocusY ? Number(d.heroFocusY) : 50 } : undefined;
+  const trim = { top: pct(d.heroTrimTop), right: pct(d.heroTrimRight), bottom: pct(d.heroTrimBottom), left: pct(d.heroTrimLeft) };
+  const imageTrim = trim.top || trim.right || trim.bottom || trim.left ? trim : undefined;
   const prevCta = (before.cta ?? {}) as Record<string, unknown>;
 
   await prisma.project.update({
@@ -198,6 +213,8 @@ export async function updateProjectOverview(projectId: string, input: unknown): 
         layout: d.heroLayout,
         badge: { vi: d.heroBadgeVi, en: d.heroBadgeEn },
         facts: { vi: d.heroFactsVi, en: d.heroFactsEn },
+        ...(imageFocus ? { imageFocus } : {}),
+        ...(imageTrim ? { imageTrim } : {}),
         ...(d.cardImageSrc ? { cardImage: { src: d.cardImageSrc, alt: { vi: d.name, en: d.name } } } : {}),
         // Keep a hand-written alt text when the image itself is unchanged.
         ...(d.heroImageSrc

@@ -58,11 +58,16 @@ export type ProjectHero = {
   /** Small print on the hero photo (e.g. "Hình ảnh minh họa" on a
    * rendering). Empty = none. */
   imageNote?: Localized<string>;
-  /** Desktop-only crop of the hero photo, without touching the file:
-   * zoom `scale` (e.g. 1.15) around the point `originX/originY` (0–1 of the
-   * frame). Lets something printed in a corner of the photo (a developer
-   * logo) move out from under the site header. Absent = plain cover. */
-  imageCrop?: { scale: number; originX: number; originY: number };
+  /** Where the subject sits in the hero photo (0–100 % from the left /
+   * top). The crop keeps it in view: centred on phones, in the right-hand
+   * part on desktop (the text block owns the left 55%). Absent = a plain
+   * cover crop around the image's Media focal point. */
+  imageFocus?: { x: number; y: number };
+  /** Strips of the hero photo (in % of its width/height) that are never
+   * shown from tablet width up (phones only show a slice around the
+   * subject) — the file itself is untouched. E.g. `top: 15` keeps a logo
+   * printed in the photo's top sky out from under the site header. */
+  imageTrim?: { top?: number; right?: number; bottom?: number; left?: number };
   placeholderLabel?: Localized<string>;
   /** Short label for ProjectNav's first item (e.g. "Q'Terra", not the
    * stylized all-caps hero title). Falls back to `project.name`. */
@@ -84,7 +89,9 @@ export type ProjectHero = {
 export type ProjectLayout = "full" | "compact";
 
 /** Section-level call to action used by the compact layout. `href` is an
- * anchor/URL, or "call" for the site hotline (Admin → Cài đặt). */
+ * anchor/URL, "call" for the site hotline (Admin → Cài đặt), or — in
+ * Amenities — "form" to open the lead form in place (source
+ * "<slug>-tien-ich"). */
 export type ProjectSectionAction = {
   actionLabel?: Localized<string>;
   actionHref?: string;
@@ -224,6 +231,8 @@ export type ProjectPhotoStatement = {
   body: Localized<string>;
   image?: { src: string; alt: Localized<string> };
   placeholderLabel?: Localized<string>;
+  /** Key figures under the body (compact layout), e.g. 18 · "tầng nổi". */
+  facts?: { value: string; label: Localized<string> }[];
   tone?: "charcoal" | "ocean-blue";
   /** ProjectNav label override (architecture variant only — "views" never
    * gets a nav item) — falls back to `eyebrow`. */
@@ -876,7 +885,7 @@ export type ProjectNavItem = { href: string; label: Localized<string> };
  * shorter nav — no per-project nav config needed.
  */
 export function getProjectNavItems(project: ProjectDetailData): ProjectNavItem[] {
-  if (isCompactLayout(project)) return [...getCompactAnchorItems(project), { href: "#lead", label: project.cta.eyebrow }];
+  if (isCompactLayout(project)) return getCompactAnchorItems(project);
   const items: ProjectNavItem[] = [
     { href: `#${project.slug}`, label: { vi: project.hero.navLabel ?? project.name, en: project.hero.navLabel ?? project.name } },
   ];
@@ -926,7 +935,8 @@ export function getProjectNavItems(project: ProjectDetailData): ProjectNavItem[]
 }
 
 /** Compact layout's sticky anchor bar (Tổng quan · Vị trí · Căn hộ ·
- * Tiện ích · Giá) — labels come from each section's `navLabel`. */
+ * Tiện ích · Giá · Pháp lý · Liên hệ) — section labels come from each
+ * section's `navLabel`; an item only exists when its section does. */
 export function getCompactAnchorItems(project: ProjectDetailData): ProjectNavItem[] {
   const items: ProjectNavItem[] = [];
   const towers = project.towers;
@@ -947,7 +957,21 @@ export function getCompactAnchorItems(project: ProjectDetailData): ProjectNavIte
   // The price block is always rendered (at least its "Nhận bảng giá" CTA).
   const investment = isSectionVisible(project, "investment") ? project.investment : undefined;
   items.push({ href: "#gia", label: investment ? navLabelOf(investment) : { vi: "Giá", en: "Pricing" } });
+  // "Pháp lý" = the Kiểm chứng & Base Land block — only when it renders.
+  if (hasVerifyTrust(project)) items.push({ href: "#kiem-chung", label: { vi: "Pháp lý", en: "Legal" } });
+  // The lead form closes every project page.
+  const contact = project.cta.eyebrow;
+  items.push({ href: "#lead", label: contact?.vi?.trim() || contact?.en?.trim() ? contact : { vi: "Liên hệ", en: "Contact" } });
   return items;
+}
+
+/** The "Kiểm chứng & Base Land" block shows with a document list or the
+ * Base Land trust points (same test as CompactProjectPage). */
+export function hasVerifyTrust(project: ProjectDetailData): boolean {
+  const documents = isSectionVisible(project, "documents") && !!project.documents?.items.length;
+  const legal = project.legal;
+  const trust = !!legal?.points?.length || !!(legal?.body?.vi?.trim() || legal?.body?.en?.trim());
+  return documents || trust;
 }
 
 /** A section's anchor label: its navLabel when filled, else its eyebrow. */
