@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import type { ProjectDetailData } from "@/lib/project-detail/types";
-import { getCompactAnchorItems, isCompactLayout, isSectionVisible } from "@/lib/project-detail/types";
+import { getCompactAnchorItems, hasVirtualTour, isCompactLayout, isSectionVisible } from "@/lib/project-detail/types";
 import { ProjectHero } from "./ProjectHero";
 import { ProjectIntro } from "./ProjectIntro";
 import { ProjectStats } from "./ProjectStats";
@@ -49,7 +49,7 @@ export function ProjectPage({
   extras?: ReactNode;
 }) {
   if (isCompactLayout(project)) return <CompactProjectPage project={project} extras={extras} />;
-  const showTour = isSectionVisible(project, "virtualTour") && !!project.virtualTour?.tourUrl;
+  const showTour = hasVirtualTour(project);
   return (
     <div className="relative w-full" data-project-theme={project.theme}>
       <ProjectHero
@@ -179,7 +179,7 @@ export function ProjectPage({
 function CompactProjectPage({ project, extras }: { project: ProjectDetailData; extras?: ReactNode }) {
   const show = (key: Parameters<typeof isSectionVisible>[1]) => isSectionVisible(project, key);
   const { towers, location, architecture, residences, amenities, videoDuo, documents, legal } = project;
-  const showTour = show("virtualTour") && !!project.virtualTour?.tourUrl;
+  const showTour = hasVirtualTour(project);
   const anchors = getCompactAnchorItems(project);
 
   const hasReasons = !!towers?.reasons?.length;

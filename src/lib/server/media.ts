@@ -32,6 +32,18 @@ export const MAX_RAW_IMAGE_UPLOAD_BYTES = 4 * 1024 * 1024;
 export const IMAGE_MAX_DIMENSION = 2560;
 export const IMAGE_WEBP_QUALITY = 80;
 
+// 360° (equirectangular) images for the self-hosted tour: they need their
+// full resolution (~6000×3000) to stay sharp when zoomed into, so they skip
+// the 2560px cap and the watermark (a tiled mark would smear across the
+// sphere). The raw file goes browser → Blob first ("pano-raw/…", up to
+// 25MB — far over the 4.5MB function body limit), then
+// /api/media/process-pano re-encodes it and deletes the raw copy.
+export const PANO_MAX_RAW_BYTES = 25 * 1024 * 1024;
+export const PANO_MAX_WIDTH = 6000;
+export const PANO_WEBP_QUALITY = 80;
+export const PANO_RAW_PREFIX = "pano-raw/";
+export const PANO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+
 export function kindForMimeType(mimeType: string): MediaKind | null {
   if (mimeType.startsWith("image/")) return "IMAGE";
   if (mimeType.startsWith("video/")) return "VIDEO";

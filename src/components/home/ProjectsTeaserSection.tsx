@@ -34,7 +34,8 @@ export function ProjectsTeaserSection({
             <Accent text={t.title} />
           </h2>
         )}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {/* 4 cards → one row of 4, never 3 + a lone card. */}
+        <div className={`grid grid-cols-1 gap-8 sm:grid-cols-2 ${t.items.length === 4 ? "lg:grid-cols-4 lg:gap-6" : "lg:grid-cols-3"}`}>
           {t.items.map((item, i) => {
             // The linked project's card image (Admin → Dự án → Tổng quan →
             // Ảnh đại diện) wins, so both pages show the same photo.

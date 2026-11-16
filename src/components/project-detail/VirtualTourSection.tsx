@@ -8,6 +8,8 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { LeadModal } from "@/components/LeadModal";
 import { trackEvent } from "@/lib/analytics";
 import type { ProjectLeadQualifier, ProjectVirtualTour } from "@/lib/project-detail/types";
+import { tourScenes } from "@/lib/project-detail/types";
+import { PanoramaTour } from "./PanoramaTour";
 import { Accent } from "@/components/Accent";
 import { focalPosition } from "./imageFrame";
 
@@ -26,14 +28,7 @@ import { focalPosition } from "./imageFrame";
 const secondaryBtn =
   "inline-flex cursor-pointer items-center rounded-xs border border-[var(--project-accent)] bg-transparent px-5 py-3 font-ui text-xs font-bold tracking-[0.08em] text-[var(--color-charcoal)] uppercase hover:bg-[rgba(var(--project-accent-rgb),0.15)]";
 
-export function VirtualTourSection({
-  id,
-  data,
-  projectSlug,
-  fallbackImage,
-  qualifiers,
-  compact,
-}: {
+type TourSectionProps = {
   id: string;
   /** Compact layout: shorter frame (21:9 on desktop) and less padding. */
   compact?: boolean;
@@ -41,7 +36,16 @@ export function VirtualTourSection({
   projectSlug: string;
   fallbackImage?: string;
   qualifiers?: ProjectLeadQualifier[];
-}) {
+};
+
+/** External tour link (`tourUrl`, e.g. Q'Terra) wins; otherwise the
+ * self-hosted Pannellum scenes. */
+export function VirtualTourSection(props: TourSectionProps) {
+  if (!props.data.tourUrl?.trim() && tourScenes(props.data).length) return <PanoramaTour {...props} />;
+  return <ExternalTour {...props} />;
+}
+
+function ExternalTour({ id, data, projectSlug, fallbackImage, qualifiers, compact }: TourSectionProps) {
   const { pick, lang } = useLang();
   const [embedded, setEmbedded] = useState(false);
   const [frameLoaded, setFrameLoaded] = useState(false);

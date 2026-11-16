@@ -7,6 +7,7 @@ import { Reveal } from "@/components/Reveal";
 import type { ProjectInvestment as ProjectInvestmentData, ProjectPaymentPlan, ProjectSalesPhases } from "@/lib/project-detail/types";
 import { Accent } from "@/components/Accent";
 import { CompactHeading } from "./shared";
+import { LaunchCountdown } from "./LaunchCountdown";
 
 export function InvestmentSection({
   id,
@@ -194,11 +195,26 @@ function CompactInvestment({ id, data, salesPhases }: { id: string; data?: Proje
   const eyebrow = data && pick(data.eyebrow) ? pick(data.eyebrow) : pick({ vi: "Giá & lộ trình", en: "Price & timeline" });
   const headline = data && pick(data.headline) ? pick(data.headline) : pick({ vi: "Bảng giá & chính sách bán hàng", en: "Pricing & sales policy" });
   const points = !hasPricing ? (data?.points ?? []) : [];
+  const milestones = (data?.milestones ?? []).filter((m) => m.date?.trim() && (m.title?.vi?.trim() || m.title?.en?.trim()));
 
   return (
     <section id={id} className="bg-[var(--color-deep-earth)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
       <Reveal className="mx-auto max-w-[1440px]">
         <CompactHeading dark eyebrow={eyebrow} headline={<Accent text={headline} onDark />} className="mb-10 md:mb-12" />
+        {data?.countdownTo?.trim() && (
+          <LaunchCountdown to={data.countdownTo.trim()} label={pick(data.countdownLabel ?? { vi: "", en: "" }) || pick({ vi: "Dự kiến mở bán", en: "Expected launch" })} />
+        )}
+        {!!milestones.length && (
+          <ol className="m-0 mb-10 grid list-none grid-cols-1 gap-x-8 gap-y-5 p-0 sm:grid-cols-2 lg:grid-cols-4 md:mb-12">
+            {milestones.map((m, i) => (
+              <li key={i} className="relative border-t border-[rgba(var(--project-accent-rgb),0.45)] pt-4">
+                <span aria-hidden className="absolute -top-[5px] left-0 h-2.5 w-2.5 rounded-full bg-[var(--project-accent-light)]" />
+                <div className="mb-1.5 font-display text-xl leading-[1.3] text-[var(--project-accent-light)] tabular-nums">{m.date}</div>
+                <div className="font-ui text-[13px] leading-[1.45] font-bold tracking-[0.06em] text-[var(--color-warm-white)] uppercase">{pick(m.title)}</div>
+              </li>
+            ))}
+          </ol>
+        )}
         {data && (hasPricing || launch) && <PricingBlock data={data} launch={launch} />}
         {points.length > 0 && (
           <ul className="m-0 mb-10 grid list-none grid-cols-1 gap-x-10 p-0 md:grid-cols-2">
@@ -223,7 +239,11 @@ function CompactInvestment({ id, data, salesPhases }: { id: string; data?: Proje
             href={data?.pricingCtaHref || "#lead"}
             className="inline-flex min-h-12 flex-none items-center justify-center rounded-xs border border-[var(--project-primary)] bg-[var(--project-primary)] px-8 py-4 font-ui text-[13px] font-bold tracking-[0.08em] text-[var(--project-primary-foreground)] uppercase no-underline hover:bg-[var(--project-primary-dark)] sm:ml-auto"
           >
-            {hasPricing && data && pick(data.pricingCtaLabel) ? pick(data.pricingCtaLabel) : pick(LATEST_PRICE_CTA)}
+            {hasPricing && data && pick(data.pricingCtaLabel)
+              ? pick(data.pricingCtaLabel)
+              : data?.noPriceCtaLabel && pick(data.noPriceCtaLabel)
+                ? pick(data.noPriceCtaLabel)
+                : pick(LATEST_PRICE_CTA)}
           </Link>
         </div>
       </Reveal>

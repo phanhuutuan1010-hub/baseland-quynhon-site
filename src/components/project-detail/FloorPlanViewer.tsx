@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import type { ProjectFloorPlans as ProjectFloorPlansData } from "@/lib/project-detail/types";
 import { chipClass } from "./shared";
 import { Accent } from "@/components/Accent";
+import { ZoomBadge, ZoomLightbox } from "./ZoomLightbox";
 
 export function FloorPlanViewer({ id, data }: { id: string; data: ProjectFloorPlansData }) {
   const { pick } = useLang();
@@ -81,20 +82,14 @@ export function FloorPlanViewer({ id, data }: { id: string; data: ProjectFloorPl
       </Reveal>
 
       {lightboxOpen && (
-        <div
-          onClick={() => setLightboxOpen(false)}
-          className="fixed inset-0 z-[200] flex cursor-zoom-out items-center justify-center bg-[rgba(38,34,32,0.94)] p-4 sm:p-8 md:p-12"
-        >
-          <Image src={activePlan.src} alt={pick(activePlan.alt)} width={1600} height={1200} className="max-h-full max-w-full object-contain" />
-          <button
-            type="button"
-            aria-label={pick(data.closeAria)}
-            onClick={() => setLightboxOpen(false)}
-            className="absolute top-5 right-6 cursor-pointer border-none bg-none text-[32px] leading-none text-[var(--color-warm-white)]"
-          >
-            ×
-          </button>
-        </div>
+        <ZoomLightbox
+          src={activePlan.src}
+          alt={pick(activePlan.alt)}
+          caption={pick(activePlan.caption)}
+          width={sizeOf(activePlan).width}
+          height={sizeOf(activePlan).height}
+          onClose={() => setLightboxOpen(false)}
+        />
       )}
     </section>
   );
@@ -106,18 +101,32 @@ export function FloorPlanViewer({ id, data }: { id: string; data: ProjectFloorPl
  * button instead of a separate Floor Plans section. Mount it outside any
  * Reveal (a transformed ancestor would trap `position: fixed`).
  */
+/** Intrinsic size attached by the server mapper (lib/server/imageMeta). */
+function sizeOf(img: object): { width?: number; height?: number } {
+  const m = img as { width?: unknown; height?: unknown };
+  const width = Number(m.width);
+  const height = Number(m.height);
+  return width > 0 && height > 0 ? { width, height } : {};
+}
+
 export function FloorPlanModal({ data, open, onClose }: { data: ProjectFloorPlansData; open: boolean; onClose: () => void }) {
   const { pick } = useLang();
   const groupKeys = Object.keys(data.groupLabels);
   // Start on the first plan of the first group shown (the chips' order).
   const firstPlan = data.items.find((p) => p.group === groupKeys[0]) ?? data.items[0];
   const [planKey, setPlanKey] = useState(firstPlan?.key ?? "");
+  const [zoom, setZoom] = useState(false);
+  // Esc closes the zoom viewer first, not the whole dialog.
+  const zoomOpenRef = useRef(false);
+  useEffect(() => {
+    zoomOpenRef.current = zoom;
+  }, [zoom]);
   const activePlan = data.items.find((p) => p.key === planKey) ?? firstPlan;
 
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && !zoomOpenRef.current) onClose();
     };
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -160,7 +169,7 @@ export function FloorPlanModal({ data, open, onClose }: { data: ProjectFloorPlan
           <div className="mb-5 flex flex-col gap-3">
             {groupKeys.map((g) => (
               <div key={g} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                <div className="w-24 flex-none font-ui text-[11px] font-bold tracking-[0.12em] text-[var(--color-deep-earth)] uppercase">
+                <div className="flex-none font-ui text-[11px] font-bold tracking-[0.12em] text-[var(--color-deep-earth)] uppercase sm:w-30">
                   {pick(data.groupLabels[g])}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -175,23 +184,35 @@ export function FloorPlanModal({ data, open, onClose }: { data: ProjectFloorPlan
               </div>
             ))}
           </div>
-          <a
+          {/* Full width of the dialog (never shrunk further); tap = zoom. */}
+          <button
+            type="button"
             key={activePlan.key}
-            href={activePlan.src}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block animate-[fade-slide-in_400ms_var(--ease-editorial)] border border-[var(--color-border)] bg-white"
+            onClick={() => setZoom(true)}
+            aria-label={`${pick(activePlan.alt)} — ${pick(data.zoomBtn) || pick({ vi: "Phóng to", en: "Zoom" })}`}
+            className="relative block w-full animate-[fade-slide-in_400ms_var(--ease-editorial)] cursor-zoom-in border border-[var(--color-border)] bg-white p-0"
           >
             <Image
               src={activePlan.src}
               alt={pick(activePlan.alt)}
-              width={1600}
-              height={1200}
+              width={sizeOf(activePlan).width ?? 1600}
+              height={sizeOf(activePlan).height ?? 1200}
               sizes="(min-width: 1100px) 1050px, 100vw"
               className="block h-auto w-full"
             />
-          </a>
+            <ZoomBadge label={pick(data.zoomBtn) || pick({ vi: "Phóng to", en: "Zoom" })} />
+          </button>
           <p className="m-0 mt-3 font-body text-sm text-[var(--color-text-muted)]">{pick(activePlan.caption)}</p>
+          {zoom && (
+            <ZoomLightbox
+              src={activePlan.src}
+              alt={pick(activePlan.alt)}
+              caption={pick(activePlan.caption)}
+              width={sizeOf(activePlan).width}
+              height={sizeOf(activePlan).height}
+              onClose={() => setZoom(false)}
+            />
+          )}
           <p className="m-0 mt-2 font-body text-xs text-[var(--color-deep-earth)]">{pick(data.footnote)}</p>
         </div>
         <div className="border-t border-[var(--color-border)] px-5 py-4 sm:px-7">

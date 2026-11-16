@@ -298,6 +298,52 @@
   --project-coastal-blue: #4a86a8;
 }
 
+/*
+ * CYRA ESTERO QUY NHƠN — "River × Sunrise": deep teal (river) + coral
+ * (sunrise), both sampled from the project logo, on a cream ground. CTA
+ * fills stay Brand Green sitewide (--project-primary is left unset). The
+ * base cream/sand/limestone/deep-earth tokens are re-pointed inside this
+ * scope only, so every shared section picks up the palette without a fork.
+ * Coral as TEXT uses darker shades that pass WCAG AA on cream/limestone
+ * (#a8353d 5.3:1 on cream, #9e3139 5.1:1 on limestone); the bright logo
+ * coral is only used as light text on teal (#f39a93, 4.7:1).
+ * Motion: reveals slide in sideways (--reveal-x) instead of rising.
+ */
+[data-project-theme="cyra"] {
+  --color-warm-white: #fbf7f0; /* Cream */
+  --color-sand: #f1e8da; /* Warm sand */
+  --color-limestone: #ebe3d4;
+  --color-deep-earth: #0d4a4c; /* Deep river teal — dark sections, small print */
+  --color-clay: #17686b; /* River teal — start of the lead-form gradient */
+  --color-border: rgba(13, 74, 76, 0.14);
+  --color-text-muted: #55605d;
+  --project-accent: #a8353d; /* Deep coral — eyebrows, markers */
+  --project-accent-dark: #9e3139;
+  --project-accent-light: #f39a93; /* Sunrise coral — light text on teal */
+  --project-accent-rgb: 168, 53, 61;
+  --project-background: #fbf7f0;
+  --project-surface: #f1e8da;
+  --project-dark: #0d4a4c;
+  --project-dark-alt: #0b3f42; /* River teal, deeper */
+  --project-border: rgba(18, 122, 126, 0.24);
+  --project-muted: #55605d;
+  --project-teal: #127a7e; /* Logo teal */
+  --project-coral: #e8525a; /* Logo coral */
+  --reveal-x: -24px;
+  --reveal-y: 0px;
+  --hero-x: -18px;
+  --hero-y: 0px;
+}
+
+/* Self-hosted 360° viewer (components/project-detail/PanoramaTour.tsx). The
+ * gyroscope is driven by our own opt-in button (iOS needs a tap to ask). */
+.bl-pano .pnlm-orientation-button {
+  display: none !important;
+}
+.bl-pano .pnlm-container {
+  background: var(--color-charcoal);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -422,7 +468,7 @@ textarea {
 @keyframes hero-rise {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translate(var(--hero-x, 0px), var(--hero-y, 20px));
   }
   to {
     opacity: 1;
@@ -432,7 +478,7 @@ textarea {
 
 @keyframes hero-rise-solid {
   from {
-    transform: translateY(20px);
+    transform: translate(var(--hero-x, 0px), var(--hero-y, 20px));
   }
   to {
     transform: none;

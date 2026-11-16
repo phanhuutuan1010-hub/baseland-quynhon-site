@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { getSessionUser } from "@/lib/server/auth";
-import { ALLOWED_MIME_TYPES, MAX_SIZE_BY_KIND, kindForMimeType } from "@/lib/server/media";
+import { ALLOWED_MIME_TYPES, MAX_SIZE_BY_KIND, PANO_ALLOWED_TYPES, PANO_MAX_RAW_BYTES, PANO_RAW_PREFIX, kindForMimeType } from "@/lib/server/media";
 
 // Issues a short-lived, constrained client upload token so the file goes
 // straight from the admin's browser to Blob storage — never through this
@@ -23,10 +23,20 @@ export async function POST(request: Request): Promise<NextResponse> {
     const jsonResponse = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async (pathname) => {
+      onBeforeGenerateToken: async (pathname, clientPayload) => {
         const user = await getSessionUser();
         if (!user || user.role !== "ADMIN") {
           throw new Error("Không có quyền upload");
+        }
+
+        // Raw 360° image on its way to /api/media/process-pano.
+        if (clientPayload === "pano") {
+          if (!pathname.startsWith(PANO_RAW_PREFIX)) throw new Error("Sai đường dẫn ảnh 360°");
+          return {
+            allowedContentTypes: [...PANO_ALLOWED_TYPES],
+            maximumSizeInBytes: PANO_MAX_RAW_BYTES,
+            addRandomSuffix: true,
+          };
         }
 
         const ext = pathname.split(".").pop()?.toLowerCase();

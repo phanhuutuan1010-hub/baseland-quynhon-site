@@ -16,11 +16,14 @@ export function MediaPickerField({
   value,
   onChange,
   kindFilter,
+  pano,
 }: {
   label: string;
   value: string;
   onChange: (url: string) => void;
   kindFilter?: MediaItem["kind"];
+  /** 360° image picker/uploader (see MediaPickerModal). */
+  pano?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const showPreview = kindFilter === "IMAGE" && value;
@@ -45,11 +48,11 @@ export function MediaPickerField({
           onClick={() => setOpen(true)}
           className="shrink-0 rounded-xs border border-[var(--color-border)] px-3.5 py-2.5 font-ui text-xs font-bold tracking-[0.04em] uppercase hover:bg-[var(--color-sand)]"
         >
-          Chọn media
+          {pano ? "Chọn ảnh 360°" : "Chọn media"}
         </button>
       </div>
 
-      <MediaPickerModal open={open} onClose={() => setOpen(false)} onSelect={onChange} kindFilter={kindFilter} />
+      <MediaPickerModal open={open} onClose={() => setOpen(false)} onSelect={onChange} kindFilter={kindFilter} pano={pano} />
     </div>
   );
 }

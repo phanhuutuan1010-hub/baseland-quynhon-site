@@ -6,6 +6,7 @@ import { MediaPickerField } from "@/components/admin/MediaPickerField";
 import { LangToggle } from "@/components/admin/LangToggle";
 import { SaveBar } from "@/components/admin/SaveBar";
 import { RepeatableStringList } from "@/components/admin/RepeatableList";
+import { TourScenesEditor } from "@/components/admin/TourScenesEditor";
 
 // Human-friendly label from a camelCase/snake_case field key — not a
 // per-section label map, since this form is intentionally generic (see its
@@ -95,6 +96,23 @@ const FIELD_LABELS: Record<string, string> = {
   adNoticeLine1: "Dải thông báo — dòng 1, icon lịch (chỉ hiện cho khách từ quảng cáo, URL có utm_source; 2 dòng trống = ẩn)",
   adNoticeLine2: "Dải thông báo — dòng 2, icon định vị",
   adNoticeCtaLabel: "Dải thông báo — chữ nút gọi",
+  color: "Màu nhận diện (mã hex, VD #4caf50)",
+  variants: "Các mẫu căn của loại này (2 mẫu trở lên = có tab con)",
+  floorPlanImage: "Ảnh layout căn",
+  showFlat: "Ảnh căn hộ mẫu (để trống = ẩn)",
+  photos: "Ảnh",
+  caption: "Chú thích",
+  planImage: "Ảnh mặt bằng tiện ích (mở được để phóng to)",
+  planButtonLabel: "Nút xem mặt bằng tiện ích — chữ",
+  gallery: "Dải ảnh dưới thẻ tiện ích (để trống = ẩn)",
+  countdownTo: "Đếm ngược tới ngày (YYYY-MM-DD, giờ VN; trống = ẩn; tự ẩn khi qua ngày)",
+  countdownLabel: "Nhãn đếm ngược",
+  milestones: "Lộ trình (dự kiến)",
+  noPriceCtaLabel: "Nút bảng giá khi chưa có giá (trống = \"Nhận bảng giá mới nhất\")",
+  nfa: "Diện tích (ô 1)",
+  nsa: "Diện tích (ô 2)",
+  nfaLabel: "Nhãn diện tích ô 1",
+  nsaLabel: "Nhãn diện tích ô 2",
 };
 
 function prettifyKey(key: string): string {
@@ -156,6 +174,12 @@ function FieldEditor({
   lang: "vi" | "en";
   onChange: (next: Json) => void;
 }) {
+  // Self-hosted 360° tour scenes get their own visual editor (preview +
+  // click-to-place hotspots) instead of the generic list.
+  if (path === "scenes") {
+    return <TourScenesEditor value={value} lang={lang} onChange={(next) => onChange(next as unknown as Json)} />;
+  }
+
   if (isLocalizedLeaf(value)) {
     const text = value[lang];
     const long = text.length > 70 || /body|desc|statement|note|content|sub/i.test(path);

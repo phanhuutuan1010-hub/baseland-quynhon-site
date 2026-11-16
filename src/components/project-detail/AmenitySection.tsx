@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
@@ -8,8 +9,10 @@ import type { ProjectAmenities as ProjectAmenitiesData } from "@/lib/project-det
 import { Accent } from "@/components/Accent";
 import { CompactHeading } from "./shared";
 import { Carousel } from "./Carousel";
-import { focalPosition } from "./imageFrame";
+import { focalPosition, frameRatio } from "./imageFrame";
 import { SectionAction } from "./ProjectContact";
+import { ZoomBadge, ZoomLightbox } from "./ZoomLightbox";
+import { PhotoStrip, hasPhotos } from "./PhotoStrip";
 
 export function AmenitySection({ id, data, compact }: { id: string; data: ProjectAmenitiesData; compact?: boolean }) {
   const { pick } = useLang();
@@ -72,6 +75,9 @@ export function AmenitySection({ id, data, compact }: { id: string; data: Projec
  * mobile. */
 function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) {
   const { pick } = useLang();
+  const [zoomSlot, setZoomSlot] = useState<string | null>(null);
+  const zoomChapter = data.chapters.find((c) => c.slotId === zoomSlot && c.planImage?.src);
+  const planLabel = pick(data.planButtonLabel ?? { vi: "", en: "" }) || pick({ vi: "Xem mặt bằng", en: "View plan" });
   return (
     <section id={id} className="bg-[var(--color-limestone)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
       <Reveal className="mx-auto max-w-[1440px]">
@@ -82,11 +88,32 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
         <Carousel label={pick(data.eyebrow)} className={amenityGrid(data.chapters.length).row}>
           {data.chapters.map((ch) => (
             <article key={ch.slotId} className={`${amenityGrid(data.chapters.length).card} flex flex-col bg-[var(--color-warm-white)]`}>
-              {/* No photo yet → text card only (no grey box). */}
-              {ch.image?.src && (
+              {/* Photo first; else the amenity plan (uncropped, tap = zoom);
+                  neither → text card only (no grey box). */}
+              {ch.image?.src ? (
                 <div className="aspect-4/3 overflow-hidden">
                   <Image src={ch.image.src} alt={pick(ch.image.alt)} width={640} height={480} className="h-full w-full object-cover" style={{ objectPosition: focalPosition(ch.image) }} />
                 </div>
+              ) : (
+                ch.planImage?.src && (
+                  <button
+                    type="button"
+                    onClick={() => setZoomSlot(ch.slotId)}
+                    aria-label={`${pick(ch.planImage.alt) || pick(ch.title)} — ${planLabel}`}
+                    className="relative block w-full cursor-zoom-in overflow-hidden border-none bg-white p-0"
+                    style={{ aspectRatio: frameRatio(ch.planImage, "4 / 3") }}
+                  >
+                    <Image
+                      src={ch.planImage.src}
+                      alt={pick(ch.planImage.alt)}
+                      width={800}
+                      height={600}
+                      sizes="(min-width: 1024px) 420px, 80vw"
+                      className="h-full w-full object-contain"
+                    />
+                    <ZoomBadge label={planLabel} />
+                  </button>
+                )
               )}
               <div className="flex flex-1 flex-col p-5">
                 <div className="mb-2 font-ui text-[11px] font-bold tracking-[0.14em] text-[var(--project-accent-dark)] uppercase">{ch.kicker}</div>
@@ -97,12 +124,32 @@ function AmenityCards({ id, data }: { id: string; data: ProjectAmenitiesData }) 
                 <p className="m-0 mt-auto font-ui text-[11px] leading-[1.7] font-semibold tracking-[0.06em] text-[var(--color-charcoal)] uppercase">
                   {ch.items.map((item) => pick(item)).join(" · ")}
                 </p>
+                {ch.image?.src && ch.planImage?.src && (
+                  <button
+                    type="button"
+                    onClick={() => setZoomSlot(ch.slotId)}
+                    className="mt-4 cursor-pointer self-start border-none bg-transparent p-0 font-ui text-xs font-bold tracking-[0.08em] text-[var(--project-primary-text)] uppercase hover:text-[var(--project-primary-dark)]"
+                  >
+                    {planLabel} →
+                  </button>
+                )}
               </div>
             </article>
           ))}
         </Carousel>
+        {hasPhotos(data.gallery) && <PhotoStrip data={data.gallery} className="mt-12 md:mt-16" />}
         <SectionAction data={data} show="md-down" className="mt-8 w-full" />
       </Reveal>
+      {zoomChapter?.planImage && (
+        <ZoomLightbox
+          src={zoomChapter.planImage.src}
+          alt={pick(zoomChapter.planImage.alt) || pick(zoomChapter.title)}
+          caption={`${zoomChapter.kicker} · ${pick(zoomChapter.title)}`}
+          width={Number((zoomChapter.planImage as { width?: number }).width) || undefined}
+          height={Number((zoomChapter.planImage as { height?: number }).height) || undefined}
+          onClose={() => setZoomSlot(null)}
+        />
+      )}
     </section>
   );
 }

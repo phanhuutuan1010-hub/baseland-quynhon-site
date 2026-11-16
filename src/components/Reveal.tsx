@@ -50,7 +50,11 @@ export function Reveal({
       className={className}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(28px)",
+        // "none" once visible (not translate(0)): a transformed ancestor
+        // would trap position:fixed overlays (fullscreen 360°, modals).
+        // Offset comes from the project theme (--reveal-x/--reveal-y), e.g.
+        // a sideways slide for Cyra Estero; default is a 28px rise.
+        transform: visible ? "none" : "translate(var(--reveal-x, 0px), var(--reveal-y, 28px))",
         transition: `opacity var(--duration-slow) var(--ease-editorial) ${delayMs}ms, transform var(--duration-slow) var(--ease-editorial) ${delayMs}ms`,
       }}
     >

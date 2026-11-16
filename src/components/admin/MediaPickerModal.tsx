@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { listMedia } from "@/app/admin/(protected)/media/actions";
 import { uploadMediaFile } from "@/app/admin/(protected)/media/uploadFile";
+import { PANO_MAX_MB, uploadPanoFile } from "@/app/admin/(protected)/media/uploadPano";
 import type { MediaItem } from "@/app/admin/(protected)/media/types";
 
 function toItem(r: Awaited<ReturnType<typeof listMedia>>[number]): MediaItem {
@@ -42,11 +43,15 @@ export function MediaPickerModal({
   onClose,
   onSelect,
   kindFilter,
+  pano,
 }: {
   open: boolean;
   onClose: () => void;
   onSelect: (url: string) => void;
   kindFilter?: MediaItem["kind"];
+  /** 360° mode: lists only 360° images and uploads through the pano
+   * pipeline (≤25MB, kept at ~6000px, 2:1 checked). */
+  pano?: boolean;
 }) {
   // No separate `loading` boolean: `items` is null until the fetch below
   // resolves, which is all the "Đang tải…" state needs — one less setState
@@ -61,17 +66,18 @@ export function MediaPickerModal({
     let cancelled = false;
     listMedia(kindFilter).then((rows) => {
       if (cancelled) return;
-      setItems(rows.map(toItem));
+      const all = rows.map(toItem);
+      setItems(pano ? all.filter((m) => m.filename.startsWith("360-")) : all);
     });
     return () => {
       cancelled = true;
     };
-  }, [open, kindFilter]);
+  }, [open, kindFilter, pano]);
 
   async function handleUpload(file: File) {
     setUploading(true);
     setError(null);
-    const result = await uploadMediaFile(file);
+    const result = pano ? await uploadPanoFile(file) : await uploadMediaFile(file);
     setUploading(false);
     if ("error" in result) {
       setError(result.error);
@@ -92,7 +98,7 @@ export function MediaPickerModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="m-0 font-ui text-sm font-bold tracking-[0.04em] text-[var(--color-charcoal)] uppercase">Chọn media</h2>
+          <h2 className="m-0 font-ui text-sm font-bold tracking-[0.04em] text-[var(--color-charcoal)] uppercase">{pano ? "Chọn ảnh 360°" : "Chọn media"}</h2>
           <button type="button" onClick={onClose} className="font-ui text-xs font-bold uppercase text-[var(--color-text-muted)]">
             Đóng
           </button>
@@ -102,7 +108,7 @@ export function MediaPickerModal({
           <input
             ref={fileInputRef}
             type="file"
-            accept={ACCEPT_BY_KIND[kindFilter ?? "IMAGE"]}
+            accept={pano ? "image/jpeg,image/png,image/webp" : ACCEPT_BY_KIND[kindFilter ?? "IMAGE"]}
             disabled={uploading}
             onChange={(e) => {
               const file = e.target.files?.[0];
@@ -112,6 +118,11 @@ export function MediaPickerModal({
           />
           {uploading && <span className="shrink-0 font-body text-xs text-[var(--color-brand-green)]">Đang tải lên…</span>}
         </div>
+        {pano && (
+          <p className="m-0 font-body text-xs text-[var(--color-text-muted)]">
+            Ảnh 360° equirectangular tỉ lệ 2:1 (khuyên dùng ~6000×3000), JPG/PNG/WebP, tối đa {PANO_MAX_MB}MB — tự chuyển WebP, giữ độ phân giải tối đa 6000px.
+          </p>
+        )}
         {error && <p className="m-0 font-body text-sm text-[var(--color-error)]">{error}</p>}
 
         {items === null && <p className="m-0 font-body text-sm text-[var(--color-text-muted)]">Đang tải…</p>}

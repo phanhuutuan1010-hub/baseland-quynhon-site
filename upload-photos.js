@@ -6,6 +6,8 @@
 //   node upload-photos.js --prod     upload vào Media Library production
 //   node upload-photos.js --dev      upload vào DB dev
 //   thêm --limit 3 để chạy thử 3 ảnh trước
+//   thêm --dir "<thư mục>" để upload ảnh đã nén sẵn ở thư mục khác thay cho
+//   photos-out/ (VD ảnh web của một dự án mới; bỏ qua _nguon.json)
 //
 // Nếu có photos-in/_nguon.json (tạo bởi `node fetch-project-images.js --stage`)
 // thì CHỈ upload các ảnh có trong danh sách đó, kèm tiêu đề + caption ghi
@@ -19,6 +21,8 @@ const sharp = require("sharp");
 const target = process.argv[2];
 const limitArg = process.argv.indexOf("--limit");
 const limit = limitArg > -1 ? Number(process.argv[limitArg + 1]) : undefined; // chạy thử vài ảnh
+const dirArg = process.argv.indexOf("--dir");
+const customDir = dirArg > -1 ? path.resolve(process.argv[dirArg + 1] ?? "") : null;
 if (target !== "--prod" && target !== "--dev") {
   console.log("Chọn nơi upload: node upload-photos.js --prod   hoặc   node upload-photos.js --dev");
   process.exit(1);
@@ -35,9 +39,10 @@ const { put } = require("@vercel/blob");
 const { PrismaPg } = require("@prisma/adapter-pg");
 const { PrismaClient } = require("@prisma/client");
 
-const OUTPUT_DIR = path.join(__dirname, "photos-out");
-const SOURCES_FILE = path.join(__dirname, "photos-in", "_nguon.json");
-const LOG_FILE = path.join(OUTPUT_DIR, "_da-upload.json");
+const OUTPUT_DIR = customDir ?? path.join(__dirname, "photos-out");
+const SOURCES_FILE = customDir ? null : path.join(__dirname, "photos-in", "_nguon.json");
+// Log luôn nằm trong photos-out/ (không ghi vào thư mục nguồn của --dir).
+const LOG_FILE = path.join(__dirname, "photos-out", "_da-upload.json");
 const CONCURRENCY = 3;
 const MIME = { ".webp": "image/webp", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png" };
 
@@ -57,7 +62,7 @@ function readJson(file, fallback) {
 async function main() {
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
   const dbHost = new URL(process.env.DATABASE_URL).hostname.split(".")[0];
-  const sources = readJson(SOURCES_FILE, null);
+  const sources = SOURCES_FILE ? readJson(SOURCES_FILE, null) : null;
   const log = readJson(LOG_FILE, {});
   const logKey = (file) => `${dbHost}:${file}`;
 

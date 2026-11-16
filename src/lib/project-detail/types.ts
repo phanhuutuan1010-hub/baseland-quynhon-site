@@ -254,12 +254,27 @@ export type ProjectAmenityChapter = {
   items: Localized<string>[];
   direction: "row" | "row-reverse";
   image?: { src: string; alt: Localized<string> };
+  /** Amenity floor plan (text-bearing → shown uncropped, opens zoomable).
+   * Used as the card image when there is no `image` photo. */
+  planImage?: { src: string; alt: Localized<string> };
+};
+
+/** Captioned photo row (Carousel) — e.g. "Bên trong căn hộ mẫu". */
+export type ProjectPhotoStrip = {
+  title: Localized<string>;
+  /** Small print under the row (e.g. "Hình ảnh minh họa"). */
+  note: Localized<string>;
+  photos: { src: string; alt: Localized<string>; caption: Localized<string> }[];
 };
 
 export type ProjectAmenities = ProjectSectionAction & {
   eyebrow: Localized<string>;
   headline: Localized<string>;
   chapters: ProjectAmenityChapter[];
+  /** Label of the per-card "view plan" button (cards with `planImage`). */
+  planButtonLabel?: Localized<string>;
+  /** Optional photo row under the cards. Empty = hidden. */
+  gallery?: ProjectPhotoStrip;
   /** ProjectNav label override — falls back to `eyebrow`. */
   navLabel?: Localized<string>;
 };
@@ -284,6 +299,19 @@ export type ProjectResidenceUnit = {
   area?: string;
   /** Share of the unit mix (e.g. "~67% quỹ căn", "142 căn"). */
   share?: Localized<string>;
+  /** Identity colour of the type (hex, e.g. "#4caf50") — a dot on its tab. */
+  color?: string;
+  /** Several layouts of one type (e.g. A.02 / A.06): sub-tabs whose
+   * areas and plan replace the unit's own. Empty = no sub-tabs. */
+  variants?: ProjectResidenceVariant[];
+};
+
+export type ProjectResidenceVariant = {
+  key: string;
+  name: Localized<string>;
+  nfa: string;
+  nsa: string;
+  floorPlanImage?: { src: string; alt: Localized<string> };
 };
 
 /** "Mặt bằng tầng điển hình" summary under the residence table. */
@@ -315,6 +343,8 @@ export type ProjectResidences = {
   typicalFloor?: ProjectTypicalFloor;
   /** ProjectNav label override — falls back to `eyebrow`. */
   navLabel?: Localized<string>;
+  /** "Bên trong căn hộ mẫu" photo row under the selector. Empty = hidden. */
+  showFlat?: ProjectPhotoStrip;
 };
 
 export type ProjectFloorPlanGroupKey = string;
@@ -371,6 +401,15 @@ export type ProjectInvestment = {
   paymentPlans?: ProjectPaymentPlan[];
   /** Small print under the payment plans (e.g. "dự kiến, theo từng đợt"). */
   paymentNote?: Localized<string>;
+  /** Countdown target date "YYYY-MM-DD" (Vietnam time, start of day).
+   * Empty or past = no countdown. */
+  countdownTo?: string;
+  countdownLabel?: Localized<string>;
+  /** Expected timeline (e.g. "22/11/2026 · Khai trương nhà mẫu"). */
+  milestones?: { date: string; title: Localized<string> }[];
+  /** Price button text while the project has no price figures (e.g. "Nhận
+   * bảng giá khi mở bán"); empty = "Nhận bảng giá mới nhất". */
+  noPriceCtaLabel?: Localized<string>;
   /** ProjectNav label override — falls back to `eyebrow`. */
   navLabel?: Localized<string>;
 };
@@ -574,16 +613,43 @@ export type ProjectSalesPhases = {
   adNoticeCtaLabel?: Localized<string>;
 };
 
-/** "Tham quan ảo 360°" — an external 360° tour (developer-hosted). The
- * page only ever shows the poster until the visitor clicks play: the
- * iframe is never loaded up front (it is heavy WebGL content). Desktop +
- * `allowEmbed` → iframe in place with a fullscreen button; mobile or
- * `allowEmbed: false` → opens `tourUrl` in a new tab. */
+/** A hotspot inside a 360° scene that moves the visitor to another scene. */
+export type ProjectTourHotspot = {
+  /** `id` of the destination scene. */
+  target: string;
+  yaw: number;
+  pitch: number;
+  /** Tooltip on the hotspot; empty = the destination scene's name. */
+  label: Localized<string>;
+};
+
+/** One equirectangular 360° photo (2:1, ~6000×3000) of a self-hosted tour. */
+export type ProjectTourScene = {
+  id: string;
+  name: Localized<string>;
+  /** Media Library URL of the 360° image (uploaded via "Ảnh 360°"). */
+  src: string;
+  /** Initial view: horizontal angle, vertical angle, field of view (degrees). */
+  yaw: number;
+  pitch: number;
+  hfov: number;
+  hotspots: ProjectTourHotspot[];
+};
+
+/** "Tham quan ảo 360°" — either an external tour (`tourUrl`, developer-
+ * hosted) or a self-hosted multi-scene tour (`scenes`, Pannellum). The
+ * page only ever shows the poster until the visitor clicks play: neither
+ * the iframe nor the 360° viewer/images load up front. External tour:
+ * desktop + `allowEmbed` → iframe in place; mobile → full-screen viewer;
+ * `allowEmbed: false` → new tab. `tourUrl` wins when both are filled. */
 export type ProjectVirtualTour = {
   eyebrow: Localized<string>;
   headline: Localized<string>;
   body: Localized<string>;
   tourUrl: string;
+  /** Self-hosted scenes; used when `tourUrl` is empty. No scene with an
+   * image = the section hides itself. */
+  scenes?: ProjectTourScene[];
   /** Set false if the tour host starts refusing to be framed. */
   allowEmbed: boolean;
   /** Empty src → falls back to the hero image. */
@@ -741,6 +807,17 @@ export function isSectionVisible(project: ProjectDetailData, key: ProjectSection
   return project[key] != null;
 }
 
+/** Scenes of a self-hosted tour that actually have an image. */
+export function tourScenes(tour?: ProjectVirtualTour): ProjectTourScene[] {
+  return (tour?.scenes ?? []).filter((s) => !!s?.src?.trim());
+}
+
+/** The 360° section shows only with an external link or at least one scene. */
+export function hasVirtualTour(project: ProjectDetailData): boolean {
+  const tour = project.virtualTour;
+  return isSectionVisible(project, "virtualTour") && !!tour && (!!tour.tourUrl?.trim() || tourScenes(tour).length > 0);
+}
+
 export type ProjectNavItem = { href: string; label: Localized<string> };
 
 /**
@@ -779,7 +856,7 @@ export function getProjectNavItems(project: ProjectDetailData): ProjectNavItem[]
   if (isSectionVisible(project, "floorPlans") && project.floorPlans) {
     items.push({ href: "#floorplans", label: project.floorPlans.navLabel ?? project.floorPlans.eyebrow });
   }
-  if (isSectionVisible(project, "virtualTour") && project.virtualTour?.tourUrl) {
+  if (hasVirtualTour(project) && project.virtualTour) {
     items.push({ href: "#virtual-tour", label: project.virtualTour.navLabel ?? project.virtualTour.eyebrow });
   }
   if (isSectionVisible(project, "education") && project.education) {

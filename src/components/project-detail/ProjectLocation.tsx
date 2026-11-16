@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
@@ -11,6 +11,7 @@ import { CompactHeading } from "./shared";
 import { Carousel } from "./Carousel";
 import { focalPosition, frameRatio } from "./imageFrame";
 import { SectionAction } from "./ProjectContact";
+import { ZoomBadge, ZoomLightbox } from "./ZoomLightbox";
 
 export function ProjectLocation({
   id,
@@ -155,6 +156,8 @@ export function ProjectLocation({
 
 function CompactLocation({ id, data, destinations }: { id: string; data: ProjectLocationData; destinations?: ProjectGallery }) {
   const { pick } = useLang();
+  const [mapZoom, setMapZoom] = useState(false);
+  const mapMeta = (data.mapImage ?? {}) as { width?: number; height?: number };
   return (
     <section id={id} className="bg-[var(--project-dark-alt)] px-5 py-14 sm:px-8 sm:py-16 md:px-12 md:py-20">
       <Reveal className="mx-auto max-w-[1440px]">
@@ -211,12 +214,23 @@ function CompactLocation({ id, data, destinations }: { id: string; data: Project
             <SectionAction data={data} variant="light" show="md-up" className="mt-8" />
           </div>
           {data.mapImage?.src && (
-            <div
-              className="overflow-hidden border border-[rgba(250,245,238,0.16)] bg-[var(--color-sand)]"
+            <button
+              type="button"
+              onClick={() => setMapZoom(true)}
+              aria-label={`${pick(data.mapImage.alt)} — ${pick({ vi: "phóng to", en: "zoom" })}`}
+              className="relative block w-full cursor-zoom-in overflow-hidden border border-[rgba(250,245,238,0.16)] bg-[var(--color-sand)] p-0"
               style={{ aspectRatio: frameRatio(data.mapImage, "4 / 3") }}
             >
-              <Image src={data.mapImage.src} alt={pick(data.mapImage.alt)} width={800} height={600} className="h-full w-full object-contain" />
-            </div>
+              <Image
+                src={data.mapImage.src}
+                alt={pick(data.mapImage.alt)}
+                width={1200}
+                height={900}
+                sizes="(min-width: 768px) 55vw, 100vw"
+                className="h-full w-full object-contain"
+              />
+              <ZoomBadge label={pick({ vi: "Phóng to", en: "Zoom" })} />
+            </button>
           )}
         </div>
 
@@ -244,6 +258,16 @@ function CompactLocation({ id, data, destinations }: { id: string; data: Project
         )}
         <SectionAction data={data} variant="light" show="md-down" className="mt-8 w-full" />
       </Reveal>
+      {mapZoom && data.mapImage?.src && (
+        <ZoomLightbox
+          src={data.mapImage.src}
+          alt={pick(data.mapImage.alt)}
+          caption={pick(data.mapImage.alt)}
+          width={Number(mapMeta.width) || undefined}
+          height={Number(mapMeta.height) || undefined}
+          onClose={() => setMapZoom(false)}
+        />
+      )}
     </section>
   );
 }

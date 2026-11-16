@@ -48,7 +48,7 @@ export function VerifyTrustSection({
               <ul className="m-0 grid list-none grid-cols-2 gap-x-6 gap-y-4 p-0">
                 {legal.points.map((p, i) => (
                   <li key={i} className="border-l border-[rgba(var(--project-accent-rgb),0.5)] pl-3.5">
-                    <div className="font-ui text-xs leading-[1.5] font-bold tracking-[0.08em] text-[var(--color-deep-earth)] uppercase">{pick(p.label)}</div>
+                    <div className="font-ui text-xs leading-[1.5] font-bold tracking-[0.08em] text-[var(--color-deep-earth)] uppercase [text-wrap:balance]">{pick(p.label)}</div>
                   </li>
                 ))}
               </ul>

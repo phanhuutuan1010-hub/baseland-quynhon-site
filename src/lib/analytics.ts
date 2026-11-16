@@ -22,7 +22,8 @@ export function trackTourLinkClick(href: string, tourUrl: string | undefined, pr
 export function trackEvent(name: string, payload: Record<string, string | number | boolean> = {}) {
   if (typeof window === "undefined") return;
   // Every way of opening a project's 360° tour funnels through here.
-  if (name === "project_360_open") pixelTrackCustom("View360", { project: String(payload.project ?? ""), source: String(payload.source ?? ""), ...pixelUtmParams() });
+  // (project_360_open = external tour, tour_open = self-hosted scenes)
+  if (name === "project_360_open" || name === "tour_open") pixelTrackCustom("View360", { project: String(payload.project ?? ""), source: String(payload.source ?? ""), ...pixelUtmParams() });
   const w = window as unknown as { dataLayer?: Record<string, unknown>[] };
   w.dataLayer = w.dataLayer || [];
   w.dataLayer.push({ event: name, ...payload });

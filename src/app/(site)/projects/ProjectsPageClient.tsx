@@ -281,7 +281,10 @@ export function ProjectsPageClient({
           </h2>
 
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 sm:gap-x-8 lg:grid-cols-3">
+            // 4 cards → one row of 4, never 3 + a lone card.
+            <div
+              className={`grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 sm:gap-x-8 ${filtered.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}
+            >
               {filtered.map((p) => {
                 return (
                   <Link key={p.key} href={`/projects/${p.slug}`} className="group flex flex-col no-underline">

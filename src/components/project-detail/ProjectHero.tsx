@@ -92,7 +92,7 @@ export function ProjectHero({
             <span style={cssLine(650, 48)} className="block h-0.5 rounded-sm bg-[var(--project-accent-light)]" />
             <span
               style={cssStep(700, 500)}
-              className="font-ui text-sm font-semibold tracking-[0.16em] text-[var(--color-warm-white)] uppercase"
+              className="font-ui text-sm font-semibold tracking-[0.16em] text-[var(--color-warm-white)] uppercase [text-wrap:balance]"
             >
               {pick(data.addressLine)}
             </span>
@@ -122,7 +122,7 @@ export function ProjectHero({
         {(pick(data.ctaExploreLabel) || pick(data.ctaConsultLabel) || (tourCta && pick(tourCta.label))) && (
           <div
             style={cssScaleStep(1100)}
-            className={compact ? "grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:gap-4 [&>a]:justify-center [&>a]:gap-1.5 [&>a]:px-2 [&>a]:text-xs [&>a]:tracking-[0.04em] [&>a]:whitespace-nowrap sm:[&>a]:px-8 sm:[&>a]:text-[13px] sm:[&>a]:tracking-[0.08em]" : "flex flex-wrap gap-4"}
+            className={compact ? "grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:gap-4 [&>a]:justify-center [&>a]:gap-1.5 [&>a]:px-2 [&>a]:text-xs [&>a]:tracking-[0.04em] [&>a]:text-center [&>a]:leading-[1.35] sm:[&>a]:px-8 sm:[&>a]:text-[13px] sm:[&>a]:tracking-[0.08em]" : "flex flex-wrap gap-4"}
           >
             {showExplore && (
               <Link
