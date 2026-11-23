@@ -19,7 +19,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/privacy`, changeFrequency: "yearly", priority: 0.2 },
   ];
 
-  const projectRoutes: MetadataRoute.Sitemap = projectSlugs.map((slug) => ({
+  // Moved to qterra.apartqn.com / cyraestero.apartqn.com (301, next.config.ts).
+  const MOVED = new Set(["qterra", "cyra-estero"]);
+  const projectRoutes: MetadataRoute.Sitemap = projectSlugs.filter((slug) => !MOVED.has(slug)).map((slug) => ({
     url: `${SITE_URL}/projects/${slug}`,
     changeFrequency: "weekly",
     priority: 0.9,
